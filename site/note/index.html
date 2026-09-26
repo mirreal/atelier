@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>轻笔记 · flomo 式卡片笔记</title>
+<style>
+  :root {
+    --green: #2f9e6e;
+    --green-light: #e8f5ee;
+    --green-hover: #27885f;
+    --bg: #f7f8f7;
+    --card: #ffffff;
+    --text: #2c2e2c;
+    --text-2: #6b6f6b;
+    --text-3: #9ca09c;
+    --border: #ececec;
+    --tag-1: #2f9e6e; --tag-2: #d4a13a; --tag-3: #5b8def;
+    --tag-4: #d4699c; --tag-5: #8a6fdf; --tag-6: #cc7a4a;
+    --heat-0: #ebedf0; --heat-1: #c6e9d5; --heat-2: #8fd6b1;
+    --heat-3: #57bd8c; --heat-4: #2f9e6e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    display: flex;
+  }
+
+  /* ============ 侧边栏 ============ */
+  .sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--green);
+    padding: 2px 10px 18px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo svg { flex-shrink: 0; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-2);
+    font-size: 14px;
+    margin-bottom: 2px;
+    user-select: none;
+    transition: background .15s, color .15s;
+  }
+  .nav-item:hover { background: #f2f4f2; color: var(--text); }
+  .nav-item.active { background: var(--green-light); color: var(--green); font-weight: 600; }
+  .nav-item .label { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+  .nav-item .label span.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-item .count { font-size: 12px; color: var(--text-3); flex-shrink: 0; }
+  .nav-item.active .count { color: var(--green); }
+  .nav-icon { width: 16px; text-align: center; flex-shrink: 0; font-size: 13px; }
+  .side-section {
+    font-size: 12px;
+    color: var(--text-3);
+    padding: 18px 10px 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .tag-children { margin-left: 18px; }
+  .side-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.9;
+    padding-left: 10px;
+  }
+  .side-footer b { color: var(--text-2); font-weight: 600; }
+  .data-ops { display: flex; gap: 8px; margin-top: 10px; }
+  .data-btn {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    border: 1px solid var(--border);
+    background: #fafbfa;
+    border-radius: 8px;
+    padding: 7px 4px;
+    font-size: 12px;
+    color: var(--text-2);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+  .data-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .data-btn svg { flex-shrink: 0; }
+
+  /* ============ 主区域 ============ */
+  .main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px 60px;
+  }
+  .content-wrap { width: 100%; max-width: 620px; }
+
+  /* 顶栏 */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 2px 14px;
+  }
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .search-box:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(47,158,110,.12); }
+  .search-box svg { flex-shrink: 0; opacity: .45; }
+  .search-box input {
+    border: none; outline: none; flex: 1;
+    font-size: 14px; background: transparent; color: var(--text);
+  }
+  .search-box input::placeholder { color: var(--text-3); }
+  .btn-review {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-size: 14px;
+    color: var(--text-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .btn-review:hover { border-color: var(--green); color: var(--green); }
+
+  /* 输入卡片 */
+  .composer {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px 18px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    border: 1px solid var(--border);
+    transition: box-shadow .2s;
+  }
+  .composer:focus-within { box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+  .composer textarea {
+    width: 100%;
+    min-height: 96px;
+    border: none; outline: none; resize: vertical;
+    font-size: 15px;
+    line-height: .7;
+    font-family: inherit;
+    color: var(--text);
+    background: transparent;
+    line-height: 1.7;
+  }
+  .composer textarea::placeholder { color: var(--text-3); }
+  .composer-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    min-height: 0; margin: 4px 0 6px;
+  }
+  .composer-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f3f4f3;
+    padding-top: 10px;
+  }
+  .hint { font-size: 12px; color: var(--text-3); }
+  .hint kbd {
+    background: #f2f4f2; border-radius: 4px; padding: 1px 5px;
+    font-size: 11px; font-family: inherit; border: 1px solid var(--border);
+  }
+  .char-count { font-size: 12px; color: var(--text-3); margin-right: 12px; }
+  .btn-save {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-save:hover { background: var(--green-hover); }
+  .btn-save:active { transform: scale(.97); }
+  .editing-badge {
+    display: none;
+    font-size: 12px; color: #b8860b; background: #fdf6e3;
+    padding: 2px 10px; border-radius: 20px; margin-bottom: 8px;
+    align-items: center; gap: 6px;
+  }
+  .editing-badge.show { display: inline-flex; }
+  .editing-cancel { cursor: pointer; color: var(--text-3); text-decoration: underline; }
+
+  /* 笔记列表 */
+  .list-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 22px 2px 10px;
+  }
+  .list-title { font-size: 14px; font-weight: 600; color: var(--text-2); }
+  .list-sub { font-size: 12px; color: var(--text-3); }
+
+  .note {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px 12px;
+    margin-bottom: 12px;
+    animation: fadein .25s ease;
+    transition: box-shadow .15s;
+  }
+  .note:hover { box-shadow: 0 3px 12px rgba(0,0,0,.06); }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .note-content {
+    font-size: 15px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .note-content .tag-chip {
+    color: var(--green);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .note-content .tag-chip:hover { text-decoration: underline; }
+  .note-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #f5f6f5;
+  }
+  .note-time { font-size: 12px; color: var(--text-3); }
+  .note-ops { display: flex; gap: 4px; opacity: 0; transition: opacity .15s; }
+  .note:hover .note-ops { opacity: 1; }
+  .note-op {
+    border: none; background: transparent; cursor: pointer;
+    font-size: 12px; color: var(--text-3);
+    padding: 4px 8px; border-radius: 6px;
+    display: flex; align-items: center; gap: 4px;
+    font-family: inherit;
+  }
+  .note-op:hover { background: #f2f4f2; color: var(--text-2); }
+  .note-op.danger:hover { background: #fdeeee; color: #cc4b4b; }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-3);
+    font-size: 14px;
+  }
+  .empty .big { font-size: 40px; margin-bottom: 12px; }
+
+  /* ============ 热力图 ============ */
+  .heatmap-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 26px;
+  }
+  .heatmap-title {
+    font-size: 13px; font-weight: 600; color: var(--text-2);
+    margin-bottom: 12px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .heatmap-title .sub { font-weight: 400; font-size: 12px; color: var(--text-3); }
+  .heat-scroll { overflow-x: auto; padding-bottom: 4px; }
+  .heat-grid { display: flex; gap: 3px; }
+  .heat-col { display: flex; flex-direction: column; gap: 3px; }
+  .heat-cell {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    background: var(--heat-0);
+    position: relative;
+    cursor: default;
+  }
+  .heat-cell.l1 { background: var(--heat-1); }
+  .heat-cell.l2 { background: var(--heat-2); }
+  .heat-cell.l3 { background: var(--heat-3); }
+  .heat-cell.l4 { background: var(--heat-4); }
+  .heat-cell:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .heat-legend {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--text-3); margin-top: 10px; justify-content: flex-end;
+  }
+
+  /* ============ 随机回顾弹层 ============ */
+  .review-mask {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .review-mask.show { display: flex; }
+  .review-card {
+    background: var(--card);
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 28px;
+    position: relative;
+    animation: pop .25s ease;
+  }
+  @keyframes pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+  .review-label {
+    font-size: 12px; color: var(--green);
+    background: var(--green-light);
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .review-time { font-size: 12px; color: var(--text-3); margin-top: 16px; }
+  .review-close {
+    position: sticky; top: 0;
+    float: right;
+    border: none; background: #f2f4f2;
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; color: var(--text-2); font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .review-close:hover { background: #e6e9e6; }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #333; color: #fff;
+    padding: 10px 22px;
+    border-radius: 24px;
+    font-size: 13px;
+    z-index: 200;
+    transition: transform .3s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* 响应式 */
+  @media (max-width: 640px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; order: 2; border-right: none; border-top: 1px solid var(--border); }
+    .side-footer { display: none; }
+    .main { padding: 0 12px 30px; order: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======== 侧边栏 ======== -->
+<aside class="sidebar">
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/>
+      <path d="M7 9.5h6M7 13h10M7 16.5h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    轻笔记
+  </div>
+
+  <div class="nav-item active" data-filter="all" id="nav-all">
+    <div class="label"><span class="nav-icon">🗒</span><span class="name">全部笔记</span></div>
+    <span class="count">0</span>
+  </div>
+  <div class="nav-item" data-filter="none" id="nav-none">
+    <div class="label"><span class="nav-icon">📄</span><span class="name">未分类</span></div>
+    <span class="count">0</span>
+  </div>
+
+  <div class="side-section">标签</div>
+  <div id="tag-nav"></div>
+
+  <div class="side-footer">
+    <div>共 <b id="stat-total">0</b> 条笔记</div>
+    <div>连续记录 <b id="stat-streak">0</b> 天</div>
+    <div class="data-ops">
+      <button class="data-btn" id="btn-export" title="导出全部数据：JSON 备份 + Markdown">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        导出
+      </button>
+      <button class="data-btn" id="btn-import" title="导入 JSON 备份文件（与现有笔记合并）">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L8 8m4-4l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        导入
+      </button>
+    </div>
+  </div>
+  <input type="file" id="file-import" accept=".json,application/json" style="display:none">
+</aside>
+
+<!-- ======== 主区域 ======== -->
+<main class="main">
+  <div class="content-wrap">
+
+    <div class="topbar">
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#333" stroke-width="2"/><path d="M20 20l-4-4" stroke="#333" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search" type="text" placeholder="搜索笔记内容或 #标签…">
+      </div>
+      <button class="btn-review" id="btn-review" title="随机回顾一条旧笔记">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.3 5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 20v-5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        随机回顾
+      </button>
+    </div>
+
+    <!-- 输入卡片 -->
+    <div class="composer">
+      <div class="editing-badge" id="editing-badge">
+        ✎ 正在编辑
+        <span class="editing-cancel" id="editing-cancel">取消</span>
+      </div>
+      <textarea id="input" placeholder="now，记录一件小事…&#10;用 #标签 或 #标签/子标签# 来整理（标签后记得加空格）"></textarea>
+      <div class="composer-tags" id="composer-tags"></div>
+      <div class="composer-foot">
+        <div class="hint">⌘/Ctrl + Enter 保存 · <kbd>#</kbd> 打标签</div>
+        <div style="display:flex;align-items:center;">
+          <span class="char-count" id="char-count">0 字</span>
+          <button class="btn-save" id="btn-save">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 列表 -->
+    <div class="list-head">
+      <div class="list-title" id="list-title">全部笔记</div>
+      <div class="list-sub" id="list-sub"></div>
+    </div>
+    <div id="notes"></div>
+
+    <!-- 热力图 -->
+    <div class="heatmap-card" id="heatmap-card">
+      <div class="heatmap-title">
+        记录热力图
+        <span class="sub" id="heatmap-sub"></span>
+      </div>
+      <div class="heat-scroll"><div class="heat-grid" id="heatmap"></div></div>
+      <div class="heat-legend">
+        少 <div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div> 多
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- 随机回顾 -->
+<div class="review-mask" id="review-mask">
+  <div class="review-card">
+    <button class="review-close" id="review-close">✕</button>
+    <div class="review-label">🎲 随机回顾</div>
+    <div class="note-content" id="review-content"></div>
+    <div class="review-time" id="review-time"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= 数据层 ================= */
+  var STORE_KEY = 'qingbiji.notes.v1';
+  var notes = [];
+  var currentFilter = 'all';   // 'all' | 'none' | 标签字符串（含斜杠的完整路径）
+  var currentSearch = '';
+  var editingId = null;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr)) notes = arr;
+      }
+    } catch (e) { /* 数据损坏时从零开始 */ }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(notes)); }
+    catch (e) { toast('保存失败：本地存储空间不足'); }
+  }
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  /* ================= 标签解析 ================= */
+  // flomo 风格：#标签 或 #父/子#，# 前必须是行首或空白，以空格/行尾/闭合#结束
+  var TAG_RE = /(^|\s)#([^#\s][^#\n]*?)(#|(?=\s|$))/g;
+  function parseTags(text) {
+    var tags = [];
+    var m;
+    TAG_RE.lastIndex = 0;
+    while ((m = TAG_RE.exec(text)) !== null) {
+      var t = m[2].trim().replace(/\/+$/, '');
+      if (t && tags.indexOf(t) === -1) tags.push(t);
+    }
+    return tags;
+  }
+
+  /* 标签树：把 "读书/小说" 展开成树形结构 */
+  function buildTagTree() {
+    var root = { children: {}, count: 0 };
+    notes.forEach(function (n) {
+      n.tags.forEach(function (tag) {
+        var parts = tag.split('/');
+        var node = root;
+        node.count++;
+        parts.forEach(function (p) {
+          if (!node.children[p]) node.children[p] = { name: p, fullPath: (node === root ? p : node.fullPath + '/' + p), children: {}, count: 0 };
+          node = node.children[p];
+          node.count++;
+        });
+      });
+    });
+    return root;
+  }
+
+  function tagColor(tag) {
+    var palette = ['var(--tag-1)', 'var(--tag-2)', 'var(--tag-3)', 'var(--tag-4)', 'var(--tag-5)', 'var(--tag-6)'];
+    var h = 0;
+    for (var i = 0; i < tag.length; i++) h = (h * 31 + tag.charCodeAt(i)) % 997;
+    return palette[h % palette.length];
+  }
+
+  /* ================= 时间格式化 ================= */
+  function fmtDate(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function fmtRelative(ts) {
+    var diff = Date.now() - ts;
+    var min = Math.floor(diff / 60000);
+    if (min < 1) return '刚刚';
+    if (min < 60) return min + ' 分钟前';
+    var h = Math.floor(min / 60);
+    if (h < 24) return h + ' 小时前';
+    var d = Math.floor(h / 24);
+    if (d === 1) return '昨天';
+    if (d < 7) return d + ' 天前';
+    var dt = new Date(ts);
+    var y = dt.getFullYear() === new Date().getFullYear() ? '' : dt.getFullYear() + '-';
+    return y + (dt.getMonth() + 1) + '月' + dt.getDate() + '日';
+  }
+
+  /* ================= 渲染 ================= */
+  var $ = function (id) { return document.getElementById(id); };
+
+  function renderSidebar() {
+    var counts = { all: notes.length, none: 0 };
+    notes.forEach(function (n) { if (!n.tags.length) counts.none++; });
+
+    $('nav-all').querySelector('.count').textContent = counts.all;
+    $('nav-none').querySelector('.count').textContent = counts.none;
+    $('stat-total').textContent = notes.length;
+    $('stat-streak').textContent = calcStreak();
+
+    var tree = buildTagTree();
+    var html = '';
+    function renderNode(node, depth) {
+      var names = Object.keys(node.children).sort(function (a, b) {
+        return node.children[b].count - node.children[a].count;
+      });
+      names.forEach(function (name) {
+        var c = node.children[name];
+        var isActive = currentFilter === c.fullPath;
+        html += '<div class="nav-item' + (isActive ? ' active' : '') + '" data-filter="' + esc(c.fullPath) + '">' +
+          '<div class="label"><span class="nav-icon"><span style="color:' + tagColor(c.fullPath) + '">●</span></span>' +
+          '<span class="name">' + esc(c.name) + '</span></div>' +
+          '<span class="count">' + c.count + '</span></div>';
+        if (Object.keys(c.children).length) renderNode(c, depth + 1);
+      });
+    }
+    renderNode(tree, 0);
+    $('tag-nav').innerHTML = html || '<div style="font-size:12px;color:var(--text-3);padding:4px 10px;">还没有标签，在笔记里写 #标签 试试</div>';
+
+    // 高亮 全部/未分类
+    $('nav-all').classList.toggle('active', currentFilter === 'all');
+    $('nav-none').classList.toggle('active', currentFilter === 'none');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // 内容渲染：标签部分变成可点击的绿色
+  function renderContent(text) {
+    var html = '';
+    var last = 0;
+    var m;
+    TAG_RE.lastIndex = 0;
+    while ((m = TAG_RE.exec(text)) !== null) {
+      html += esc(text.slice(last, m.index + m[1].length));
+      html += '<span class="tag-chip" data-tag="' + esc(m[2]) + '">#' + esc(m[2]) + '</span>';
+      last = m.index + m[0].length;
+    }
+    html += esc(text.slice(last));
+    return html;
+  }
+
+  function getFiltered() {
+    var kw = currentSearch.trim().toLowerCase();
+    var list = notes.filter(function (n) {
+      if (currentFilter === 'none' && n.tags.length) return false;
+      if (currentFilter !== 'all' && currentFilter !== 'none') {
+        var hit = n.tags.some(function (t) { return t === currentFilter || t.indexOf(currentFilter + '/') === 0; });
+        if (!hit) return false;
+      }
+      if (kw) {
+        if (kw[0] === '#') {
+          var tagKw = kw.slice(1).toLowerCase();
+          return n.tags.some(function (t) { return t.toLowerCase().indexOf(tagKw) !== -1; });
+        }
+        return n.content.toLowerCase().indexOf(kw) !== -1 ||
+               n.tags.some(function (t) { return t.toLowerCase().indexOf(kw) !== -1; });
+      }
+      return true;
+    });
+    list.sort(function (a, b) { return b.createdAt - a.createdAt; });
+    return list;
+  }
+
+  function renderNotes() {
+    var list = getFiltered();
+    var box = $('notes');
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><div class="big">🍃</div>' +
+        (notes.length ? '这里没有匹配的笔记' : '写下第一条笔记吧，比如：<br><br>「今天尝试了新咖啡馆 ☕ #生活/美食」') +
+        '</div>';
+    } else {
+      var html = '';
+      list.forEach(function (n) {
+        html += '<div class="note" data-id="' + n.id + '">' +
+          '<div class="note-content">' + renderContent(n.content) + '</div>' +
+          '<div class="note-foot">' +
+          '<span class="note-time" title="' + fmtDate(n.createdAt) + '">' + fmtRelative(n.createdAt) + '</span>' +
+          '<div class="note-ops">' +
+          '<button class="note-op" data-op="edit">✎ 编辑</button>' +
+          '<button class="note-op danger" data-op="del">🗑 删除</button>' +
+          '</div></div></div>';
+      });
+      box.innerHTML = html;
+    }
+
+    var title = '全部笔记';
+    if (currentFilter === 'none') title = '未分类';
+    else if (currentFilter !== 'all') title = '#' + currentFilter;
+    if (currentSearch) title = '搜索：' + currentSearch;
+    $('list-title').textContent = title;
+    $('list-sub').textContent = list.length ? list.length + ' 条' : '';
+  }
+
+  /* ================= 热力图 ================= */
+  function calcStreak() {
+    var days = {};
+    notes.forEach(function (n) {
+      var d = new Date(n.createdAt);
+      var key = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      days[key] = (days[key] || 0) + 1;
+    });
+    var streak = 0;
+    var cur = new Date();
+    // 如果今天没记，从昨天开始算连续
+    var key = cur.getFullYear() + '-' + pad(cur.getMonth() + 1) + '-' + pad(cur.getDate());
+    if (!days[key]) cur = new Date(cur.getTime() - 86400000);
+    while (true) {
+      var k = cur.getFullYear() + '-' + pad(cur.getMonth() + 1) + '-' + pad(cur.getDate());
+      if (days[k]) { streak++; cur = new Date(cur.getTime() - 86400000); }
+      else break;
+    }
+    return streak;
+  }
+
+  function renderHeatmap() {
+    var WEEKS = 26;
+    var dayCount = {};
+    notes.forEach(function (n) {
+      var d = new Date(n.createdAt);
+      var key = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      dayCount[key] = (dayCount[key] || 0) + 1;
+    });
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // 结束于本周六（最后一列对齐到当前周）
+    var end = today.getTime() + (6 - today.getDay()) * 86400000;
+    var start = end - (WEEKS * 7 - 1) * 86400000;
+
+    var html = '';
+    var totalIn = 0;
+    for (var w = 0; w < WEEKS; w++) {
+      html += '<div class="heat-col">';
+      for (var dow = 0; dow < 7; dow++) {
+        var t = start + (w * 7 + dow) * 86400000;
+        var d = new Date(t);
+        var key = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+        var c = dayCount[key] || 0;
+        var level = c === 0 ? '' : c === 1 ? 'l1' : c === 2 ? 'l2' : c <= 4 ? 'l3' : 'l4';
+        var cls = 'heat-cell' + (level ? ' ' + level : '');
+        if (t > today.getTime() + 86400000) cls += '" style="visibility:hidden'; // 未来日期隐藏
+        if (t <= today.getTime()) totalIn += c;
+        html += '<div class="' + cls + '" data-tip="' + (d.getMonth() + 1) + '月' + d.getDate() + '日 · ' + c + ' 条"></div>';
+      }
+      html += '</div>';
+    }
+    $('heatmap').innerHTML = html;
+    $('heatmap-sub').textContent = '近半年 ' + totalIn + ' 条';
+  }
+
+  /* ================= 交互 ================= */
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+
+  function renderComposerTags() {
+    var text = $('input').value;
+    var tags = parseTags(text);
+    $('composer-tags').innerHTML = tags.map(function (t) {
+      return '<span style="font-size:12px;padding:2px 10px;border-radius:12px;background:var(--green-light);color:var(--green)">' + esc(t) + '</span>';
+    }).join('');
+    $('char-count').textContent = text.length + ' 字';
+  }
+
+  function saveNote() {
+    var text = $('input').value.trim();
+    if (!text) { toast('写点什么再保存吧'); return; }
+
+    if (editingId) {
+      var n = null;
+      notes.forEach(function (x) { if (x.id === editingId) n = x; });
+      if (n) { n.content = text; n.tags = parseTags(text); n.updatedAt = Date.now(); }
+      toast('已更新');
+    } else {
+      notes.push({ id: uid(), content: text, tags: parseTags(text), createdAt: Date.now(), updatedAt: Date.now() });
+      toast('已记录 ✅');
+    }
+    save();
+    cancelEdit();
+    $('input').value = '';
+    renderComposerTags();
+    renderAll();
+  }
+
+  function startEdit(id) {
+    var n = null;
+    notes.forEach(function (x) { if (x.id === id) n = x; });
+    if (!n) return;
+    editingId = id;
+    $('input').value = n.content;
+    $('editing-badge').classList.add('show');
+    renderComposerTags();
+    $('input').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function cancelEdit() {
+    editingId = null;
+    $('editing-badge').classList.remove('show');
+  }
+
+  function deleteNote(id) {
+    var n = null;
+    notes.forEach(function (x) { if (x.id === id) n = x; });
+    if (!n) return;
+    if (!confirm('确定删除这条笔记吗？')) return;
+    notes = notes.filter(function (x) { return x.id !== id; });
+    save();
+    renderAll();
+    toast('已删除');
+  }
+
+  function randomReview() {
+    if (!notes.length) { toast('还没有笔记可以回顾'); return; }
+    var n = notes[Math.floor(Math.random() * notes.length)];
+    $('review-content').innerHTML = renderContent(n.content);
+    $('review-time').textContent = fmtDate(n.createdAt) + ' · ' + fmtRelative(n.createdAt);
+    $('review-mask').classList.add('show');
+  }
+
+  function renderAll() {
+    renderSidebar();
+    renderNotes();
+    renderHeatmap();
+  }
+
+  /* ================= 导入 / 导出 ================= */
+  function stamp() {
+    var d = new Date();
+    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '_' + pad(d.getHours()) + pad(d.getMinutes());
+  }
+
+  function download(filename, content, mime) {
+    var blob = new Blob([content], { type: mime + ';charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function exportJSON() {
+    if (!notes.length) { toast('还没有笔记可导出'); return; }
+    var data = { app: 'qingbiji', version: 1, exportedAt: new Date().toISOString(), count: notes.length, notes: notes };
+    download('轻笔记备份_' + stamp() + '.json', JSON.stringify(data, null, 2), 'application/json');
+    toast('已导出 JSON 备份（' + notes.length + ' 条）');
+  }
+
+  function exportMarkdown() {
+    if (!notes.length) { toast('还没有笔记可导出'); return; }
+    var sorted = notes.slice().sort(function (a, b) { return a.createdAt - b.createdAt; });
+    var lines = ['# 轻笔记导出', '', '> 共 ' + notes.length + ' 条 · ' + fmtDate(Date.now()), ''];
+    var byDay = {};
+    var dayOrder = [];
+    sorted.forEach(function (n) {
+      var d = new Date(n.createdAt);
+      var key = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      if (!byDay[key]) { byDay[key] = []; dayOrder.push(key); }
+      byDay[key].push(n);
+    });
+    dayOrder.forEach(function (day) {
+      lines.push('## ' + day, '');
+      byDay[day].forEach(function (n) {
+        var time = new Date(n.createdAt);
+        lines.push('**' + pad(time.getHours()) + ':' + pad(time.getMinutes()) + '**', '', n.content, '', '---', '');
+      });
+    });
+    download('轻笔记_' + stamp() + '.md', lines.join('\n'), 'text/markdown');
+    toast('已导出 Markdown');
+  }
+
+  // 校验一条导入的笔记，返回规范化对象或不合法返回 null
+  function normalizeNote(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    var content = typeof raw.content === 'string' ? raw.content.trim() : '';
+    if (!content) return null;
+    var createdAt = typeof raw.createdAt === 'number' && raw.createdAt > 0 ? raw.createdAt : Date.now();
+    var tags = Array.isArray(raw.tags)
+      ? raw.tags.filter(function (t) { return typeof t === 'string' && t.trim(); }).map(function (t) { return t.trim(); })
+      : parseTags(content);
+    return {
+      id: typeof raw.id === 'string' && raw.id ? raw.id : uid(),
+      content: content,
+      tags: tags,
+      createdAt: createdAt,
+      updatedAt: typeof raw.updatedAt === 'number' && raw.updatedAt > 0 ? raw.updatedAt : createdAt
+    };
+  }
+
+  function importJSON(text) {
+    var data;
+    try { data = JSON.parse(text); }
+    catch (e) { toast('导入失败：不是有效的 JSON 文件'); return; }
+
+    // 兼容两种格式：本应用的 {notes:[...]} 备份，或裸的笔记数组 [...]
+    var rawList = Array.isArray(data) ? data : (Array.isArray(data.notes) ? data.notes : null);
+    if (!rawList) { toast('导入失败：文件格式不认识'); return; }
+
+    var existing = {};
+    notes.forEach(function (n) { existing[n.id] = true; });
+    var added = 0, skipped = 0;
+    rawList.forEach(function (raw) {
+      var n = normalizeNote(raw);
+      if (!n) { skipped++; return; }
+      if (existing[n.id]) { skipped++; return; }
+      existing[n.id] = true;
+      notes.push(n);
+      added++;
+    });
+    save();
+    renderAll();
+    if (added) toast('导入成功：新增 ' + added + ' 条' + (skipped ? '，跳过 ' + skipped + ' 条（重复/无效）' : ''));
+    else toast('没有新笔记被导入（' + skipped + ' 条重复或无效）');
+  }
+
+  function triggerExport() {
+    if (!notes.length) { toast('还没有笔记可导出'); return; }
+    var mode = confirm(
+      '导出格式选择：\n\n' +
+      '【确定】JSON 备份 —— 完整数据，可用于导入恢复\n' +
+      '【取消】Markdown —— 人类可读，适合导入 Obsidian / Notion 等'
+    );
+    if (mode) exportJSON(); else exportMarkdown();
+  }
+
+  function handleImportFile(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () { importJSON(String(reader.result)); };
+    reader.onerror = function () { toast('读取文件失败'); };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  /* ================= 事件绑定 ================= */
+  $('btn-save').addEventListener('click', saveNote);
+  $('input').addEventListener('input', renderComposerTags);
+  $('input').addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); saveNote(); }
+  });
+  $('editing-cancel').addEventListener('click', function () {
+    cancelEdit();
+    $('input').value = '';
+    renderComposerTags();
+  });
+
+  $('search').addEventListener('input', function () {
+    currentSearch = this.value;
+    renderNotes();
+  });
+
+  // 侧边栏筛选（事件委托）
+  document.querySelector('.sidebar').addEventListener('click', function (e) {
+    var item = e.target.closest('.nav-item');
+    if (!item) return;
+    currentFilter = item.getAttribute('data-filter');
+    renderAll();
+  });
+
+  // 笔记操作（事件委托）
+  $('notes').addEventListener('click', function (e) {
+    var chip = e.target.closest('.tag-chip');
+    if (chip) {
+      currentFilter = chip.getAttribute('data-tag');
+      currentSearch = '';
+      $('search').value = '';
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    var op = e.target.closest('.note-op');
+    if (!op) return;
+    var id = op.closest('.note').getAttribute('data-id');
+    if (op.getAttribute('data-op') === 'edit') startEdit(id);
+    else deleteNote(id);
+  });
+
+  $('btn-review').addEventListener('click', randomReview);
+
+  $('btn-export').addEventListener('click', triggerExport);
+  $('btn-import').addEventListener('click', function () { $('file-import').value = ''; $('file-import').click(); });
+  $('file-import').addEventListener('change', function () {
+    handleImportFile(this.files && this.files[0]);
+  });
+
+  // 拖拽 JSON 文件到页面直接导入
+  document.addEventListener('dragover', function (e) { e.preventDefault(); });
+  document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f && /\.json$/i.test(f.name)) handleImportFile(f);
+  });
+  $('review-close').addEventListener('click', function () { $('review-mask').classList.remove('show'); });
+  $('review-mask').addEventListener('click', function (e) {
+    if (e.target === this) this.classList.remove('show');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') $('review-mask').classList.remove('show');
+  });
+
+  /* ================= 启动 ================= */
+  load();
+  renderAll();
+  renderComposerTags();
+
+  // 首次使用预置两条示例笔记
+  if (!notes.length && !localStorage.getItem('qingbiji.inited')) {
+    var now = Date.now();
+    notes = [
+      { id: uid(), content: '欢迎使用轻笔记 🎉\n像发微博一样随手记，用 #标签 整理，左侧可以按标签筛选。\n试试右上角的「随机回顾」！', tags: ['欢迎使用'], createdAt: now - 3600000, updatedAt: now - 3600000 },
+      { id: uid(), content: '支持多级标签，比如这样 #读书/小说# 或 #灵感/产品#\n标签会自动在左侧生成一棵树。', tags: ['读书/小说', '灵感/产品'], createdAt: now - 7200000, updatedAt: now - 7200000 }
+    ];
+    save();
+    localStorage.setItem('qingbiji.inited', '1');
+    renderAll();
+  }
+})();
+</script>
+</body>
+</html>
