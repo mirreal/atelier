@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROGUE — 复古终端地牢探险</title>
+<meta name="description" content="Web 版复古 UNIX 终端风格 Roguelike 地牢探险游戏：ASCII 地图、角色成长、装备物品、CRT 扫描线效果。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>@</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="crt">
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="flicker" aria-hidden="true"></div>
+
+  <!-- ============ 标题界面 ============ -->
+  <section id="title-screen" aria-label="标题界面">
+<pre class="ascii-art" aria-hidden="true">
+ ██████╗  ██████╗  ██████╗ ██╗   ██╗ ██████╗ ███████╗
+ ██╔══██╗██╔═══██╗██╔════╝ ██║   ██║██╔════╝ ██╔════╝
+ ██████╔╝██║   ██║██║  ███╗██║   ██║██║  ███╗█████╗
+ ██╔══██╗██║   ██║██║   ██║██║   ██║██║   ██║██╔══╝
+ ██║  ██║╚██████╔╝╚██████╔╝╚██████╔╝╚██████╔╝███████╗
+ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝
+</pre>
+<pre class="ascii-sub" aria-hidden="true">
+   ── 复古 UNIX 终端地牢探险 · EST. 1980 ──
+</pre>
+<div class="title-log">
+<pre>
+<span class="t-dim">ttyv0 — 80x24 — 琥珀色荧光终端已就绪</span>
+<span class="t-info">[boot] dungeon.sys v2.7.1 加载完成</span>
+<span class="t-info">[boot] 检测到低层地牢信号……Amulet of Yendor 深度未知</span>
+<span class="t-warn">[warn] 21 层以下生物敌意显著上升，冒险者自负其责</span>
+</pre>
+</div>
+<div class="title-keys">
+<pre>
+ 移动/攻击  <span class="t-bright">h j k l</span> · <span class="t-bright">方向键</span> · <span class="t-bright">WASD</span>    等待 <span class="t-bright">.</span>
+ 拾取 <span class="t-bright">g</span>   背包 <span class="t-bright">i</span>   装备 <span class="t-bright">e</span>   使用 <span class="t-bright">q</span>   丢弃 <span class="t-bright">D</span>   下楼 <span class="t-bright">&gt;</span>
+</pre>
+</div>
+<p class="blink-prompt">PRESS ANY KEY TO ENTER THE DUNGEON<span class="cursor">▊</span></p>
+  </section>
+
+  <!-- ============ 游戏主界面 ============ -->
+  <main id="game-screen" class="hidden" aria-label="游戏主界面">
+    <header id="topbar">
+      <span>ROGUE</span>
+      <span class="t-dim">ttyv0</span>
+      <span id="clock">--:--:--</span>
+    </header>
+
+    <div id="main-layout">
+      <div id="left-col">
+        <pre id="map" role="img" aria-label="地牢地图" tabindex="0"></pre>
+        <div id="touch-controls" aria-label="触控面板">
+          <div class="dpad">
+            <button data-dir="up" aria-label="上">▲</button>
+            <div class="dpad-mid">
+              <button data-dir="left" aria-label="左">◀</button>
+              <button data-dir="wait" aria-label="等待">·</button>
+              <button data-dir="right" aria-label="右">▶</button>
+            </div>
+            <button data-dir="down" aria-label="下">▼</button>
+          </div>
+          <div class="tkeys">
+            <button data-key="g">g 拾取</button>
+            <button data-key="i">i 背包</button>
+            <button data-key="q">q 使用</button>
+            <button data-key="e">e 装备</button>
+            <button data-key="D">D 丢弃</button>
+            <button data-key=">"> &gt; 下楼</button>
+          </div>
+        </div>
+      </div>
+
+      <aside id="side-col" aria-label="角色状态">
+        <section class="panel" id="char-panel">
+          <h2>── CHARACTER ──</h2>
+          <div id="char-lines"></div>
+        </section>
+        <section class="panel" id="equip-panel">
+          <h2>── EQUIPMENT ──</h2>
+          <div id="equip-lines"></div>
+        </section>
+        <section class="panel" id="inv-panel">
+          <h2>── INVENTORY ──</h2>
+          <div id="inv-lines"></div>
+        </section>
+      </aside>
+    </div>
+
+    <section id="log-panel" aria-label="系统日志" aria-live="polite">
+      <h2>── SYSTEM LOG ──</h2>
+      <pre id="log"></pre>
+    </section>
+
+    <!-- 背包/选择 模态 -->
+    <div id="modal" class="hidden" role="dialog" aria-modal="true" aria-label="选择">
+      <div id="modal-box">
+        <div id="modal-title"></div>
+        <div id="modal-body"></div>
+        <div id="modal-hint"></div>
+      </div>
+    </div>
+
+    <!-- 死亡界面 -->
+    <div id="death-screen" class="hidden" role="dialog" aria-modal="true" aria-label="游戏结束">
+<pre class="ascii-art death-art">
+   ________
+  /        \      R . I . P
+ /  REST    \
+|  IN PEACE  |    这里长眠着一位冒险者
+|            |
+|  ▓▓▓▓▓▓▓▓  |    死于地牢第 <span id="death-depth">1</span> 层
+|____________|
+ ~~~~~~~~~~~~~~~~~~
+</pre>
+      <div id="death-stats"></div>
+      <p class="blink-prompt">PRESS [R] TO REBOOT ADVENTURER<span class="cursor">▊</span></p>
+    </div>
+  </main>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
