@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>物品管家 · 记录物品位置</title>
+<style>
+:root{
+  --bg:#f4f6f7; --card:#ffffff; --text:#1b1f24; --muted:#68707b;
+  --line:#e3e7ea; --chip:#eef1f3;
+  --accent:#0f766e; --accent-soft:rgba(15,118,110,.10); --btn-text:#ffffff;
+  --danger:#c0392b; --danger-soft:rgba(192,57,43,.30);
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#131518; --card:#1c1f24; --text:#e9ecef; --muted:#98a1ac;
+    --line:#2a2f36; --chip:#242930;
+    --accent:#2fbfae; --accent-soft:rgba(47,191,174,.14); --btn-text:#06231f;
+    --danger:#f87171; --danger-soft:rgba(248,113,113,.35);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{-webkit-tap-highlight-color:transparent}
+.app{max-width:680px;margin:0 auto;padding:18px 14px calc(40px + env(safe-area-inset-bottom))}
+.app-header h1{font-size:22px;line-height:1.25;margin:0 0 4px;letter-spacing:.3px}
+.sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;min-height:26px}
+.chip{display:inline-flex;gap:4px;align-items:baseline;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.chip b{color:var(--text);font-weight:600;font-size:13px}
+
+.toolbar{position:sticky;top:0;z-index:20;background:var(--bg);margin:0 -14px;padding:8px 14px 10px}
+.toolbar-row{display:flex;gap:8px;align-items:center}
+.toolbar-row+.toolbar-row{margin-top:8px}
+.toolbar-row.wrap{flex-wrap:wrap}
+.search{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none}
+select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font-size:14px;font-family:inherit;max-width:48vw}
+input[type=text],input[type=number],textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font-size:16px;font-family:inherit}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+textarea{resize:vertical;min-height:70px}
+
+.btn{border:1px solid transparent;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1.2;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary{background:var(--accent);color:var(--btn-text);border-color:var(--accent)}
+.btn-secondary{background:var(--card);color:var(--text);border-color:var(--line)}
+.btn-ghost{background:transparent;color:var(--muted);border-color:transparent}
+.btn-danger{background:transparent;color:var(--danger);border-color:var(--danger-soft)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;color:var(--muted);font-size:14px;padding:8px 12px;font-family:inherit;cursor:pointer}
+.seg button.active{background:var(--accent);color:var(--btn-text);font-weight:600}
+
+#list{margin-top:6px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
+.item-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.item-name{font-size:15.5px;font-weight:600;word-break:break-word}
+.qty{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.meta{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.loc-pill{background:var(--accent-soft);color:var(--accent);font-weight:600;border-radius:999px;padding:2px 9px}
+.cat{border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.time{margin-left:auto;font-size:12px}
+.note{margin-top:7px;font-size:13px;color:var(--muted);white-space:pre-wrap;word-break:break-word}
+.item-actions{margin-top:10px;display:flex;justify-content:flex-end;gap:8px}
+
+.group{margin-bottom:6px}
+.group-head{display:flex;justify-content:space-between;align-items:baseline;margin:16px 2px 8px;font-size:13.5px;font-weight:600}
+.group-count{font-weight:400;color:var(--muted);font-size:12px}
+
+.empty{text-align:center;padding:44px 18px;color:var(--muted)}
+.empty p{margin:0 0 6px;font-size:15px;color:var(--text)}
+.empty .empty-sub{font-size:13px;color:var(--muted)}
+.empty-actions{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+.panel{margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px 16px}
+.panel h2{font-size:14px;margin:0 0 6px}
+.panel p{margin:0 0 12px;font-size:12.5px;color:var(--muted);line-height:1.65}
+.panel-actions{display:flex;flex-wrap:wrap;gap:8px}
+.status-line{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#9aa3ad;flex:none}
+.status-dot.on{background:var(--accent)}
+.status-dot.warn{background:#e0a800}
+details.setup{border-top:1px solid var(--line);margin-top:14px;padding-top:10px}
+details.setup summary{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:600;list-style-position:inside}
+.setup-body{padding-top:12px}
+.setup-body ol{margin:0 0 12px;padding-left:20px;font-size:12.5px;color:var(--muted);line-height:1.8}
+.setup-body ol a{color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);line-height:1.7;margin:9px 0 0}
+.hint.warn{color:#a06400;background:rgba(224,168,0,.10);border:1px solid rgba(224,168,0,.28);border-radius:10px;padding:9px 11px}
+.hint b{color:inherit}
+@media (prefers-color-scheme: dark){.hint.warn{color:#e2b455}}
+.client-row{display:flex;gap:8px;align-items:center}
+.client-row input{flex:1;min-width:0}
+.file-list{display:flex;flex-direction:column;gap:8px;margin:0 0 14px;max-height:52vh;overflow:auto}
+.file-row{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;color:var(--text);font-size:14px;cursor:pointer}
+.file-row .file-name{font-weight:600;word-break:break-all}
+.file-row .file-meta{color:var(--muted);font-size:12px}
+
+.modal{position:fixed;inset:0;z-index:60;background:rgba(10,14,18,.45);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal.hidden{display:none}
+.hidden{display:none !important}
+.modal-card{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom));animation:rise .18s ease-out}
+@keyframes rise{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
+@media (min-width:620px){.modal{align-items:center;padding:24px}.modal-card{border-radius:16px}}
+.modal-card h2{font-size:16px;margin:0 0 10px}
+.modal-text{font-size:13.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+label{display:block;font-size:12.5px;color:var(--muted);margin:12px 0 5px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-actions{display:flex;gap:10px;margin-top:18px}
+.form-actions .btn{flex:1}
+.form-actions.vertical{flex-direction:column}
+.form-actions.vertical .btn{flex:none;width:100%}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,12px);background:rgba(17,24,39,.94);color:#fff;font-size:13.5px;padding:10px 16px;border-radius:999px;max-width:86vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:80}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <h1>物品管家</h1>
+    <p class="sub">记录每件物品放在哪里，需要时一搜就能找到</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="toolbar">
+    <div class="toolbar-row">
+      <input id="search" class="search" type="search" placeholder="搜索物品 / 位置 / 备注…" autocomplete="off">
+      <button id="btnAdd" class="btn btn-primary" type="button">添加</button>
+    </div>
+    <div class="toolbar-row wrap">
+      <select id="filterLoc" aria-label="按位置筛选"><option value="">全部位置</option></select>
+      <select id="filterCat" aria-label="按分类筛选"><option value="">全部分类</option></select>
+      <select id="sort" aria-label="排序方式">
+        <option value="updated">最近更新</option>
+        <option value="name">按名称</option>
+        <option value="location">按位置</option>
+        <option value="category">按分类</option>
+      </select>
+      <div class="seg" role="group" aria-label="视图切换">
+        <button type="button" data-view="list" class="active">列表</button>
+        <button type="button" data-view="group">按位置</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="list"></main>
+
+  <section class="panel">
+    <h2>数据管理</h2>
+    <p>数据保存在当前浏览器中，不会上传到任何服务器；换设备时用导出 / 导入迁移。<br>
+       JSON 是完整备份，可原样导回；CSV 是表格格式，便于用 Excel 查看和编辑（导入支持中英文表头）。</p>
+    <div class="panel-actions">
+      <button id="btnExportJson" class="btn btn-secondary btn-sm" type="button">导出 JSON（备份）</button>
+      <button id="btnExportCsv" class="btn btn-secondary btn-sm" type="button">导出 CSV（表格）</button>
+      <button id="btnImport" class="btn btn-secondary btn-sm" type="button">导入文件</button>
+      <button id="btnClear" class="btn btn-danger btn-sm" type="button">清空全部数据</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>云同步 · Google Drive</h2>
+    <p>把数据备份到 Google Drive，或从 Drive 上的备份文件恢复到本机。文件为 JSON 格式，仍只有你能访问。</p>
+    <div id="gStatus" class="status-line"><span class="status-dot" id="gDot"></span><span id="gText">未配置</span></div>
+    <div class="panel-actions">
+      <button id="btnGConnect" class="btn btn-primary btn-sm" type="button">连接 Google Drive</button>
+      <button id="btnGDisconnect" class="btn btn-secondary btn-sm hidden" type="button">断开</button>
+      <button id="btnGSave" class="btn btn-secondary btn-sm" type="button" disabled>备份到 Drive</button>
+      <button id="btnGList" class="btn btn-secondary btn-sm" type="button" disabled>从 Drive 导入</button>
+    </div>
+    <div id="gShareWrap" class="panel-actions" style="margin-top:8px">
+      <button id="btnGShare" class="btn btn-secondary btn-sm" type="button">导出到 Drive（分享方式）</button>
+    </div>
+    <p class="hint" id="gFileHint">尚未备份。</p>
+    <details class="setup" id="gSetup">
+      <summary>一次性设置：启用 Drive 同步（约 3 分钟）</summary>
+      <div class="setup-body">
+        <p class="hint">出于安全考虑，Google 要求网页在 https 下访问、并使用你自己的 OAuth 客户端 ID，本工具无法内置。<br>
+           如果即使用分享方式也要配置，可跳过下面 1–4 步，直接点「导出到 Drive（分享方式）」，无需任何设置。</p>
+        <ol>
+          <li>打开 <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noopener">Google Cloud Console</a>，新建（或选择）一个项目。</li>
+          <li>在「API 和服务 → 库」中启用 <b>Google Drive API</b>。</li>
+          <li>在「API 和服务 → OAuth 同意屏幕」选择 <b>外部</b>，用户类型填自己即可；把你自己加入「测试用户」。</li>
+          <li>在「API 和服务 → 凭据 → 创建凭据 → OAuth 客户端 ID」，类型选 <b>Web 应用</b>；<br>
+              「已获授权的 JavaScript 来源」填本页面的地址，例如 <code>https://你的域名</code> 或本机调试用的 <code>http://localhost:8000</code>。</li>
+          <li>把生成的客户端 ID 粘贴到下方并保存，然后点「连接 Google Drive」授权。</li>
+        </ol>
+        <label for="gClientId">OAuth 客户端 ID</label>
+        <div class="client-row">
+          <input id="gClientId" type="text" placeholder="xxxxxxxxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+          <button id="btnGSaveClient" class="btn btn-secondary btn-sm" type="button">保存</button>
+        </div>
+        <p class="hint">客户端 ID 会存在本机浏览器里，只用于向 Google 发起授权，不会发往其他服务器。</p>
+        <p class="hint"><b>注意</b>：用 <code>file://</code> 直接打开本文件时，Google 不允许登录，上面 5 步也无法生效；请把文件放到 https（或 http://localhost）下访问，或改用上面的分享方式。</p>
+      </div>
+    </details>
+  </section>
+
+</div>
+
+<input type="file" id="fileInput" accept=".json,.csv,application/json,text/csv" hidden>
+
+<div class="modal hidden" id="formModal">
+  <div class="modal-card">
+    <h2 id="formTitle">添加物品</h2>
+    <form id="itemForm" novalidate>
+      <label for="fName">物品名称 *</label>
+      <input id="fName" type="text" maxlength="60" placeholder="例如：65W 充电器" required>
+      <label for="fLoc">存放位置 *</label>
+      <input id="fLoc" type="text" maxlength="60" list="locList" placeholder="例如：书桌抽屉" required>
+      <datalist id="locList"></datalist>
+      <div class="grid-2">
+        <div>
+          <label for="fCat">分类</label>
+          <input id="fCat" type="text" maxlength="30" list="catList" placeholder="例如：数码">
+          <datalist id="catList"></datalist>
+        </div>
+        <div>
+          <label for="fQty">数量</label>
+          <input id="fQty" type="number" min="1" step="1" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <label for="fNote">备注</label>
+      <textarea id="fNote" maxlength="300" rows="3" placeholder="选填，例如：黑色，出差常带"></textarea>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" id="formCancel">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="importModal">
+  <div class="modal-card">
+    <h2>导入数据</h2>
+    <p id="importInfo" class="modal-text"></p>
+    <div class="form-actions vertical">
+      <button type="button" class="btn btn-primary" id="importMerge">合并到现有数据</button>
+      <button type="button" class="btn btn-secondary" id="importReplace">覆盖全部数据</button>
+      <button type="button" class="btn btn-ghost" id="importCancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="driveModal">
+  <div class="modal-card">
+    <h2 id="driveTitle">从 Google Drive 导入</h2>
+    <p class="modal-text" id="driveInfo">正在读取…</p>
+    <div class="file-list" id="driveList"></div>
+    <div class="form-actions vertical">
+      <button type="button" class="btn btn-secondary" id="drivePick">选择其他文件…</button>
+      <button type="button" class="btn btn-ghost" id="driveClose">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+const STORAGE_KEY='item-keeper-v1';
+const $=(s)=>document.querySelector(s);
+const $$=(s)=>Array.from(document.querySelectorAll(s));
+
+let items=[];
+let view='list';          // 'list' | 'group'
+let sortBy='updated';     // 'updated' | 'name' | 'location' | 'category'
+let editingId=null;
+let pendingImport=null;
+let toastTimer=null;
+
+/* ================= 基础工具 ================= */
+const uid=()=>'it_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+
+const esc=(s)=>String(s??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg){
+  const t=$('#toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+function download(filename,content,type){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+
+function stamp(){
+  const d=new Date();
+  const p=(n)=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+function dateText(ts){
+  try{return new Date(ts).toLocaleDateString('zh-CN');}catch(e){return '';}
+}
+
+function cmpStr(a,b){ // 空值排最后
+  if(!a&&!b)return 0;
+  if(!a)return 1;
+  if(!b)return -1;
+  return a.localeCompare(b,'zh');
+}
+
+function toTime(v){
+  if(v==null||v==='')return 0;
+  const n=Number(v);
+  if(Number.isFinite(n)&&n>1e9)return n;
+  const d=new Date(v);
+  return isNaN(d.getTime())?0:d.getTime();
+}
+
+function pick(raw,keys){
+  for(const k of keys){
+    if(Object.prototype.hasOwnProperty.call(raw,k)){
+      const v=raw[k];
+      if(v!=null&&String(v).trim()!=='')return v;
+    }
+  }
+  return undefined;
+}
+
+/* ================= 数据模型 ================= */
+const KEY_NAME   =['name','名称','物品','物品名称','物品名'];
+const KEY_LOC    =['location','位置','存放位置','地点','所在位置'];
+const KEY_CAT    =['category','分类','类别','类型'];
+const KEY_QTY    =['quantity','数量','件数','qty','count'];
+const KEY_NOTE   =['note','备注','说明','notes'];
+const KEY_ID     =['id','ID'];
+const KEY_CREATED=['createdAt','添加时间','创建时间'];
+const KEY_UPDATED=['updatedAt','更新时间','修改时间'];
+
+function normalizeItem(raw){
+  if(!raw||typeof raw!=='object')return null;
+  const name=String(pick(raw,KEY_NAME)??'').trim();
+  if(!name)return null;
+  const location=String(pick(raw,KEY_LOC)??'').trim();
+  const category=String(pick(raw,KEY_CAT)??'').trim();
+  const note=String(pick(raw,KEY_NOTE)??'').trim();
+  let qty=Number(pick(raw,KEY_QTY)??1);
+  if(!Number.isFinite(qty)||qty<1)qty=1;
+  qty=Math.floor(qty);
+  const rawId=pick(raw,KEY_ID);
+  let id;
+  if(typeof rawId==='string'&&rawId.trim())id=rawId.trim();
+  else if(typeof rawId==='number'&&Number.isFinite(rawId))id=String(rawId);
+  else id=uid();
+  const created=toTime(pick(raw,KEY_CREATED))||Date.now();
+  const updated=toTime(pick(raw,KEY_UPDATED))||created;
+  return {id,name,location,category,quantity:qty,note,createdAt:created,updatedAt:updated};
+}
+
+/* ================= 本地存储 ================= */
+function load(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return [];
+    const data=JSON.parse(raw);
+    const arr=Array.isArray(data)?data:(data&&Array.isArray(data.items)?data.items:[]);
+    return arr.map(normalizeItem).filter(Boolean);
+  }catch(e){
+    console.warn('读取本地数据失败',e);
+    return [];
+  }
+}
+
+function persist(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({app:'item-keeper',version:1,savedAt:Date.now(),items}));
+  }catch(e){
+    console.warn('写入本地数据失败',e);
+    toast('保存失败：浏览器本地存储不可用');
+  }
+}
+
+/* ================= 渲染 ================= */
+function sortCmp(a,b){
+  switch(sortBy){
+    case 'name':     return cmpStr(a.name,b.name);
+    case 'location': return cmpStr(a.location,b.location)||cmpStr(a.name,b.name);
+    case 'category': return cmpStr(a.category,b.category)||cmpStr(a.name,b.name);
+    default:         return b.updatedAt-a.updatedAt;
+  }
+}
+
+function getVisible(){
+  const q=$('#search').value.trim().toLowerCase();
+  const loc=$('#filterLoc').value;
+  const cat=$('#filterCat').value;
+  const list=items.filter((it)=>{
+    if(loc&&it.location!==loc)return false;
+    if(cat&&it.category!==cat)return false;
+    if(!q)return true;
+    return [it.name,it.location,it.category,it.note].some((v)=>(v||'').toLowerCase().includes(q));
+  });
+  list.sort(sortCmp);
+  return list;
+}
+
+function renderStats(){
+  const box=$('#stats');
+  if(!items.length){box.innerHTML='';return;}
+  const totalQty=items.reduce((s,i)=>s+i.quantity,0);
+  const locs=new Set(items.map((i)=>i.location).filter(Boolean)).size;
+  box.innerHTML=
+    '<span class="chip">物品 <b>'+items.length+'</b> 种</span>'+
+    '<span class="chip">共 <b>'+totalQty+'</b> 件</span>'+
+    '<span class="chip">位置 <b>'+locs+'</b> 处</span>';
+}
+
+function renderFilterOptions(){
+  const locSel=$('#filterLoc'),catSel=$('#filterCat');
+  const locs=[...new Set(items.map((i)=>i.location).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  const cats=[...new Set(items.map((i)=>i.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  const keepLoc=locSel.value,keepCat=catSel.value;
+  locSel.innerHTML='<option value="">全部位置</option>'+locs.map((v)=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
+  catSel.innerHTML='<option value="">全部分类</option>'+cats.map((v)=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
+  locSel.value=locs.includes(keepLoc)?keepLoc:'';
+  catSel.value=cats.includes(keepCat)?keepCat:'';
+}
+
+function itemCard(it,opts){
+  const hideLoc=!!(opts&&opts.hideLoc);
+  const loc=it.location||'未记录位置';
+  return '<article class="item" data-id="'+esc(it.id)+'">'+
+    '<div class="item-top">'+
+      '<div class="item-name">'+esc(it.name)+'</div>'+
+      '<div class="qty">×'+it.quantity+'</div>'+
+    '</div>'+
+    '<div class="meta">'+
+      (hideLoc?'':'<span class="loc-pill">'+esc(loc)+'</span>')+
+      (it.category?'<span class="cat">'+esc(it.category)+'</span>':'')+
+      '<span class="time">更新于 '+dateText(it.updatedAt)+'</span>'+
+    '</div>'+
+    (it.note?'<div class="note">'+esc(it.note)+'</div>':'')+
+    '<div class="item-actions">'+
+      '<button class="btn btn-sm btn-secondary" type="button" data-act="edit">编辑</button>'+
+      '<button class="btn btn-sm btn-danger" type="button" data-act="del">删除</button>'+
+    '</div>'+
+  '</article>';
+}
+
+function renderList(){
+  const box=$('#list');
+  if(!items.length){
+    box.innerHTML='<div class="empty">'+
+      '<p>还没有记录任何物品</p>'+
+      '<p class="empty-sub">记下每件物品放在哪里，需要的时候一搜就能找到</p>'+
+      '<div class="empty-actions">'+
+        '<button class="btn btn-primary" type="button" id="emptyAdd">添加第一件物品</button>'+
+        '<button class="btn btn-secondary" type="button" id="emptyDemo">加载示例数据</button>'+
+      '</div>'+
+    '</div>';
+    return;
+  }
+  const list=getVisible();
+  if(!list.length){
+    box.innerHTML='<div class="empty">'+
+      '<p>没有匹配的物品</p>'+
+      '<p class="empty-sub">试试换个关键词，或清除筛选条件</p>'+
+      '<div class="empty-actions"><button class="btn btn-secondary" type="button" id="clearFilters">清除筛选</button></div>'+
+    '</div>';
+    return;
+  }
+  if(view==='group'){
+    const groups=new Map();
+    for(const it of list){
+      const key=it.location||'未记录位置';
+      if(!groups.has(key))groups.set(key,[]);
+      groups.get(key).push(it);
+    }
+    const keys=[...groups.keys()].sort((a,b)=>{
+      if(a==='未记录位置')return 1;
+      if(b==='未记录位置')return -1;
+      return cmpStr(a,b);
+    });
+    box.innerHTML=keys.map((key)=>{
+      const arr=groups.get(key).sort((a,b)=>cmpStr(a.name,b.name));
+      const qty=arr.reduce((s,i)=>s+i.quantity,0);
+      return '<section class="group">'+
+        '<div class="group-head"><span>'+esc(key)+'</span><span class="group-count">'+arr.length+' 种 · '+qty+' 件</span></div>'+
+        arr.map((it)=>itemCard(it,{hideLoc:true})).join('')+
+      '</section>';
+    }).join('');
+  }else{
+    box.innerHTML=list.map((it)=>itemCard(it)).join('');
+  }
+}
+
+function render(){
+  renderStats();
+  renderFilterOptions();
+  renderList();
+}
+
+/* ================= 增删改 ================= */
+function showModal(sel){$(sel).classList.remove('hidden');}
+function hideModal(sel){$(sel).classList.add('hidden');}
+
+function refreshDatalists(){
+  const locs=[...new Set(items.map((i)=>i.location).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  const cats=[...new Set(items.map((i)=>i.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  $('#locList').innerHTML=locs.map((v)=>'<option value="'+esc(v)+'"></option>').join('');
+  $('#catList').innerHTML=cats.map((v)=>'<option value="'+esc(v)+'"></option>').join('');
+}
+
+function openForm(item){
+  editingId=item?item.id:null;
+  $('#formTitle').textContent=item?'编辑物品':'添加物品';
+  $('#fName').value=item?item.name:'';
+  $('#fLoc').value=item?item.location:'';
+  $('#fCat').value=item?item.category:'';
+  $('#fQty').value=item?item.quantity:1;
+  $('#fNote').value=item?item.note:'';
+  refreshDatalists();
+  showModal('#formModal');
+  setTimeout(()=>$('#fName').focus(),60);
+}
+
+function removeItem(it){
+  if(!confirm('确定删除「'+it.name+'」吗？'))return;
+  items=items.filter((x)=>x.id!==it.id);
+  persist();render();toast('已删除');
+}
+
+function loadDemo(){
+  const now=Date.now();
+  const demo=[
+    {name:'65W 充电器',location:'书桌抽屉',category:'数码',quantity:1,note:'黑色，出差常带'},
+    {name:'护照',location:'卧室衣柜顶层',category:'证件',quantity:1,note:'和户口本放在一起'},
+    {name:'螺丝刀套装',location:'阳台储物柜',category:'工具',quantity:1,note:''},
+    {name:'感冒药',location:'客厅电视柜第二层',category:'药品',quantity:2,note:'注意有效期'},
+    {name:'备用钥匙',location:'玄关鞋柜小盒',category:'日常',quantity:3,note:'大门 / 信箱 / 储物间'}
+  ].map((x,i)=>Object.assign({id:uid(),createdAt:now-i*1000,updatedAt:now-i*1000},x));
+  items=demo.concat(items);
+  persist();render();toast('已加载示例数据');
+}
+
+/* ================= 导出 ================= */
+function csvCell(v){
+  const s=String(v??'');
+  return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+
+function exportJSON(){
+  if(!items.length){toast('暂无数据可导出');return;}
+  const payload={app:'item-keeper',version:1,exportedAt:new Date().toISOString(),count:items.length,items};
+  download('物品数据-'+stamp()+'.json',JSON.stringify(payload,null,2),'application/json');
+  toast('已导出 JSON 备份');
+}
+
+function exportCSV(){
+  if(!items.length){toast('暂无数据可导出');return;}
+  const head=['名称','分类','数量','位置','备注','更新时间'];
+  const rows=items.map((i)=>[i.name,i.category,i.quantity,i.location,i.note,new Date(i.updatedAt).toLocaleString('zh-CN')]);
+  const csv=[head].concat(rows).map((r)=>r.map(csvCell).join(',')).join('\r\n');
+  download('物品清单-'+stamp()+'.csv','\uFEFF'+csv,'text/csv;charset=utf-8');
+  toast('已导出 CSV，可用 Excel 打开');
+}
+
+/* ================= 导入 ================= */
+function parseCSV(text){
+  const rows=[];
+  let row=[];
+  let field='';
+  let inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){
+        if(text[i+1]==='"'){field+='"';i++;}
+        else inQ=false;
+      }else field+=c;
+    }else{
+      if(c==='"')inQ=true;
+      else if(c===','){row.push(field);field='';}
+      else if(c==='\r'){
+        if(text[i+1]!=='\n'){row.push(field);field='';rows.push(row);row=[];}
+      }
+      else if(c==='\n'){row.push(field);field='';rows.push(row);row=[];}
+      else field+=c;
+    }
+  }
+  if(field!==''||row.length){row.push(field);rows.push(row);}
+  return rows.filter((r)=>r.some((x)=>x.trim()!==''));
+}
+
+const KNOWN_HEADERS=new Set([
+  'name','名称','物品','物品名称','物品名',
+  'location','位置','存放位置','地点','所在位置',
+  'category','分类','类别','类型',
+  'quantity','数量','件数','qty','count',
+  'note','备注','说明','notes',
+  'id','createdat','添加时间','创建时间','updatedat','更新时间','修改时间'
+].map((s)=>s.toLowerCase()));
+
+function looksLikeHeader(cells){
+  return cells.some((c)=>KNOWN_HEADERS.has(String(c).trim().toLowerCase()));
+}
+
+function parseImport(text){
+  const trimmed=text.replace(/^\uFEFF/,'').trim();
+  if(!trimmed)throw new Error('文件内容为空');
+  let rawList;
+  if(trimmed[0]==='{'||trimmed[0]==='['){
+    const data=JSON.parse(trimmed);
+    if(Array.isArray(data))rawList=data;
+    else if(data&&Array.isArray(data.items))rawList=data.items;
+    else if(data&&Array.isArray(data.data))rawList=data.data;
+    else throw new Error('JSON 中未找到物品列表');
+  }else{
+    const rows=parseCSV(trimmed);
+    if(!rows.length)throw new Error('CSV 内容为空');
+    let headers,body;
+    if(looksLikeHeader(rows[0])){
+      headers=rows[0].map((h)=>String(h).trim());
+      body=rows.slice(1);
+    }else{
+      if(rows[0].length<2)throw new Error('无法识别的文件格式');
+      headers=['名称','分类','数量','位置','备注'];
+      body=rows;
+    }
+    rawList=body.map((r)=>{
+      const o={};
+      headers.forEach((h,i)=>{if(h)o[h]=r[i]!==undefined?r[i]:'';});
+      return o;
+    });
+  }
+  const records=[];
+  let skipped=0;
+  for(const raw of rawList){
+    const n=normalizeItem(raw);
+    if(n)records.push(n);else skipped++;
+  }
+  return {records,skipped};
+}
+
+function doImport(mode){
+  if(!pendingImport)return;
+  const records=pendingImport.records;
+  pendingImport=null;
+  if(mode==='replace'){
+    items=records;
+    toast('已导入 '+records.length+' 条记录（覆盖）');
+  }else{
+    const map=new Map(items.map((i)=>[i.id,i]));
+    let added=0,updated=0;
+    for(const r of records){
+      if(map.has(r.id))updated++;else added++;
+      map.set(r.id,r);
+    }
+    items=[...map.values()];
+    toast('导入完成：新增 '+added+' 条，更新 '+updated+' 条');
+  }
+  persist();render();hideModal('#importModal');
+}
+
+/* ================= 事件绑定 ================= */
+$('#list').addEventListener('click',(e)=>{
+  const t=e.target;
+  if(t.closest&&t.closest('#emptyAdd')){openForm(null);return;}
+  if(t.closest&&t.closest('#emptyDemo')){loadDemo();return;}
+  if(t.closest&&t.closest('#clearFilters')){
+    $('#search').value='';
+    $('#filterLoc').value='';
+    $('#filterCat').value='';
+    renderList();
+    return;
+  }
+  const btn=t.closest?t.closest('button[data-act]'):null;
+  if(!btn)return;
+  const card=btn.closest('.item');
+  if(!card)return;
+  const id=card.getAttribute('data-id');
+  const it=items.find((x)=>x.id===id);
+  if(!it)return;
+  if(btn.dataset.act==='edit')openForm(it);
+  else if(btn.dataset.act==='del')removeItem(it);
+});
+
+$('#btnAdd').addEventListener('click',()=>openForm(null));
+$('#formCancel').addEventListener('click',()=>hideModal('#formModal'));
+
+$('#itemForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const name=$('#fName').value.trim();
+  const location=$('#fLoc').value.trim();
+  if(!name){toast('请填写物品名称');$('#fName').focus();return;}
+  if(!location){toast('请填写存放位置');$('#fLoc').focus();return;}
+  let qty=Math.floor(Number($('#fQty').value));
+  if(!Number.isFinite(qty)||qty<1)qty=1;
+  const data={name,location,category:$('#fCat').value.trim(),quantity:qty,note:$('#fNote').value.trim()};
+  const now=Date.now();
+  if(editingId){
+    const it=items.find((x)=>x.id===editingId);
+    if(it){Object.assign(it,data,{updatedAt:now});toast('修改已保存');}
+  }else{
+    items.unshift(Object.assign({id:uid(),createdAt:now,updatedAt:now},data));
+    toast('已添加');
+  }
+  persist();render();hideModal('#formModal');
+});
+
+$('#search').addEventListener('input',renderList);
+$('#filterLoc').addEventListener('change',renderList);
+$('#filterCat').addEventListener('change',renderList);
+$('#sort').addEventListener('change',()=>{sortBy=$('#sort').value;renderList();});
+
+$$('.seg button').forEach((btn)=>{
+  btn.addEventListener('click',()=>{
+    view=btn.dataset.view;
+    $$('.seg button').forEach((b)=>b.classList.toggle('active',b===btn));
+    renderList();
+  });
+});
+
+$$('.modal').forEach((m)=>{
+  m.addEventListener('click',(e)=>{if(e.target===m)m.classList.add('hidden');});
+});
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape')$$('.modal').forEach((m)=>m.classList.add('hidden'));
+});
+
+$('#btnExportJson').addEventListener('click',exportJSON);
+$('#btnExportCsv').addEventListener('click',exportCSV);
+$('#btnClear').addEventListener('click',()=>{
+  if(!items.length){toast('当前没有数据');return;}
+  if(confirm('确定清空全部 '+items.length+' 条记录吗？此操作不可恢复，建议先导出备份。')){
+    items=[];persist();render();toast('已清空全部数据');
+  }
+});
+
+$('#btnImport').addEventListener('click',()=>$('#fileInput').click());
+$('#fileInput').addEventListener('change',async(e)=>{
+  const file=e.target.files&&e.target.files[0];
+  e.target.value='';
+  if(!file)return;
+  try{
+    const text=await file.text();
+    const res=parseImport(text);
+    if(!res.records.length){toast('文件中没有可导入的有效记录');return;}
+    pendingImport=res;
+    $('#importInfo').textContent='解析到 '+res.records.length+' 条记录'+(res.skipped?'（跳过 '+res.skipped+' 条无效记录）':'')+'，请选择导入方式：';
+    showModal('#importModal');
+  }catch(err){
+    console.warn(err);
+    toast('导入失败：无法识别文件格式，请使用本工具导出的 JSON / CSV');
+  }
+});
+$('#importMerge').addEventListener('click',()=>doImport('merge'));
+$('#importReplace').addEventListener('click',()=>doImport('replace'));
+$('#importCancel').addEventListener('click',()=>{pendingImport=null;hideModal('#importModal');});
+
+/* ================= Google Drive 同步 ================= */
+const G_CLIENT_KEY='item-keeper-gclient';
+const G_FILE_KEY='item-keeper-gfile';
+const G_SCOPE='https://www.googleapis.com/auth/drive.file';
+const G_API='https://www.googleapis.com/drive/v3/files';
+const G_UPLOAD='https://www.googleapis.com/upload/drive/v3/files';
+const G_BACKUP_NAME='item-keeper-backup.json';
+
+let gToken=null;
+let gTokenExp=0;
+let gScriptPromise=null;
+
+const gClientId=()=>{try{return localStorage.getItem(G_CLIENT_KEY)||'';}catch(e){return '';}};
+const gFileMeta=()=>{try{return JSON.parse(localStorage.getItem(G_FILE_KEY)||'null');}catch(e){return null;}};
+
+function setBusy(btn,busy,label){
+  if(!btn)return;
+  if(busy){btn.dataset.label=btn.textContent;btn.textContent=label||'处理中…';btn.disabled=true;}
+  else{btn.textContent=btn.dataset.label||btn.textContent;btn.disabled=false;}
+}
+
+function fmtSize(n){
+  const v=Number(n);
+  if(!Number.isFinite(v)||v<0)return '';
+  if(v<1024)return v+' B';
+  if(v<1024*1024)return (v/1024).toFixed(1)+' KB';
+  return (v/1024/1024).toFixed(1)+' MB';
+}
+
+function fmtTime(iso){
+  if(!iso)return '';
+  const d=new Date(iso);
+  return isNaN(d.getTime())?'':d.toLocaleString('zh-CN',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function gUpdateUI(){
+  const configured=!!gClientId();
+  const connected=!!(gToken&&Date.now()<gTokenExp);
+  const isFile=location.protocol==='file:';
+  const dot=$('#gDot'),text=$('#gText');
+  dot.className='status-dot';
+  if(isFile){
+    dot.classList.add('warn');
+    text.textContent='当前以 file:// 方式打开，Google 不允许登录，Drive 同步不可用';
+  }else if(!configured){
+    text.textContent='未配置：展开下方设置，填入 OAuth 客户端 ID';
+  }else if(!connected){
+    text.textContent='已配置，尚未连接';
+  }else{
+    dot.classList.add('on');
+    const meta=gFileMeta();
+    text.textContent=meta&&meta.time
+      ?'已连接 Google Drive · 上次备份 '+new Date(meta.time).toLocaleString('zh-CN')
+      :'已连接 Google Drive';
+  }
+  $('#btnGConnect').classList.toggle('hidden',connected);
+  $('#btnGDisconnect').classList.toggle('hidden',!connected);
+  $('#btnGConnect').disabled=!configured||isFile;
+  $('#btnGSave').disabled=!connected;
+  $('#btnGList').disabled=!connected;
+  $('#gClientId').value=gClientId();
+  if(isFile)$('#gSetup').open=true;
+  const meta=gFileMeta();
+  $('#gFileHint').textContent=(meta&&meta.name)
+    ?'云端备份文件：'+meta.name+(meta.time?'（备份于 '+new Date(meta.time).toLocaleString('zh-CN')+'）':'')
+    :'云端还没有备份文件，点「备份到 Drive」创建。';
+}
+
+function gLoadScript(){
+  if(window.google&&window.google.accounts&&window.google.accounts.oauth2)return Promise.resolve();
+  if(gScriptPromise)return gScriptPromise;
+  gScriptPromise=new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://accounts.google.com/gsi/client';
+    s.async=true;
+    s.defer=true;
+    s.onload=()=>resolve();
+    s.onerror=()=>reject(new Error('无法加载 Google 登录组件，请检查网络或浏览器拦截设置'));
+    document.head.appendChild(s);
+  });
+  gScriptPromise.then(null,()=>{gScriptPromise=null;});
+  return gScriptPromise;
+}
+
+function gGetToken(prompt){
+  return gLoadScript().then(()=>new Promise((resolve,reject)=>{
+    const clientId=gClientId();
+    if(!clientId){reject(new Error('请先填写并保存 OAuth 客户端 ID'));return;}
+    let settled=false;
+    const tc=google.accounts.oauth2.initTokenClient({
+      client_id:clientId,
+      scope:G_SCOPE,
+      prompt:prompt===undefined?'':prompt,
+      callback:(resp)=>{
+        if(settled)return;
+        settled=true;
+        if(resp.error){reject(new Error(resp.error_description||resp.error));return;}
+        gToken=resp.access_token;
+        gTokenExp=Date.now()+(Number(resp.expires_in||3600)-60)*1000;
+        gUpdateUI();
+        resolve(gToken);
+      },
+      error_callback:(err)=>{
+        if(settled)return;
+        settled=true;
+        reject(new Error((err&&err.message)||'授权未完成（弹窗被关闭或被浏览器拦截）'));
+      }
+    });
+    tc.requestAccessToken();
+  }));
+}
+
+async function gEnsureToken(){
+  if(gToken&&Date.now()<gTokenExp)return gToken;
+  return gGetToken('');
+}
+
+async function gFetch(url,opts){
+  let token=await gEnsureToken();
+  const doFetch=(tk)=>{
+    const o=Object.assign({},opts||{});
+    o.headers=Object.assign({},o.headers||{},{Authorization:'Bearer '+tk});
+    return fetch(url,o);
+  };
+  let res=await doFetch(token);
+  if(res.status===401){
+    gToken=null;gTokenExp=0;gUpdateUI();
+    token=await gGetToken('');
+    res=await doFetch(token);
+  }
+  if(!res.ok){
+    let detail='';
+    try{const j=await res.json();detail=(j.error&&j.error.message)||'';}catch(e){}
+    throw new Error('Google Drive 请求失败（'+res.status+'）'+(detail?'：'+detail:''));
+  }
+  return res;
+}
+
+function gPayload(){
+  return JSON.stringify({app:'item-keeper',version:1,exportedAt:new Date().toISOString(),count:items.length,items},null,2);
+}
+
+async function gBackup(){
+  if(!items.length){toast('暂无数据可备份');return;}
+  const btn=$('#btnGSave');
+  setBusy(btn,true,'备份中…');
+  try{
+    const payload=gPayload();
+    const meta=gFileMeta();
+    const boundary='----itemKeeper'+Date.now().toString(36);
+    const body='--'+boundary+'\r\n'+
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n'+
+      JSON.stringify({name:(meta&&meta.name)||G_BACKUP_NAME,mimeType:'application/json'})+'\r\n'+
+      '--'+boundary+'\r\n'+
+      'Content-Type: application/json\r\n\r\n'+
+      payload+'\r\n'+
+      '--'+boundary+'--';
+    const url=(meta&&meta.id)
+      ?G_UPLOAD+'/'+encodeURIComponent(meta.id)+'?uploadType=multipart&fields=id,name,modifiedTime'
+      :G_UPLOAD+'?uploadType=multipart&fields=id,name,modifiedTime';
+    const res=await gFetch(url,{
+      method:(meta&&meta.id)?'PATCH':'POST',
+      headers:{'Content-Type':'multipart/related; boundary='+boundary},
+      body
+    });
+    const data=await res.json();
+    localStorage.setItem(G_FILE_KEY,JSON.stringify({id:data.id,name:data.name||G_BACKUP_NAME,time:Date.now()}));
+    gUpdateUI();
+    toast('已备份 '+items.length+' 条记录到 Google Drive');
+  }catch(err){
+    console.warn(err);
+    toast('备份失败：'+err.message);
+  }finally{
+    setBusy(btn,false);
+  }
+}
+
+async function gListFiles(){
+  const q="trashed=false and (mimeType='application/json' or mimeType='text/csv')";
+  const url=G_API+'?q='+encodeURIComponent(q)+'&orderBy='+encodeURIComponent('modifiedTime desc')+'&pageSize=25&fields='+encodeURIComponent('files(id,name,modifiedTime,size,mimeType)');
+  const res=await gFetch(url,{method:'GET'});
+  const data=await res.json();
+  return (data.files||[]);
+}
+
+function gShowDriveList(files){
+  const box=$('#driveList');
+  if(!files.length){
+    box.innerHTML='<p class="hint">没有找到备份文件。先用「备份到 Drive」创建一份，或改用「导出到 Drive（分享方式）」。</p>';
+    return;
+  }
+  box.innerHTML=files.map((f)=>
+    '<button type="button" class="file-row" data-id="'+esc(f.id)+'" data-name="'+esc(f.name)+'">'+
+      '<span class="file-name">'+esc(f.name)+'</span>'+
+      '<span class="file-meta">'+esc(fmtTime(f.modifiedTime))+(f.size?' · '+esc(fmtSize(f.size)):'')+'</span>'+
+    '</button>'
+  ).join('');
+}
+
+async function gOpenImport(){
+  const modal=$('#driveModal');
+  $('#driveInfo').textContent='正在读取 Google Drive…';
+  $('#driveList').innerHTML='';
+  showModal('#driveModal');
+  try{
+    const files=await gListFiles();
+    $('#driveInfo').textContent=files.length
+      ?'选择要导入的备份文件（只显示本工具创建的 JSON / CSV 文件）：'
+      :'';
+    gShowDriveList(files);
+  }catch(err){
+    console.warn(err);
+    $('#driveInfo').textContent='读取失败：'+err.message;
+    $('#driveList').innerHTML='<p class="hint">可以改用「导出到 Drive（分享方式）」或本地「导入文件」。</p>';
+  }
+}
+
+async function gImportFile(id,name){
+  const info=$('#driveInfo');
+  info.textContent='正在下载 '+name+' …';
+  try{
+    const res=await gFetch(G_API+'/'+encodeURIComponent(id)+'?alt=media',{method:'GET'});
+    const text=await res.text();
+    const parsed=parseImport(text);
+    if(!parsed.records.length){throw new Error('文件中没有可导入的有效记录');}
+    pendingImport=parsed;
+    hideModal('#driveModal');
+    $('#importInfo').textContent='来自 Drive 的「'+name+'」：解析到 '+parsed.records.length+' 条记录'+
+      (parsed.skipped?'（跳过 '+parsed.skipped+' 条无效记录）':'')+'，请选择导入方式：';
+    showModal('#importModal');
+  }catch(err){
+    console.warn(err);
+    info.textContent='导入失败：'+err.message;
+  }
+}
+
+async function gShare(){
+  if(!items.length){toast('暂无数据可导出');return;}
+  const name='物品数据-'+stamp()+'.json';
+  const text=gPayload();
+  const file=(typeof File!=='undefined')?new File([text],name,{type:'application/json'}):null;
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+    try{
+      await navigator.share({files:[file],title:'物品管家数据备份',text:'物品管家数据备份'});
+      toast('已发送，可在分享面板中选择 Google Drive');
+    }catch(err){
+      if(err&&err.name==='AbortError')return;
+      console.warn(err);
+      toast('分享失败：'+err.message);
+    }
+    return;
+  }
+  download(name,text,'application/json');
+  toast('当前环境不支持直接分享，已下载文件；可在 Google Drive 应用中上传');
+}
+
+/* ---- Google Drive 事件 ---- */
+$('#btnGSaveClient').addEventListener('click',()=>{
+  const v=$('#gClientId').value.trim();
+  if(v&&!/\.apps\.googleusercontent\.com$/.test(v)){
+    toast('客户端 ID 应以 .apps.googleusercontent.com 结尾');
+    return;
+  }
+  try{
+    if(v)localStorage.setItem(G_CLIENT_KEY,v);else localStorage.removeItem(G_CLIENT_KEY);
+  }catch(e){console.warn(e);}
+  toast(v?'已保存客户端 ID，可以点「连接 Google Drive」':'已清除客户端 ID');
+  gUpdateUI();
+});
+
+$('#btnGConnect').addEventListener('click',async()=>{
+  const btn=$('#btnGConnect');
+  setBusy(btn,true,'连接中…');
+  try{
+    await gGetToken('');
+    toast('已连接 Google Drive');
+  }catch(err){
+    console.warn(err);
+    toast('连接失败：'+err.message);
+  }finally{
+    setBusy(btn,false);
+    gUpdateUI();
+  }
+});
+
+$('#btnGDisconnect').addEventListener('click',()=>{
+  const tk=gToken;
+  gToken=null;gTokenExp=0;
+  gUpdateUI();
+  toast('已断开连接');
+  if(tk&&window.google&&google.accounts&&google.accounts.oauth2){
+    try{google.accounts.oauth2.revoke(tk,()=>{});}catch(e){console.warn(e);}
+  }
+});
+
+$('#btnGSave').addEventListener('click',gBackup);
+$('#btnGList').addEventListener('click',gOpenImport);
+$('#btnGShare').addEventListener('click',gShare);
+$('#driveClose').addEventListener('click',()=>hideModal('#driveModal'));
+$('#drivePick').addEventListener('click',()=>{
+  hideModal('#driveModal');
+  $('#fileInput').click();
+});
+$('#driveList').addEventListener('click',(e)=>{
+  const row=e.target.closest?e.target.closest('.file-row'):null;
+  if(row)gImportFile(row.dataset.id,row.dataset.name);
+});
+
+/* ================= 启动 ================= */
+items=load();
+$('#sort').value=sortBy;
+render();
+gUpdateUI();
+
+})();
+</script>
+</body>
+</html>
