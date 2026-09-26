@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>逻辑哲学论 · 一架梯子</title>
+<style>
+:root{
+  --paper:#f6f1e7;
+  --paper-2:#fffdf7;
+  --paper-3:#efe8da;
+  --ink:#1b1916;
+  --ink-2:#4b453c;
+  --ink-3:#8d8577;
+  --line:#ded5c4;
+  --line-2:#c9bfab;
+  --accent:#b0432c;
+  --accent-2:#2c4a6e;
+  --gold:#9c7b32;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Songti SC","Source Han Serif SC",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:17.5px;line-height:1.9;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.85),rgba(255,255,255,0) 60%),
+             radial-gradient(100% 80% at 50% 100%,rgba(160,140,100,.10),rgba(255,255,255,0) 55%);
+}
+
+/* ---------- 顶部进度 ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--accent),var(--gold));
+  transition:width .12s linear;
+}
+
+/* ---------- 左侧梯子导轨 ---------- */
+.rail{
+  position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:50;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;
+}
+.rail-inner{position:relative;padding-left:14px}
+.rail-inner::before{
+  content:"";position:absolute;left:3px;top:8px;bottom:8px;width:1px;background:var(--line-2);
+}
+.rail a{
+  display:block;position:relative;color:var(--ink-3);text-decoration:none;
+  padding:5px 0 5px 10px;transition:color .25s,transform .25s;
+}
+.rail a::before{
+  content:"";position:absolute;left:-14px;top:50%;width:9px;height:1.5px;
+  background:var(--line-2);transition:background .25s,width .25s;
+}
+.rail a .n{color:var(--ink-3);margin-right:5px;transition:color .25s}
+.rail a:hover{color:var(--ink)}
+.rail a.on{color:var(--accent);transform:translateX(2px)}
+.rail a.on::before{background:var(--accent);width:15px;left:-16px}
+.rail a.on .n{color:var(--accent)}
+@media (max-width:1180px){.rail{display:none}}
+
+/* ---------- 通用 ---------- */
+.wrap{max-width:840px;margin:0 auto;padding:0 30px;position:relative;z-index:2}
+.sec{padding:110px 0 40px;position:relative;z-index:2}
+.sec-head{display:flex;gap:22px;align-items:flex-start;margin-bottom:26px}
+.sec-num{
+  font-family:var(--mono);font-size:44px;line-height:1;color:var(--accent);
+  opacity:.85;font-weight:400;flex:none;padding-top:4px;letter-spacing:-.03em;
+}
+.sec-meta{flex:1;min-width:0}
+.tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);display:block;margin-bottom:7px;
+}
+h2{
+  font-size:26px;line-height:1.5;margin:0;font-weight:600;letter-spacing:.01em;
+}
+h3{
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;margin:44px 0 14px;
+}
+p{margin:0 0 18px;color:var(--ink-2)}
+p.lede{font-size:19px;color:var(--ink);line-height:1.85}
+strong{color:var(--ink);font-weight:600}
+em{font-style:normal;background:linear-gradient(transparent 62%,rgba(176,67,44,.22) 62%);padding:0 1px}
+code{font-family:var(--mono);font-size:.88em;background:var(--paper-3);padding:1px 5px;border-radius:3px;color:var(--accent-2)}
+
+/* ---------- ASCII 画框 ---------- */
+.ascii{
+  font-family:var(--mono);font-size:13px;line-height:1.5;white-space:pre;
+  background:var(--paper-2);border:1px solid var(--line);border-radius:6px;
+  padding:24px 22px;margin:0 0 24px;overflow:auto hidden;color:var(--ink-2);
+  box-shadow:0 1px 0 rgba(0,0,0,.02),inset 0 0 0 1px rgba(255,255,255,.6);
+  position:relative;
+}
+.ascii::-webkit-scrollbar{height:8px}
+.ascii::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
+.ln{display:block;opacity:0;transform:translateY(5px)}
+.in .ln{animation:lnIn .45s cubic-bezier(.22,.8,.3,1) forwards}
+@keyframes lnIn{to{opacity:1;transform:none}}
+.ascii.big{font-size:14.5px}
+
+/* ---------- 引文 ---------- */
+.quote{
+  border-left:2px solid var(--line-2);padding:2px 0 2px 20px;margin:30px 0;
+}
+.quote .qnum{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--accent);
+  display:block;margin-bottom:5px;
+}
+.quote .de{font-style:italic;color:var(--ink-3);font-size:15.5px;margin:0 0 4px;line-height:1.65}
+.quote .zh{margin:0;color:var(--ink);font-size:17px}
+
+/* ---------- 面板 / 交互 ---------- */
+.panel{
+  border:1px solid var(--line);background:var(--paper-2);border-radius:8px;
+  padding:22px;margin:0 0 26px;box-shadow:0 1px 0 rgba(0,0,0,.02);
+}
+.panel-hd{
+  font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:16px;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;flex-wrap:wrap;
+}
+.panel-hd .hint{text-transform:none;letter-spacing:.02em;font-size:11.5px;color:var(--ink-3);opacity:.85}
+.btn{
+  font-family:var(--mono);font-size:12px;letter-spacing:.05em;
+  background:transparent;border:1px solid var(--line-2);color:var(--ink-2);
+  padding:7px 14px;border-radius:4px;cursor:pointer;transition:.18s;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(176,67,44,.05)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.readout{
+  font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--ink-2);
+  background:var(--paper-3);border-radius:5px;padding:14px 16px;margin-top:16px;
+}
+.readout b{color:var(--accent-2);font-weight:600}
+.readout .warn{color:var(--accent)}
+.readout .ok{color:#3f6b45}
+
+/* ---------- §1 切换 ---------- */
+.switchbox{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.chip{
+  font-family:var(--mono);font-size:12.5px;padding:7px 15px;border:1px solid var(--line-2);
+  border-radius:20px;cursor:pointer;color:var(--ink-3);background:transparent;transition:.2s;
+}
+.chip:hover{color:var(--ink);border-color:var(--ink-3)}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ---------- §2 网格 ---------- */
+.grid9{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+  width:min(360px,100%);margin:0 auto;border:1px solid var(--line-2);
+}
+.cell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:26px;color:var(--ink-3);cursor:pointer;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  transition:background .18s,color .18s;user-select:none;
+}
+.cell:nth-child(3n){border-right:none}
+.cell:nth-child(n+7){border-bottom:none}
+.cell:hover{background:var(--paper-3)}
+.cell.filled{color:var(--accent);font-weight:600}
+
+/* ---------- §3 映射 ---------- */
+.mapbox{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:70px;padding:10px 0 6px}
+.mapbox svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.mapcol{position:relative;z-index:2}
+.mapcol .cap{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);text-align:center;margin-bottom:12px;
+}
+.node{
+  font-family:var(--mono);font-size:24px;text-align:center;padding:12px 0;margin-bottom:10px;
+  border:1px dashed transparent;border-radius:5px;transition:.2s;cursor:default;color:var(--ink-2);
+}
+.node.hi{color:var(--accent);background:rgba(176,67,44,.07);border-color:rgba(176,67,44,.35)}
+.node.hi-r{color:var(--accent-2);background:rgba(44,74,110,.07);border-color:rgba(44,74,110,.3)}
+
+/* ---------- §4 构造器 ---------- */
+.builder{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:110px}
+.field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+select{
+  font-family:var(--mono);font-size:14px;padding:9px 10px;border:1px solid var(--line-2);
+  border-radius:5px;background:var(--paper-2);color:var(--ink);cursor:pointer;
+}
+select:focus{outline:none;border-color:var(--accent)}
+
+/* ---------- §5 真值表 ---------- */
+table.tt{
+  width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px;
+  background:var(--paper-2);
+}
+table.tt th,table.tt td{
+  border:1px solid var(--line);padding:7px 6px;text-align:center;color:var(--ink-2);
+}
+table.tt th{background:var(--paper-3);color:var(--ink-3);font-weight:500;font-size:11.5px;letter-spacing:.08em}
+table.tt td.v{color:var(--ink)}
+table.tt td.T{color:#3f6b45;font-weight:600}
+table.tt td.F{color:var(--accent);font-weight:600}
+.schema{font-family:var(--mono);font-size:12.5px;line-height:1.95}
+.srow{
+  display:grid;grid-template-columns:130px 1fr;gap:14px;padding:4px 9px;border-radius:4px;
+  cursor:pointer;transition:background .15s;align-items:baseline;
+}
+.srow:hover{background:var(--paper-3)}
+.srow.sel{background:rgba(176,67,44,.08)}
+.srow .pat{color:var(--ink-3);letter-spacing:.14em}
+.srow.sel .pat{color:var(--accent)}
+.srow .lbl{color:var(--ink-2)}
+.srow.sel .lbl{color:var(--ink);font-weight:600}
+
+/* ---------- §6 生成器 ---------- */
+.steps{font-family:var(--mono);font-size:13px;line-height:1.8}
+.step{
+  padding:9px 12px;border-left:2px solid var(--line);margin-bottom:6px;
+  opacity:.28;transition:.35s;color:var(--ink-2);
+}
+.step.on{opacity:1;border-left-color:var(--accent);background:rgba(176,67,44,.045)}
+.step .sl{color:var(--accent);font-size:11px;letter-spacing:.1em;display:block;margin-bottom:3px}
+.step .sc{display:block;color:var(--ink);margin-bottom:2px}
+.step .sd{display:block;color:var(--ink-3);font-size:12px;line-height:1.65}
+
+/* ---------- §7 沉默 ---------- */
+.throw-wrap{text-align:center;margin:46px 0 20px}
+.btn-throw{
+  font-family:var(--mono);font-size:14px;letter-spacing:.22em;padding:16px 34px;
+  background:transparent;border:1px solid var(--ink);color:var(--ink);border-radius:2px;
+  cursor:pointer;transition:.3s;text-transform:uppercase;
+}
+.btn-throw:hover{background:var(--ink);color:var(--paper);letter-spacing:.3em}
+
+#silence{
+  position:fixed;inset:0;z-index:200;background:var(--paper);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  opacity:0;pointer-events:none;transition:opacity 1.1s ease .55s;padding:30px;text-align:center;
+}
+#silence.on{opacity:1;pointer-events:auto}
+#silence .line{
+  font-family:var(--serif);font-size:clamp(19px,3.4vw,30px);line-height:1.75;
+  font-style:italic;color:var(--ink);max-width:760px;margin:0 0 16px;
+  opacity:0;transform:translateY(12px);transition:.9s ease 1.5s;
+}
+#silence .line.zh{
+  font-style:normal;font-size:clamp(16px,2.3vw,20px);color:var(--ink-2);
+  transition-delay:2.1s;
+}
+#silence.on .line{opacity:1;transform:none}
+#silence .after{
+  font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em;
+  max-width:620px;line-height:2;margin-top:22px;opacity:0;transition:.9s ease 2.8s;
+}
+#silence.on .after{opacity:1}
+#silence .btn{margin-top:26px;opacity:0;transition:.9s ease 3.4s}
+#silence.on .btn{opacity:1}
+body.dissolved main,body.dissolved .hero-inner{opacity:0;transform:translateY(-24px);filter:blur(3px);transition:1.1s ease}
+main,.hero-inner{transition:1.1s ease}
+
+/* ---------- Hero ---------- */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;padding:60px 30px}
+.hero-inner{max-width:860px;width:100%;text-align:center}
+.hero pre{
+  font-family:var(--mono);font-size:11.5px;line-height:1.32;color:var(--ink-3);
+  margin:0 0 34px;white-space:pre;overflow:auto hidden;display:inline-block;
+  text-align:left;max-width:100%;vertical-align:top;
+}
+.hero h1{
+  font-size:clamp(30px,6vw,52px);margin:0 0 6px;font-weight:600;letter-spacing:.04em;
+}
+.hero .sub{
+  font-family:var(--mono);font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 20px;
+}
+.hero .who{color:var(--ink-3);font-size:14.5px;font-style:italic;margin:0 0 30px}
+.hero .intro{max-width:620px;margin:0 auto 40px;color:var(--ink-2);font-size:17px;text-align:left}
+.hero .intro p{margin-bottom:14px}
+.cursor{display:inline-block;width:8px;height:1.05em;background:var(--accent);vertical-align:-.16em;animation:blink 1.05s steps(1) infinite;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+.scrollhint{
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--ink-3);
+  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:9px;
+}
+.scrollhint .bar{width:1px;height:38px;background:linear-gradient(var(--line-2),transparent);animation:drop 2s ease-in-out infinite}
+@keyframes drop{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+footer{
+  padding:90px 0 70px;text-align:center;position:relative;z-index:2;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:2.1;
+  border-top:1px solid var(--line);margin-top:60px;
+}
+footer .sevens{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);display:inline-block;text-align:left;margin-bottom:24px;line-height:1.9}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .wrap{padding:0 20px}
+  .ascii{font-size:10.5px;padding:16px 14px}
+  .ascii.big{font-size:11px}
+  .hero pre{font-size:8px}
+  .sec{padding:80px 0 30px}
+  .sec-num{font-size:34px}
+  h2{font-size:21px}
+  .mapbox{gap:34px}
+  .srow{grid-template-columns:104px 1fr;font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s !important;transition-duration:.001s !important}
+  .ln{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<nav class="rail" aria-label="梯子">
+  <div class="rail-inner">
+    <a href="#hero" data-rail="0"><span class="n">序</span>梯子</a>
+    <a href="#s1" data-rail="1"><span class="n">1</span>世界</a>
+    <a href="#s2" data-rail="2"><span class="n">2</span>事态</a>
+    <a href="#s3" data-rail="3"><span class="n">3</span>图像</a>
+    <a href="#s4" data-rail="4"><span class="n">4</span>命题</a>
+    <a href="#s5" data-rail="5"><span class="n">5</span>真值</a>
+    <a href="#s6" data-rail="6"><span class="n">6</span>界限</a>
+    <a href="#s7" data-rail="7"><span class="n">7</span>沉默</a>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero" id="hero" data-rail="0">
+  <div class="hero-inner">
+    <pre class="ascii-hero" id="heroArt">      +--------------------+
+      |   TRACTATUS        |
+      |   LOGICO-          |
+      |   PHILOSOPHICUS    |
+      +---------+----------+
+                |
+      .---------+----------.
+      |                    |
+      +--------------------+
+      |                    |
+      +--------------------+
+      |                    |
+      +--------------------+
+      |                    |
+      +--------------------+
+      |                    |
+      +--------------------+
+      |                    |
+     /                      \
+    /                        \
+   /__________________________\</pre>
+
+    <p class="sub">Logisch-Philosophische Abhandlung</p>
+    <h1>逻辑哲学论</h1>
+    <p class="who">Ludwig Wittgenstein · 1921 · 七句话，一架梯子</p>
+
+    <div class="intro">
+      <p>这本书一共只有七句主命题，却号称解决了全部哲学问题。它从最朴素的地方开始——世界是什么？——一路往上，最后停在第七句上，那里只有沉默。</p>
+      <p>下面这趟旅程按七级台阶展开。每一级都有一幅字符画，和一个可以动手拨弄的机关。<strong>请慢慢往上走。</strong><span class="cursor"></span></p>
+    </div>
+
+    <div class="scrollhint">
+      <span>向下滚动，开始攀登</span>
+      <div class="bar"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════════ §1 ══════════════ -->
+<section class="sec" id="s1" data-rail="1">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <div class="sec-meta">
+        <span class="tag">Welt · Tatsache</span>
+        <h2>世界是事实的总和，<br>而不是物的总和</h2>
+      </div>
+    </div>
+
+    <p class="lede">先问一个最笨的问题：世界是什么？</p>
+    <p>直觉的答案是一张清单：桌子、椅子、星星、我。世界就是所有东西加在一起。维特根斯坦说，不对。世界不是东西的仓库，而是<strong>事情的发生</strong>——是"桌子在椅子左边"、"星星在天上"这类<em>配置</em>的总和。物只是配料，物怎么摆才是世界。</p>
+
+    <pre class="ascii big">   物的总和                          事实的总和
+   Summe der Dinge                   Summe der Tatsachen
+   -----------------                 ---------------------
+
+      o   ^   #                         ^ ----- #
+      #   o   ^                         |       |
+      ^   #   o                         o ----- ^
+
+   一堆东西。                        一张关系网。
+
+   重新摆一遍  ->  还是同一个世界吗？   重新摆一遍  ->  就是另一个世界。</pre>
+
+    <p>这就是全部差别的起点。如果世界只是物的总和，那么把同样的东西重新排列，世界应该纹丝不动——可现实里，一个房间是"整整齐齐"还是"被翻过"，显然是两个世界。</p>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关一 · 世界是什么的总和？</span>
+        <span class="hint">点击切换</span>
+      </div>
+      <div class="switchbox">
+        <button class="chip on" data-mode="things">世界 = 物的总和</button>
+        <button class="chip" data-mode="facts">世界 = 事实的总和</button>
+      </div>
+      <pre class="ascii" id="s1art" style="margin:0"></pre>
+      <div class="readout" id="s1out"></div>
+    </div>
+
+    <div class="quote">
+      <span class="qnum">1</span>
+      <p class="de">Die Welt ist alles, was der Fall ist.</p>
+      <p class="zh">世界是一切发生的事情。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">1.1</span>
+      <p class="de">Die Welt ist die Gesamtheit der Tatsachen, nicht der Dinge.</p>
+      <p class="zh">世界是事实的总和，而非事物的总和。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ §2 ══════════════ -->
+<section class="sec" id="s2" data-rail="2">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <div class="sec-meta">
+        <span class="tag">Sachverhalt · Gegenstand</span>
+        <h2>事实，就是事态的存在</h2>
+      </div>
+    </div>
+
+    <p class="lede">既然世界是事实的总和，那事实又是什么？</p>
+    <p>事实不是简单的一坨，它可以拆。最下面一层是<strong>对象</strong>（物、性质、关系），对象组合起来构成<strong>事态</strong>——"这块石头在这扇窗左边"就是一个事态。而所谓<em>事实</em>，就是某个事态<strong>真的存在</strong>。事态是可能性，事实是其中实现了的那些。</p>
+
+    <pre class="ascii big">   逻辑空间  logischer Raum
+
+   +-----------+-----------+-----------+
+   |     .     |     .     |     .     |
+   +-----------+-----------+-----------+
+   |     .     |     .     |     .     |
+   +-----------+-----------+-----------+
+   |     .     |     .     |     .     |
+   +-----------+-----------+-----------+
+
+   对象一旦给定，这些可能的位置就随之给定。
+   对象是脚手架，事态是脚手架上的一次搭法。</pre>
+
+    <p>这里有个很关键的说法：<em>对象包含了一切事态的可能性</em>。一块石头之所以能被放在桌上，是因为"能被放在桌上"这件事已经写在它的可能性里了。对象是固定的、简单的、不变的；变动的永远是<strong>配置</strong>。</p>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关二 · 事态构造器</span>
+        <span class="hint">点击格子，循环放置四个对象</span>
+      </div>
+      <div class="grid9" id="grid9"></div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn" id="shuffle">随机重排</button>
+        <button class="btn" id="clearGrid">清空</button>
+      </div>
+      <div class="readout" id="s2out"></div>
+    </div>
+
+    <div class="quote">
+      <span class="qnum">2</span>
+      <p class="de">Was der Fall ist, die Tatsache, ist das Bestehen von Sachverhalten.</p>
+      <p class="zh">发生的事情，即事实，是诸事态的存在。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">2.0271</span>
+      <p class="de">Der Gegenstand ist das Feste, Bestehende; die Konfiguration ist das Wechselnde, Unbeständige.</p>
+      <p class="zh">对象是固定的、实存的；配置是变动的、不稳定的。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ §3 ══════════════ -->
+<section class="sec" id="s3" data-rail="3">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <div class="sec-meta">
+        <span class="tag">Bild · Form</span>
+        <h2>我们为自己制造事实的图像</h2>
+      </div>
+    </div>
+
+    <p class="lede">接下来是最漂亮的一步。</p>
+    <p>你怎么"说出"世界？维特根斯坦的答案是：<strong>你做一张图</strong>。不是画画那种图，而是任何一种东西——只要它的零件和世界的零件<em>一一对应地、以同样的方式排列</em>。法庭上的玩具车和玩偶人重建事故现场，就是图像；乐谱是声音的图像；句子是事实的图像。</p>
+
+    <pre class="ascii big">   图像  Bild                    实在  Wirklichkeit
+
+     ^  ----------------------------  @
+     #  ----------------------------  %
+     o  ----------------------------  *
+
+   ---------------------------------------------
+   要素的配置         =         物的配置
+   两者共有的东西：逻辑形式  die logische Form</pre>
+
+    <p>注意这里的关键：图像之所以是图像，<strong>不在于它像</strong>（玩具车并不像真车），而在于它和实在<em>共享同一种结构</em>。维特根斯坦管这个共享的东西叫"描绘形式"。所以一幅图像可以完全正确，也可以完全错误——错，也仍然是图像，因为它依然共享着形式。</p>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关三 · 同构开关</span>
+        <span class="hint">鼠标悬停看对应关系</span>
+      </div>
+      <div class="mapbox" id="mapbox">
+        <svg id="maplines"></svg>
+        <div class="mapcol" id="colL">
+          <div class="cap">图像 · Bild</div>
+          <div class="node" data-k="0">^</div>
+          <div class="node" data-k="1">#</div>
+          <div class="node" data-k="2">o</div>
+        </div>
+        <div class="mapcol" id="colR">
+          <div class="cap">实在 · Wirklichkeit</div>
+          <div class="node" data-k="0">@</div>
+          <div class="node" data-k="1">%</div>
+          <div class="node" data-k="2">*</div>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn primary" id="isoBtn">同构：开</button>
+      </div>
+      <div class="readout" id="s3out"></div>
+    </div>
+
+    <div class="quote">
+      <span class="qnum">2.12</span>
+      <p class="de">Das Bild ist ein Modell der Wirklichkeit.</p>
+      <p class="zh">图像是实在的一个模型。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">2.18</span>
+      <p class="de">Was jedes Bild, welcher Form immer, mit der Wirklichkeit gemein haben muss, um sie überhaupt abbilden zu können, ist die logische Form.</p>
+      <p class="zh">任何图像，无论具有何种形式，为了能够描绘实在，都必须与实在共有的东西，就是逻辑形式。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ §4 ══════════════ -->
+<section class="sec" id="s4" data-rail="4">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <div class="sec-meta">
+        <span class="tag">Gedanke · Satz</span>
+        <h2>思想，就是有意义的命题</h2>
+      </div>
+    </div>
+
+    <p class="lede">图像住在哪里？住在我们脑子里，那就是思想。</p>
+    <p>而思想要能被别人碰到，就必须穿上衣服——穿上一串可以被说出来的符号。这串符号就是<strong>命题</strong>。所以命题不是别的东西，命题<em>就是</em>实在的图像，只不过它的零件是词而不是颜色块。</p>
+
+    <pre class="ascii big">   名字 ---.
+            |--- 结合 --->  命题  --->  图像  --->  可能的实在
+   名字 ---'
+
+   a   ->   #
+   R   ->   "在左边"
+   b   ->   ^
+
+   "aRb"  就是  "# 在 ^ 左边"  这幅活的图像</pre>
+
+    <p>维特根斯坦说得很直接：<strong>一个名字代表一个物，另一个名字代表另一个物，它们互相连接起来，整体就像一幅活的图像那样呈现出事态。</strong>命题之所以有意义，是因为它和世界共享形式；命题之所以能被判断真假，是因为它描绘的是一个<em>可能</em>的配置。</p>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关四 · 命题构造器</span>
+        <span class="hint">拼出一个命题，看看它有没有意义</span>
+      </div>
+      <div class="builder">
+        <div class="field">
+          <label>左项</label>
+          <select id="bLeft"></select>
+        </div>
+        <div class="field">
+          <label>关系</label>
+          <select id="bRel"></select>
+        </div>
+        <div class="field">
+          <label>右项</label>
+          <select id="bRight"></select>
+        </div>
+      </div>
+      <pre class="ascii" id="s4art" style="margin:18px 0 0"></pre>
+      <div class="readout" id="s4out"></div>
+    </div>
+
+    <div class="quote">
+      <span class="qnum">4</span>
+      <p class="de">Der Gedanke ist der sinnvolle Satz.</p>
+      <p class="zh">思想是有意义的命题。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">4.0311</span>
+      <p class="de">Ein Name steht für ein Ding, ein anderer für ein anderes Ding und untereinander sind sie verbunden, so stellt das Ganze — wie ein lebendes Bild — den Sachverhalt vor.</p>
+      <p class="zh">一个名字代表一个物，另一个名字代表另一个物，它们互相结合，于是整体就像一幅活的图像一样呈现出事态。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ §5 ══════════════ -->
+<section class="sec" id="s5" data-rail="5">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">5</div>
+      <div class="sec-meta">
+        <span class="tag">Wahrheitsfunktion</span>
+        <h2>命题是基本命题的真值函项</h2>
+      </div>
+    </div>
+
+    <p class="lede">到这里，语言被拆成了积木。</p>
+    <p>最底下是<strong>基本命题</strong>——最简单的断言，本身不再含有逻辑零件。所有别的命题，都是把基本命题拿"并且""或者""并非"这类操作拼起来的。而这类操作有一个冷酷的性质：<em>复合命题的真假，完全由零件的真假决定</em>。这就是"真值函项"。给它一张真值表，它就无所遁形。</p>
+
+    <pre class="ascii big">     p    q   |  p AND q   p OR q   p -> q
+   -----------+-----------------------------
+     W    W   |     W        W        W
+     W    F   |     F        W        F
+     F    W   |     F        W        W
+     F    F   |     F        F        W</pre>
+
+    <p>看最右边一列。它只在一种情况下是假——当前件真而后件假。除此之外，一个假命题可以"推出"任何东西。这就是逻辑，冷冰冰，不需要任何经验。</p>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关五 · 真值表探索器</span>
+        <span class="hint">切换连接词，看真假如何被决定</span>
+      </div>
+      <div class="btn-row" style="margin-bottom:16px" id="ttChips"></div>
+      <table class="tt" id="ttTable"></table>
+      <div class="readout" id="s5out"></div>
+    </div>
+
+    <h3>5.101 · 十六行图式</h3>
+    <p>维特根斯坦在 5.101 里给出了一张图式：<strong>给定 n 个基本命题，就有 2^(2^n) 种真值函项。</strong>两个基本命题，正好十六种——不多不少，就是下面这十六行。它们穷尽了"用 p、q 能说的一切"。</p>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关五之二 · 全部十六种真值函项</span>
+        <span class="hint">点击任意一行</span>
+      </div>
+      <div class="schema" id="schema"></div>
+      <div class="readout" id="schemaOut"></div>
+    </div>
+
+    <div class="quote">
+      <span class="qnum">5</span>
+      <p class="de">Der Satz ist eine Wahrheitsfunktion der Elementarsätze.</p>
+      <p class="zh">命题是基本命题的真值函项。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">5.101</span>
+      <p class="de">Die Wahrheitsfunktionen einer gegebenen Anzahl von Elementarsätzen lassen sich immer in einem Schema folgender Art hinschreiben.</p>
+      <p class="zh">给定数目的基本命题的真值函项，总是可以写成下面这种图式。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ §6 ══════════════ -->
+<section class="sec" id="s6" data-rail="6">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">6</div>
+      <div class="sec-meta">
+        <span class="tag">Grenze · das Mystische</span>
+        <h2>一般形式，以及世界的界限</h2>
+      </div>
+    </div>
+
+    <p class="lede">现在把整台机器压缩成一个公式。</p>
+    <p>既然所有命题都是真值函项，那么只要有一个操作，能对任意一组命题"同时否定"，再让它反复作用于基本命题，就能生成<strong>一切命题</strong>。这个操作叫 <code>N</code>，这个公式就是命题的一般形式：</p>
+
+    <pre class="ascii big">   [ p-bar , xi-bar , N(xi-bar) ]
+
+   一般形式：对任一命题集合 xi-bar，同时否定其中的每一个命题。
+
+                 N(xi)
+           /       |       \
+           p       q       r
+           |       |       |
+          N(p)    N(q)    N(r)
+           \       |       /
+            \      |      /
+         N( N(p), N(q), N(r) )</pre>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <span>机关六 · 施加 N</span>
+        <span class="hint">一步，再一步</span>
+      </div>
+      <div class="steps" id="steps"></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn primary" id="nextN">施加 N</button>
+        <button class="btn" id="resetN">回到起点</button>
+      </div>
+      <div class="readout" id="s6out"></div>
+    </div>
+
+    <p>逻辑命题（比如"要么下雨要么不下雨"）是这套机器的<strong>退化输出</strong>：它在所有真值组合下都为真。它看上去说了一件很确定的事，其实什么也没说。维特根斯坦说，逻辑命题是世界的<em>脚手架</em>——它支撑着世界，但它本身不描绘任何东西。</p>
+
+    <p>然后，这本书突然转向了。前面七百多个编号都在讲语言能做什么，到第 6.4 节往后，维特根斯坦开始讲那些<strong>不能</strong>被说出的东西：伦理、美学、生命的意义、死亡、世界的存在本身。他说，它们不是"还没被研究清楚"，而是<em>在语言之外</em>。它们不可以说，但它们会<strong>自己显示出来</strong>。这就是"神秘的东西"。</p>
+
+    <div class="quote">
+      <span class="qnum">6</span>
+      <p class="de">Die allgemeine Form der Wahrheitsfunktion ist: [p̄, ξ̄, N(ξ̄)]. Dies ist die allgemeine Form des Satzes.</p>
+      <p class="zh">真值函项的一般形式是：[p̄, ξ̄, N(ξ̄)]。这就是命题的一般形式。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">6.522</span>
+      <p class="de">Es gibt allerdings Unaussprechliches. Dies zeigt sich, es ist das Mystische.</p>
+      <p class="zh">确实存在着不可言说的东西。它自己显示出来，它是神秘的东西。</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">6.44</span>
+      <p class="de">Nicht wie die Welt ist, ist das Mystische, sondern dass sie ist.</p>
+      <p class="zh">神秘的不是世界如何存在，而是世界竟然存在。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ §7 ══════════════ -->
+<section class="sec" id="s7" data-rail="7">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">7</div>
+      <div class="sec-meta">
+        <span class="tag">Schweigen</span>
+        <h2>对于不可言说者，<br>必须保持沉默</h2>
+      </div>
+    </div>
+
+    <p class="lede">梯子的最后一格。</p>
+    <p>读到这里你可能会发现一件尴尬的事：前面六节讲的全都是"命题是图像""语言有界限"——可这些说法本身，是命题吗？它们描绘了哪个事实？</p>
+
+    <p>维特根斯坦在 6.54 里承认了这个尴尬，而且把它变成了全书的机关：<strong>这本书里的话都是无意义的。</strong>它们不是真理，是<em>梯子</em>。你踩着它们爬上来，看到了语言的样子，然后你必须把梯子扔掉。</p>
+
+    <pre class="ascii big">   +-------------------------------------------+
+   |                                           |
+   |                                           |
+   |                                           |
+   |                                           |
+   |                                           |
+   |                                           |
+   +-------------------------------------------+
+
+        这里没有图像。这里没有命题。这里没有梯子。</pre>
+
+    <p>第七句只有一行字。它是这本书唯一真正的"命题"，也是唯一不需要论证的一句——因为任何论证它的话，都已经越过了界限。</p>
+
+    <div class="throw-wrap">
+      <button class="btn-throw" id="throwBtn">扔掉梯子</button>
+    </div>
+
+    <div class="quote">
+      <span class="qnum">6.54</span>
+      <p class="de">Meine Sätze erläutern dadurch, dass sie der, welcher mich versteht, am Ende als unsinnig erkennt, wenn er durch sie — auf ihnen — über sie hinausgestiegen ist. (Er muss sozusagen die Leiter wegwerfen, nachdem er auf ihr hinaufgestiegen ist.)</p>
+      <p class="zh">我的命题通过下述方式起阐明作用：任何理解我的人，当他借助这些命题——踩着它们——攀登上去并超越了它们之后，最终会认识到它们是无意义的。（他可以说：在爬上梯子之后，必须把梯子扔掉。）</p>
+    </div>
+    <div class="quote">
+      <span class="qnum">7</span>
+      <p class="de">Wovon man nicht sprechen kann, darüber muss man schweigen.</p>
+      <p class="zh">对于不可言说者，必须保持沉默。</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <pre class="sevens">1  世界是一切发生的事情
+2  发生的事情，即事实，是诸事态的存在
+3  事实的逻辑图像是思想
+4  思想是有意义的命题
+5  命题是基本命题的真值函项
+6  真值函项的一般形式是 [ p-bar, xi-bar, N(xi-bar) ]
+7  对于不可言说者，必须保持沉默</pre>
+    <div>字符画与交互设计 · 依《逻辑哲学论》1921 年首版编号编排<br>德文原文据 Suhrkamp 版，中文为通行译法</div>
+  </div>
+</footer>
+
+<div id="silence">
+  <p class="line">Wovon man nicht sprechen kann,<br>darüber muss man schweigen.</p>
+  <p class="line zh">对于不可言说者，必须保持沉默。</p>
+  <p class="after">梯子已经扔掉了。维特根斯坦本人也是这样做的：写完这本书，他离开哲学，去奥地利乡下当了六年小学教师。<br>十六年后他才回来，而回来时，他几乎推翻了这里的一切——不再有"图像"，只有"用法"。那本《哲学研究》是另一架梯子。</p>
+  <button class="btn" id="backBtn">把梯子捡回来</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ─────────── 通用工具 ─────────── */
+  function el(sel,root){return (root||document).querySelector(sel);}
+  function els(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
+
+  // 把 <pre> 拆成逐行动画
+  function prepAscii(pre){
+    if(pre.dataset.done) return;
+    pre.dataset.done="1";
+    var lines=pre.textContent.replace(/\s+$/,"").split("\n");
+    pre.textContent="";
+    lines.forEach(function(t,i){
+      var s=document.createElement("span");
+      s.className="ln";
+      s.textContent=t.length?t:"\u00a0";
+      s.style.animationDelay=(i*26)+"ms";
+      pre.appendChild(s);
+    });
+  }
+  els("pre.ascii, pre.ascii-hero").forEach(prepAscii);
+
+  // 进入视口后播放
+  var io=new IntersectionObserver(function(ents){
+    ents.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add("in");
+        els(".ln",e.target).forEach(function(s,i){s.style.animationDelay=(i*26)+"ms";});
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.12,rootMargin:"0px 0px -40px 0px"});
+  els("pre.ascii, pre.ascii-hero").forEach(function(p){io.observe(p);});
+
+  /* ─────────── 进度条 & 导轨 ─────────── */
+  var bar=el("#progress"), railLinks=els(".rail a");
+  function onScroll(){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    var p=h>0?Math.min(1,Math.max(0,window.scrollY/h)):0;
+    bar.style.width=(p*100).toFixed(2)+"%";
+    var mid=window.scrollY+window.innerHeight*0.38, cur=0;
+    els("[data-rail]").forEach(function(s){
+      var top=s.offsetTop;
+      if(top<=mid) cur=parseInt(s.dataset.rail,10);
+    });
+    railLinks.forEach(function(a){
+      a.classList.toggle("on",parseInt(a.dataset.rail,10)===cur);
+    });
+  }
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",onScroll);
+  onScroll();
+
+  /* ─────────── §1 物 vs 事实 ─────────── */
+  var ART1={
+    things:[
+      "      o   ^   #",
+      "      #   o   ^",
+      "      ^   #   o",
+      "",
+      "   一堆东西，没有内部结构。",
+      "   重新排列它们，",
+      "   世界纹丝不动 —— 因为清单没变。"
+    ].join("\n"),
+    facts:[
+      "      ^ ----- #",
+      "      |       |",
+      "      o ----- ^",
+      "",
+      "   同一批对象，构成一张关系网。",
+      "   重新排列它们，",
+      "   世界就换了一个 —— 事实变了。"
+    ].join("\n")
+  };
+  var OUT1={
+    things:"<b>世界 = 物的总和</b>\n世界是一张清单：有 o、有 ^、有 #。\n\n它无法说明：为什么同一个房间，\n\"整齐\"和\"被翻过\"是两个世界。\n\n清单里没有\"之间\"。",
+    facts:"<b>世界 = 事实的总和</b>\n世界是一组\"什么和什么怎样关联\"。\n\no 在 ^ 上面、^ 在 # 左边 —— 这些才是世界。\n\n物是配角，配置是主角。\n这正是命题 1.1 要说的。"
+  };
+  function setS1(mode){
+    var pre=el("#s1art");
+    pre.dataset.done="";
+    pre.textContent=ART1[mode];
+    prepAscii(pre);
+    pre.classList.add("in");
+    el("#s1out").textContent="";
+    el("#s1out").innerHTML=OUT1[mode].replace(/\n/g,"<br>");
+    els(".chip").forEach(function(c){c.classList.toggle("on",c.dataset.mode===mode);});
+  }
+  els(".chip").forEach(function(c){c.addEventListener("click",function(){setS1(c.dataset.mode);});});
+  setS1("things");
+
+  /* ─────────── §2 事态构造器 ─────────── */
+  var OBJ=["^","#","o","*"], NAMES={"^":"三角形","#":"方块","o":"圆圈","*":"星形"};
+  var gridState=new Array(9).fill(null);
+  var gridEl=el("#grid9");
+  for(var i=0;i<9;i++){
+    (function(idx){
+      var c=document.createElement("div");
+      c.className="cell";
+      c.textContent=".";
+      c.addEventListener("click",function(){cycleCell(idx);});
+      gridEl.appendChild(c);
+    })(i);
+  }
+  function cycleCell(idx){
+    var cur=gridState[idx];
+    // 空格子：放下第一个还没上场的对象
+    if(cur===null){
+      var free=OBJ.filter(function(o){return gridState.indexOf(o)===-1;});
+      place(idx, free.length?free[0]:OBJ[0]);
+      return;
+    }
+    // 已有对象：在"自己 + 还没上场的对象"里循环，最后回到空
+    var pool=OBJ.filter(function(o){return o===cur||gridState.indexOf(o)===-1;});
+    var k=pool.indexOf(cur);
+    if(k===pool.length-1){ gridState[idx]=null; }
+    else{ place(idx,pool[k+1]); return; }
+    renderGrid();
+  }
+  function place(idx,obj){
+    var old=gridState.indexOf(obj);
+    if(old>-1) gridState[old]=null;
+    gridState[idx]=obj;
+    renderGrid();
+  }
+  function renderGrid(){
+    var cells=els(".cell",gridEl);
+    cells.forEach(function(c,i){
+      c.textContent=gridState[i]===null?".":gridState[i];
+      c.classList.toggle("filled",gridState[i]!==null);
+    });
+    var lines=[],cnt=0;
+    OBJ.forEach(function(o){
+      var at=gridState.indexOf(o);
+      if(at>-1){ cnt++; lines.push("  "+o+"  "+NAMES[o]+"  位于 第"+(Math.floor(at/3)+1)+"行第"+(at%3+1)+"列"); }
+    });
+    var out=el("#s2out");
+    if(cnt===0){
+      out.innerHTML="<b>逻辑空间是空的。</b><br>九个格子代表对象可能占据的位置。<br>点击任意格子，把一个对象放进去。<br><br><span class='warn'>注意：对象只有四个，位置却有九个 —— 可能性总是多于现实。</span>";
+    }else{
+      out.innerHTML="<b>当前事态（"+cnt+" 个）</b><br>"+lines.join("<br>")+
+        "<br><br>对象始终是那四个：^ # o *　—— 它们<span class='ok'>固定、简单、不变</span>。"+
+        "<br>变的只是<span class='warn'>配置</span>。"+
+        (cnt===4?"<br><br><b>这是一个可能世界。</b>换一种摆法，就是另一个可能世界。":"");
+    }
+  }
+  el("#shuffle").addEventListener("click",function(){
+    gridState=new Array(9).fill(null);
+    var slots=[0,1,2,3,4,5,6,7,8];
+    for(var i=slots.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=slots[i];slots[i]=slots[j];slots[j]=t;}
+    OBJ.forEach(function(o,k){ gridState[slots[k]]=o; });
+    renderGrid();
+  });
+  el("#clearGrid").addEventListener("click",function(){ gridState=new Array(9).fill(null); renderGrid(); });
+  renderGrid();
+
+  /* ─────────── §3 同构映射 ─────────── */
+  var isoOn=true, perm=[0,1,2], order=[0,1,2];
+  var svg=el("#maplines"), mapbox=el("#mapbox");
+  function drawLines(){
+    var box=mapbox.getBoundingClientRect();
+    var L=els("#colL .node"), R=els("#colR .node");
+    var h="";
+    order.forEach(function(rk,li){
+      var a=L[li].getBoundingClientRect(), b=R[rk].getBoundingClientRect();
+      var x1=a.right-box.left, y1=a.top+a.height/2-box.top;
+      var x2=b.left-box.left,  y2=b.top+b.height/2-box.top;
+      var stroke=isoOn?"#c9bfab":"#b0432c";
+      var mx=(x1+x2)/2;
+      h+='<path d="M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2+
+         '" fill="none" stroke="'+stroke+'" stroke-width="'+(isoOn?1.2:1)+'" stroke-dasharray="'+(isoOn?"0":"3 3")+'" opacity="'+(isoOn?.9:.65)+'"/>';
+    });
+    svg.setAttribute("viewBox","0 0 "+box.width+" "+box.height);
+    svg.innerHTML=h;
+  }
+  function renderIso(){
+    order=isoOn?[0,1,2]:perm;
+    var L=els("#colL .node"), R=els("#colR .node");
+    L.forEach(function(n,i){ n.textContent=OBJ[i]; });
+    R.forEach(function(n,i){ n.textContent=["@","%","*"][i]; });
+    var m={0:"@",1:"%",2:"*"};
+    var pairs=order.map(function(rk,li){ return OBJ[li]+" -> "+m[rk]; }).join("　");
+    var out=el("#s3out");
+    if(isoOn){
+      out.innerHTML="<b>同构成立。</b><br>图像要素与实在对象一一对应，且排列方式相同：<br>"+pairs+
+      "<br><br>所以这是一幅<span class='ok'>图像</span>：它可以说出世界的样子，也可以说错。<br>说错的时候它仍然是图像 —— 因为它仍然共享着形式。";
+    }else{
+      out.innerHTML="<b>同构被打乱了。</b><br>对应关系变得混乱：<br>"+pairs+
+      "<br><br>现在它<span class='warn'>不再是图像</span>了。它失去了与实在共享的形式，<br>于是它退化成了一个纯粹的物 —— 一堆符号，什么也没描绘。<br><br>这正是 2.17 的意思：<br>图像之为图像，只在于它的要素以特定方式相互关联。";
+    }
+  }
+  els("#mapbox .node").forEach(function(n){
+    n.addEventListener("mouseenter",function(){
+      var k=parseInt(n.dataset.k,10), isL=n.parentNode.id==="colL";
+      els("#mapbox .node").forEach(function(x){x.classList.remove("hi","hi-r");});
+      if(isL){ n.classList.add("hi"); els("#colR .node")[order[k]].classList.add("hi-r"); }
+      else{ n.classList.add("hi-r"); els("#colL .node")[order.indexOf(k)].classList.add("hi"); }
+    });
+    n.addEventListener("mouseleave",function(){
+      els("#mapbox .node").forEach(function(x){x.classList.remove("hi","hi-r");});
+    });
+  });
+  el("#isoBtn").addEventListener("click",function(){
+    isoOn=!isoOn;
+    this.textContent="同构："+(isoOn?"开":"关");
+    this.classList.toggle("primary",isoOn);
+    if(!isoOn){ perm=[0,2,1]; }
+    renderIso(); drawLines();
+  });
+  window.addEventListener("resize",drawLines);
+  window.addEventListener("load",drawLines);
+  setTimeout(function(){ renderIso(); drawLines(); },60);
+  setTimeout(drawLines,700);
+  renderIso();
+
+  /* ─────────── §4 命题构造器 ─────────── */
+  var ITEMS={a:{glyph:"#",kind:"obj",txt:"方块 #"},b:{glyph:"^",kind:"obj",txt:"三角 ^"},c:{glyph:"o",kind:"obj",txt:"圆圈 o"},n7:{glyph:"7",kind:"num",txt:"数字 7"},n3:{glyph:"3",kind:"num",txt:"数字 3"}};
+  var RELS={
+    left:{txt:"在……左边",need:"obj",word:"在左边"},
+    above:{txt:"在……上边",need:"obj",word:"在上边"},
+    gt:{txt:"大于",need:"num",word:"大于"}
+  };
+  function fillSelect(sel,obj){
+    sel.innerHTML="";
+    Object.keys(obj).forEach(function(k){
+      var o=document.createElement("option");
+      o.value=k; o.textContent=obj[k].txt;
+      sel.appendChild(o);
+    });
+  }
+  fillSelect(el("#bLeft"),ITEMS); fillSelect(el("#bRight"),ITEMS); fillSelect(el("#bRel"),RELS);
+  el("#bLeft").value="a"; el("#bRight").value="b"; el("#bRel").value="left";
+  function renderProp(){
+    var lk=el("#bLeft").value, rk=el("#bRight").value, rk2=el("#bRel").value;
+    var L=ITEMS[lk], R=ITEMS[rk], REL=RELS[rk2];
+    var pre=el("#s4art"), out=el("#s4out");
+    var prop=L.glyph+" "+REL.word+" "+R.glyph;
+    var art,verdict,cls;
+
+    if(REL.need==="num" && (L.kind!=="num" || R.kind!=="num")){
+      var bad = L.kind!=="num"? L.glyph : R.glyph;
+      art=[
+        "   命题：  \"" + prop + "\"",
+        "",
+        "   " + L.glyph + "  --" + REL.word + "-->  " + R.glyph,
+        "",
+        "   ？？？  这里画不出任何图像。"
+      ].join("\n");
+      verdict="<span class='warn'>没有意义（unsinnig）。</span><br>\"大于\"是一个需要数字的关系，而 "+bad+" 不是数字。<br>这个名字被放进了它无法进入的位置 —— 就像把螺丝刀当尺子用。<br><br>注意：它不是\"假\"，而是<span class='warn'>连假都算不上</span>。<br>假命题仍然描绘了一个可能的配置；这个符号串什么都没描绘。";
+      cls="warn";
+    }else if(lk===rk && REL.need==="obj"){
+      art=[
+        "   命题：  \"" + prop + "\"",
+        "",
+        "   " + L.glyph + "  --" + REL.word + "-->  " + L.glyph,
+        "",
+        "   ？？？  一个对象不可能在自己旁边。"
+      ].join("\n");
+      verdict="<span class='warn'>逻辑上不可能。</span><br>同一个名字出现在关系两端，这不是一个可描绘的配置。<br>命题的形式不允许它，所以它不是假命题，而是<span class='warn'>伪命题</span>。";
+      cls="warn";
+    }else{
+      art=[
+        "   命题：  \"" + prop + "\"",
+        "",
+        "   " + L.glyph + "  --" + REL.word + "-->  " + R.glyph,
+        "",
+        "   图像成立。它描绘了一个可能的配置。"
+      ].join("\n");
+      verdict="<span class='ok'>有意义。</span><br>名字 "+L.glyph+"、"+R.glyph+" 各自代表一个物，<br>关系 \""+REL.word+"\" 把它们连起来 —— 整体像一幅活的图像，<br>呈现出\""+prop+"\"这个事态。<br><br>它可能真，也可能假。要判断真假，得去看世界。<br>但有没有意义，语言自己就能决定。";
+      cls="ok";
+    }
+    pre.dataset.done=""; pre.textContent=art; prepAscii(pre); pre.classList.add("in");
+    out.innerHTML=verdict;
+  }
+  ["#bLeft","#bRel","#bRight"].forEach(function(s){ el(s).addEventListener("change",renderProp); });
+  renderProp();
+
+  /* ─────────── §5 真值表 ─────────── */
+  var CONN={
+    and:{sym:"p AND q",label:"合取",fn:function(p,q){return p&&q;}},
+    or:{sym:"p OR q",label:"析取",fn:function(p,q){return p||q;}},
+    imp:{sym:"p -> q",label:"蕴含",fn:function(p,q){return (!p)||q;}},
+    iff:{sym:"p <-> q",label:"等值",fn:function(p,q){return p===q;}},
+    nand:{sym:"p NAND q",label:"否定的合取",fn:function(p,q){return !(p&&q);}},
+    nor:{sym:"p NOR q",label:"否定的析取",fn:function(p,q){return !(p||q);}},
+    xor:{sym:"p XOR q",label:"排斥析取",fn:function(p,q){return p!==q;}}
+  };
+  var curConn="and";
+  var chipWrap=el("#ttChips");
+  Object.keys(CONN).forEach(function(k){
+    var b=document.createElement("button");
+    b.className="chip"+(k===curConn?" on":"");
+    b.textContent=CONN[k].sym;
+    b.addEventListener("click",function(){ curConn=k; renderTT(); });
+    chipWrap.appendChild(b);
+  });
+  function renderTT(){
+    els("#ttChips .chip").forEach(function(c){ c.classList.toggle("on",c.textContent===CONN[curConn].sym); });
+    var f=CONN[curConn].fn;
+    var rows=[[true,true],[true,false],[false,true],[false,false]];
+    var h="<thead><tr><th>p</th><th>q</th><th>"+CONN[curConn].sym+"</th></tr></thead><tbody>";
+    rows.forEach(function(r){
+      var v=f(r[0],r[1]);
+      h+="<tr><td class='v "+(r[0]?"T":"F")+"'>"+(r[0]?"W":"F")+"</td>"+
+         "<td class='v "+(r[1]?"T":"F")+"'>"+(r[1]?"W":"F")+"</td>"+
+         "<td class='"+(v?"T":"F")+"'>"+(v?"W":"F")+"</td></tr>";
+    });
+    h+="</tbody>";
+    el("#ttTable").innerHTML=h;
+    var t=0; rows.forEach(function(r){ if(f(r[0],r[1])) t++; });
+    var note;
+    if(t===4) note="<span class='ok'>四行全真 —— 这是一条重言式。逻辑命题什么也没有说。</span>";
+    else if(t===0) note="<span class='warn'>四行全假 —— 这是矛盾式。它同样什么也没有说。</span>";
+    else note="真值分布由 "+t+" / 4 行决定。<br>只要四个 W/F 给定了，这个函项就被完全确定了 —— 不需要知道 p 和 q 说的是什么。";
+    el("#s5out").innerHTML="<b>"+CONN[curConn].label+"</b>　"+CONN[curConn].sym+"<br><br>"+note+
+      "<br><br>维特根斯坦的要点在这里：<em>复合命题的真假，完全由零件的真假决定</em>。<br>逻辑不关心内容，只关心结构。";
+  }
+  renderTT();
+
+  /* 5.101 十六行 */
+  var F16=[
+    ["FFFF","矛盾式  ⊥","永远为假。什么也没有说。"],
+    ["FFFW","p ↓ q","并非 p 或 q。只有两个都假时才真。"],
+    ["FFWF","¬p ∧ q","p 假而 q 真。"],
+    ["FFWW","¬p","并非 p。"],
+    ["FWFF","p ∧ ¬q","p 真而 q 假。"],
+    ["FWFW","¬q","并非 q。"],
+    ["FWWF","p ⊕ q","p 与 q 恰好一个为真。"],
+    ["FWWW","p ↑ q","并非 p 和 q 两者都真。"],
+    ["WFFF","p ∧ q","p 和 q 两者都真。"],
+    ["WFFW","p ↔ q","p 与 q 真值相同。"],
+    ["WFWF","q","就是 q 本身。"],
+    ["WFWW","p → q","如果 p 则 q。"],
+    ["WWFF","p","就是 p 本身。"],
+    ["WWFW","q → p","如果 q 则 p。"],
+    ["WWWF","p ∨ q","p 或 q，至少一个为真。"],
+    ["WWWW","重言式  ⊤","永远为真。什么也没有说。"]
+  ];
+  var schemaEl=el("#schema");
+  F16.forEach(function(row,i){
+    var d=document.createElement("div");
+    d.className="srow";
+    var pat="("+row[0].split("").join(" ")+")(p, q)";
+    d.innerHTML='<span class="pat">'+pat+'</span><span class="lbl">'+row[1]+'</span>';
+    d.addEventListener("click",function(){
+      els(".srow").forEach(function(x){x.classList.remove("sel");});
+      d.classList.add("sel");
+      el("#schemaOut").innerHTML="<b>（"+row[0].split("").join(" ")+"）</b>　"+row[1]+"<br>"+row[2]+
+        "<br><br><span style='opacity:.75'>四个位置依次对应 (p,q) = (W,W)、(W,F)、(F,W)、(F,F)。<br>W 表示该组合下命题为真。十六行，一个不多，一个不少。</span>";
+    });
+    schemaEl.appendChild(d);
+  });
+  el("#schemaOut").innerHTML="十六行就是 <b>2^(2^2) = 16</b> 种真值函项。<br>它们穷尽了用两个命题能说的一切 —— 逻辑的边界，在这里被一次性画完了。<br><br><span style='opacity:.75'>点击任意一行看它的读法。</span>";
+
+  /* ─────────── §6 N 操作 ─────────── */
+  var STEPS=[
+    {l:"0 · 起点",c:"p",d:"一个基本命题。它直接描绘一个事态。"},
+    {l:"1 · 施加 N",c:"N(p)  =  ¬p",d:"同时否定一个命题，得到它的否定。"},
+    {l:"2 · 再施加 N",c:"N(N(p))  =  p",d:"否定之否定回到自身。操作是自反的。"},
+    {l:"3 · 同时否定两个",c:"N(p, q)  =  ¬p ∧ ¬q",d:"\"既不 p 也不 q\"。注意：这仍然只是否定。"},
+    {l:"4 · 否定它",c:"N(N(p, q))  =  p ∨ q",d:"析取出现了。它不在起点里，是被 N 造出来的。"},
+    {l:"5 · 构造合取",c:"N( N(p,q), N(N(p),N(q)) )  =  p ∧ q",d:"合取同样只是 N 的组合。"},
+    {l:"6 · 一切",c:"N( ...N( ... )... )  =  所有命题",d:"∧、∨、→、↔、¬ —— 全部连接词，都只是同一个操作的反复施行。"}
+  ];
+  var stepEl=el("#steps"), stepN=1;
+  function renderSteps(){
+    stepEl.innerHTML="";
+    STEPS.forEach(function(s,i){
+      var d=document.createElement("div");
+      d.className="step"+(i<stepN?" on":"");
+      d.innerHTML='<span class="sl">'+s.l+'</span><span class="sc">'+s.c+'</span><span class="sd">'+s.d+'</span>';
+      stepEl.appendChild(d);
+    });
+    var out=el("#s6out");
+    if(stepN<=1){
+      out.innerHTML="起点只有一个基本命题 p。<br>下面每一次点击，都是同一个操作 <b>N</b> 的再一次施行。<br><br><span style='opacity:.75'>问题：这样反复下去，真的能造出全部命题吗？</span>";
+    }else if(stepN>=STEPS.length){
+      out.innerHTML="<b>能。</b>从 p 出发，只用一个操作 N，反复施加，<br>就能生成<b>全部</b>命题 —— 这就是 [p̄, ξ̄, N(ξ̄)] 的含义。<br><br>逻辑的全部机械装置，收缩成了一个符号。<br><span class='ok'>6.001：每一个命题都是对基本命题连续施行 N 的结果。</span>";
+    }else{
+      out.innerHTML="已经施加 <b>"+(stepN-1)+"</b> 次 N。<br>"+STEPS[stepN-1].d+
+      "<br><br><span style='opacity:.75'>继续点，看它还能长出什么。</span>";
+    }
+  }
+  el("#nextN").addEventListener("click",function(){ if(stepN<STEPS.length) stepN++; renderSteps(); });
+  el("#resetN").addEventListener("click",function(){ stepN=1; renderSteps(); });
+  renderSteps();
+
+  /* ─────────── §7 扔梯子 ─────────── */
+  el("#throwBtn").addEventListener("click",function(){
+    document.body.classList.add("dissolved");
+    el("#silence").classList.add("on");
+    window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+  });
+  el("#backBtn").addEventListener("click",function(){
+    el("#silence").classList.remove("on");
+    document.body.classList.remove("dissolved");
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="oZthVrL1b1k55J7slLFSkj">
+<head data-page-node-id="XrKCyo1PFB5rAyLxEJZFEC">
+<meta charset="utf-8" data-page-node-id="Wfhox9lxcwGTKYJVH1vv7G">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="ZB1TaSnuatqjJrePErZk9m">
+<meta name="color-scheme" content="dark" data-page-node-id="JPIie8zNID6H1Y8CqCffT2">
+<title>MINDFUL.EXE — ZEN-OS 正念终端</title>
+<style>
+:root{
+  --panel:rgba(9,20,13,.86);
+  --ph:#8bffb0;
+  --ph-2:#c9ffd9;
+  --ph-dim:#3f8a58;
+  --ph-dark:#1b3d27;
+  --amber:#ffc46b;
+  --rose:#ff8fb0;
+  --line:#245c39;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+  --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:#030604; color:var(--ph);
+  font-family:var(--mono); font-size:14px; line-height:1.55;
+  overflow:hidden; -webkit-font-smoothing:antialiased;
+  text-shadow:0 0 3px rgba(139,255,176,.35);
+  letter-spacing:.02em;
+}
+button{font-family:inherit;letter-spacing:inherit}
+::selection{background:var(--ph-dim);color:#02110a}
+
+/* ---------- 显示器外壳 ---------- */
+.monitor{
+  position:fixed; inset:0; padding:clamp(0px,1.1vw,20px);
+  background:radial-gradient(120% 90% at 50% 0%, #0d1a12 0%, #060b08 45%, #020403 100%);
+}
+.bezel{
+  position:relative; width:100%; height:100%;
+  border-radius:16px / 20px;
+  padding:clamp(0px,.7vw,12px);
+  background:linear-gradient(160deg,#1b241d,#0a100c 40%,#050806);
+  box-shadow:0 30px 80px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.screen{
+  position:relative; width:100%; height:100%; overflow:hidden;
+  border-radius:10px / 14px;
+  background:radial-gradient(130% 110% at 50% 42%, #0f2013 0%, #081109 55%, #040805 100%);
+  box-shadow:
+    inset 0 0 140px rgba(0,0,0,.92),
+    inset 0 0 60px rgba(70,255,150,.055),
+    0 0 0 2px #060d08,
+    0 0 44px rgba(60,200,120,.10);
+}
+
+/* ---------- CRT 特效层 ---------- */
+.fx{position:absolute;inset:0;pointer-events:none;z-index:60}
+.fx-scan{
+  background:repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,0,0,.30) 2px, rgba(0,0,0,.30) 4px);
+  mix-blend-mode:multiply; opacity:.85;
+}
+.fx-mask{
+  background:radial-gradient(115% 105% at 50% 50%, rgba(0,0,0,0) 42%, rgba(0,0,0,.62) 88%, rgba(0,0,0,.9) 100%);
+}
+.fx-band{
+  position:absolute; left:-10%; right:-10%; height:26%;
+  background:linear-gradient(to bottom, rgba(139,255,176,0), rgba(139,255,176,.055), rgba(139,255,176,0));
+  animation:roll 8.5s linear infinite;
+}
+@keyframes roll{ from{transform:translateY(-120%)} to{transform:translateY(520%)} }
+.fx-flick{background:rgba(160,255,200,.022);animation:flick 2.6s steps(1) infinite}
+@keyframes flick{ 0%,97%{opacity:.35} 97.5%{opacity:.9} 98%{opacity:.2} 98.6%{opacity:.75} 99.2%{opacity:.3} 100%{opacity:.35} }
+.fx-glow{box-shadow:inset 0 0 90px rgba(90,255,160,.07)}
+
+/* 关机 / 开机 */
+.power{position:absolute;inset:0;z-index:90;pointer-events:none;background:#000;opacity:0;
+  transition:opacity .14s linear}
+.power.on{opacity:1;pointer-events:all}
+.power .line{
+  position:absolute; left:6%; right:6%; top:50%; height:3px; background:#dfffe9;
+  transform:scaleX(0); box-shadow:0 0 26px 6px rgba(150,255,190,.85);
+}
+.power.anim-in .line{animation:crtin .42s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes crtin{
+  0%{transform:scaleX(0) scaleY(1);opacity:1}
+  45%{transform:scaleX(1) scaleY(1);opacity:1}
+  70%{transform:scaleX(1) scaleY(9);opacity:.9}
+  100%{transform:scaleX(1) scaleY(160);opacity:0}
+}
+.power.anim-out .line{animation:crtout .34s ease-in forwards}
+@keyframes crtout{
+  0%{transform:scaleX(1) scaleY(150);opacity:1}
+  55%{transform:scaleX(1) scaleY(3);opacity:1}
+  100%{transform:scaleX(0) scaleY(1);opacity:0}
+}
+
+/* ---------- 开机自检 ---------- */
+.boot{position:absolute;inset:0;z-index:55;background:#030604;padding:clamp(16px,4vw,46px);
+  overflow:hidden;font-size:13px;line-height:1.75;display:flex;flex-direction:column}
+.boot.done{opacity:0;transition:opacity .3s;pointer-events:none}
+.boot__head{color:var(--ph-2);letter-spacing:.12em;margin-bottom:1.2em;white-space:pre-wrap}
+#bootLog{white-space:pre-wrap;flex:1;overflow:hidden}
+#bootLog .ok{color:var(--amber)}
+#bootLog .dim{color:var(--ph-dim)}
+.boot__hint{margin-top:14px;color:var(--amber);min-height:1.6em}
+.cursor{display:inline-block;width:.62em;height:1em;background:var(--ph);vertical-align:-.14em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- OS 布局 ---------- */
+.os{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column}
+.menubar{
+  display:flex;align-items:center;gap:2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+  padding:0 8px;height:34px;flex:0 0 auto;
+  background:linear-gradient(180deg,#16301f,#0c1b12);
+  border-bottom:2px solid var(--line);
+}
+.menubar::-webkit-scrollbar{display:none}
+.brand{display:flex;align-items:center;gap:7px;padding-right:12px;margin-right:6px;
+  border-right:2px solid var(--line);color:var(--ph-2);font-weight:700;letter-spacing:.14em;font-size:12px;white-space:nowrap}
+.brand .led{width:9px;height:9px;background:var(--ph);box-shadow:0 0 8px var(--ph);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.28}}
+.tab{
+  appearance:none;border:0;background:transparent;color:var(--ph-dim);
+  padding:5px 10px;font-size:12px;letter-spacing:.08em;cursor:pointer;white-space:nowrap;
+}
+.tab:hover{color:var(--ph-2);background:rgba(139,255,176,.09)}
+.tab[aria-selected="true"]{background:var(--ph-dark);color:var(--ph-2);
+  box-shadow:inset -2px -2px 0 rgba(0,0,0,.5),inset 2px 2px 0 rgba(139,255,176,.32)}
+.tab .k{color:var(--amber);font-size:10px}
+
+.workspace{flex:1;min-height:0;padding:clamp(8px,1.4vw,16px);display:flex}
+.win{display:none;flex-direction:column;width:100%;min-height:0;
+  background:var(--panel);border:2px solid var(--line);
+  box-shadow:0 0 0 2px #060d08, 6px 6px 0 rgba(0,0,0,.45)}
+.win.active{display:flex}
+.win__bar{
+  display:flex;align-items:center;gap:10px;flex:0 0 auto;
+  padding:5px 8px;background:linear-gradient(180deg,#2c6b43,#1d4b2e);
+  border-bottom:2px solid var(--line);color:#eafff1;font-size:12px;letter-spacing:.1em;font-weight:700;
+  text-shadow:0 1px 0 rgba(0,0,0,.55);
+}
+.win__bar .dots{display:flex;gap:3px}
+.win__bar .dots i{width:8px;height:8px;background:#0b1a11;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.win__bar .spacer{flex:1}
+.win__bar .cbtn{width:18px;height:16px;display:grid;place-items:center;background:#0f2417;color:var(--ph);
+  font-size:11px;line-height:1;cursor:pointer;border:0;
+  box-shadow:inset -2px -2px 0 rgba(0,0,0,.55),inset 2px 2px 0 rgba(139,255,176,.3)}
+.win__bar .cbtn:hover{background:#1d4b2e;color:var(--ph-2)}
+.win__body{flex:1;min-height:0;padding:clamp(10px,1.5vw,18px);display:flex;flex-direction:column;gap:12px;overflow:auto}
+
+.statusbar{
+  flex:0 0 auto;display:flex;align-items:center;gap:14px;
+  padding:0 10px;height:28px;font-size:11px;letter-spacing:.09em;color:var(--ph-dim);
+  background:linear-gradient(180deg,#0c1b12,#16301f);border-top:2px solid var(--line);
+  overflow:hidden;white-space:nowrap;
+}
+.statusbar .sep{flex:1}
+.statusbar b{color:var(--ph);font-weight:400}
+.statusbar .pwr{cursor:pointer;color:var(--amber)}
+.statusbar .pwr:hover{color:var(--ph-2)}
+
+/* ---------- 通用像素控件 ---------- */
+.btn{
+  appearance:none;border:0;cursor:pointer;font-size:12px;letter-spacing:.1em;
+  padding:8px 14px;color:var(--ph);background:#204a30;
+  box-shadow:inset -3px -3px 0 rgba(0,0,0,.5), inset 3px 3px 0 rgba(139,255,176,.3), 0 0 0 2px #0a1710;
+  transition:background .08s linear,color .08s linear;
+}
+.btn:hover{background:#2d6644;color:var(--ph-2)}
+.btn:active{box-shadow:inset 3px 3px 0 rgba(0,0,0,.55), inset -3px -3px 0 rgba(139,255,176,.22), 0 0 0 2px #0a1710;
+  transform:translate(1px,1px)}
+.btn[aria-pressed="true"]{background:var(--amber);color:#1a1204;
+  box-shadow:inset -3px -3px 0 rgba(0,0,0,.35), inset 3px 3px 0 rgba(255,255,255,.5), 0 0 0 2px #0a1710}
+.btn:focus-visible,.tab:focus-visible,.cbtn:focus-visible{outline:2px dashed var(--amber);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row.stretch{align-items:stretch}
+.lbl{font-size:11px;letter-spacing:.14em;color:var(--ph-dim)}
+.hint{font-size:11px;color:var(--ph-dim);letter-spacing:.06em}
+kbd{background:#0e2416;box-shadow:inset 0 0 0 1px var(--line);padding:1px 5px;font-size:11px;color:var(--ph-2)}
+
+/* ---------- 舞台 / 画布 ---------- */
+.stage{position:relative;flex:1;min-height:220px;
+  background:radial-gradient(90% 80% at 50% 50%, rgba(20,60,36,.5), rgba(4,10,7,.9));
+  box-shadow:inset 0 0 0 2px #0a1710, inset 0 0 50px rgba(0,0,0,.6);overflow:hidden}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+.overlay{position:absolute;inset:0;display:block;pointer-events:none;text-align:center}
+.overlay .center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:clamp(14px,3.5vw,40px)}
+.overlay .bottom{position:absolute;left:0;right:0;bottom:0;height:20%;max-height:66px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.overlay .phase{font-family:var(--sans);font-size:clamp(17px,3.2vw,26px);font-weight:600;color:var(--ph-2);
+  letter-spacing:.3em;text-indent:.3em;line-height:1.15;
+  text-shadow:0 0 12px rgba(139,255,176,.6),0 0 34px rgba(139,255,176,.28)}
+.overlay .sub{font-size:11px;letter-spacing:.24em;color:var(--amber)}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:12px;flex:1;min-height:0}
+@media (max-width:820px){
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .stage{min-height:300px}
+}
+
+.card{background:rgba(6,16,10,.72);box-shadow:inset 0 0 0 2px #0f2718;padding:12px}
+.card h4{margin:0 0 9px;font-size:11px;letter-spacing:.18em;color:var(--amber);font-weight:700}
+.stat{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:4px 0;
+  border-bottom:1px dashed rgba(63,138,88,.4)}
+.stat:last-child{border-bottom:0}
+.stat span{color:var(--ph-dim);letter-spacing:.08em}
+.stat b{color:var(--ph-2);font-weight:400;font-variant-numeric:tabular-nums}
+
+.bar{display:flex;gap:2px;height:14px}
+.bar i{flex:1;background:#123021;box-shadow:inset 0 0 0 1px rgba(63,138,88,.35)}
+.bar i.on{background:var(--ph);box-shadow:0 0 6px rgba(139,255,176,.6)}
+
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;height:20px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:10px;background:#123021;box-shadow:inset 0 0 0 2px #0a1710}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:20px;margin-top:-5px;
+  background:var(--ph);box-shadow:0 0 0 2px #061009,0 0 10px rgba(139,255,176,.7)}
+input[type=range]::-moz-range-track{height:10px;background:#123021}
+input[type=range]::-moz-range-thumb{border:0;border-radius:0;width:12px;height:20px;background:var(--ph)}
+
+.console{background:#030a06;box-shadow:inset 0 0 0 2px #0d2316;padding:8px 10px;height:112px;overflow:auto;
+  font-size:11.5px;line-height:1.7;color:var(--ph-dim)}
+.console div{white-space:pre-wrap}
+.console .t{color:#2f6b47}
+.console .v{color:var(--amber)}
+.console::-webkit-scrollbar{width:8px}
+.console::-webkit-scrollbar-thumb{background:var(--ph-dark)}
+.console::-webkit-scrollbar-track{background:#08150e}
+
+.prompt{font-family:var(--sans);font-size:clamp(17px,2.6vw,25px);line-height:1.85;color:var(--ph-2);
+  letter-spacing:.05em;text-shadow:0 0 10px rgba(139,255,176,.4)}
+.prompt .cur{display:inline-block;width:.5em;height:1.05em;background:var(--amber);vertical-align:-.16em;
+  animation:blink 1s steps(1) infinite}
+
+.chartwrap{position:relative;height:186px}
+.chartwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+.dayrow{display:grid;grid-template-columns:repeat(14,1fr);font-size:10px;color:var(--ph-dim);text-align:center}
+
+.toast{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);z-index:70;
+  background:#0b1c12;box-shadow:inset 0 0 0 2px var(--line),4px 4px 0 rgba(0,0,0,.5);
+  padding:9px 16px;font-size:12px;letter-spacing:.08em;color:var(--ph-2);max-width:88%;
+  opacity:0;transition:opacity .18s,transform .18s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+.toast b{color:var(--amber);font-weight:400}
+
+@media (prefers-reduced-motion:reduce){
+  .fx-band,.fx-flick{animation:none}
+  .fx-flick{opacity:.25}
+  .brand .led{animation:none}
+}
+@media (max-width:560px){
+  .statusbar .hide-sm{display:none}
+  .menubar{height:auto;padding:4px 6px}
+  .brand{font-size:11px}
+}
+</style>
+</head>
+<body data-page-node-id="HoBGaDlQkXQfh6jHGexOxM">
+<div class="monitor" data-page-node-id="LdVX5DyGBqotSZJM9U5CM7">
+ <div class="bezel" data-page-node-id="vox2hStj680RS9R8rFzSjk">
+  <div class="screen" id="screen" data-page-node-id="BtbYf7ZNmYGyArfd2q8gtC">
+
+    <div class="os" id="os" data-page-node-id="alNSwpop7EZxwWYsCEtcwc">
+      <div class="menubar" role="tablist" aria-label="模块" data-page-node-id="G1Z6pxUancBQ2GwQYCsgVK">
+        <div class="brand" data-page-node-id="nhyODPT8FNFooaASIRSZYd"><span class="led" data-page-node-id="xAeZKOy5W5m8EXLkd2GnAZ"></span>ZEN-OS 1.0</div>
+        <button class="tab" role="tab" data-mod="breathe" aria-selected="true" data-page-node-id="5jTi9BZ0DO0zAleNrbAuOk">呼吸 <span class="k" data-page-node-id="K4quwUoGA40T0r4CeKGBcA">1</span></button>
+        <button class="tab" role="tab" data-mod="focus" aria-selected="false" data-page-node-id="yhmjxSb1GL4Sv5iOCHKsWi">专注 <span class="k" data-page-node-id="cw8Avv9s5VUl2ILyFRBGsa">2</span></button>
+        <button class="tab" role="tab" data-mod="ambient" aria-selected="false" data-page-node-id="vxunYCeH4TT7Yf7rZ268RS">环境 <span class="k" data-page-node-id="wb9QSwjUiw91G1kSFxWnOe">3</span></button>
+        <button class="tab" role="tab" data-mod="cards" aria-selected="false" data-page-node-id="ZpcGYanh15oDaVn95JAm7T">心念 <span class="k" data-page-node-id="xdyhJmjfa82kEHia7GddDD">4</span></button>
+        <button class="tab" role="tab" data-mod="log" aria-selected="false" data-page-node-id="AGDCRuyT3XZ4gzU5nHgQe0">日志 <span class="k" data-page-node-id="xmel9uxO1WmNPrKFIMGHkh">5</span></button>
+        <button class="tab" role="tab" data-mod="help" aria-selected="false" data-page-node-id="pPH9BLIVOky7Ytl24YDDBo">帮助 <span class="k" data-page-node-id="BjXlhkkPsF5lzvEEI7RQ2Q">6</span></button>
+      </div>
+
+      <div class="workspace" id="workspace" data-page-node-id="kLiclACEqoldIq4QZzPkId">
+
+        <!-- ---------- 呼吸 ---------- -->
+        <section class="win active" id="win-breathe" role="tabpanel" aria-label="呼吸引导" data-page-node-id="jEHNBrtaDnbsqLlp4AGGuz">
+          <header class="win__bar" data-page-node-id="5PXDSJdCA7l6QDnsRv6ytn">
+            <span class="dots" data-page-node-id="GIFUkbsGkoIH7GOwmHuUsS"><i data-page-node-id="b41eyOw6A6iH8iE9MGpO4d"></i><i data-page-node-id="buqYICM8cDHn0Zv35GFF4G"></i><i data-page-node-id="0wHg5RIUNLyzZNUnm3o4JM"></i></span>
+            <span data-page-node-id="sk3CsieWEP8Irb299QDIZE">BREATHE.SYS — 呼吸引导</span>
+            <span class="spacer" data-page-node-id="GByhkXzD3hNxjM4WFU9ki1"></span>
+            <button class="cbtn" data-close title="关闭" data-page-node-id="zz8YzwBL1fi6TLiKAt2ixZ">×</button>
+          </header>
+          <div class="win__body" data-page-node-id="MdDy5olZfg5lRSFPqGriwX">
+            <div class="row" data-page-node-id="YQmsNpNVNe2g4y27nyUYv3">
+              <span class="lbl" data-page-node-id="pCFPOwqT3WC3KODGkolyfx">模式</span>
+              <button class="btn" data-pattern="box" data-page-node-id="mJC2VbY3ZTDXDjtIkIsLxS">箱式 4-4-4-4</button>
+              <button class="btn" data-pattern="relax" data-page-node-id="bQT6haDIp6RrKB0WId6fIH">放松 4-7-8</button>
+              <button class="btn" data-pattern="calm" data-page-node-id="xi181hlHZy44iXXgNbM9Wc">平衡 6-6</button>
+              <button class="btn" data-pattern="deep" data-page-node-id="3voLjGZ7gcQI6ypT7HLhnu">深长 5-2-7</button>
+            </div>
+            <div class="grid2" data-page-node-id="TmWnFxuH6R7mGmWrtqdlp5">
+              <div class="stage" id="stage-breathe" data-page-node-id="s8FzQGBViJ7Yowrm4fDtUC">
+                <canvas id="cvBreathe" data-page-node-id="LUfiWye78kzbARnZjq6qMw"></canvas>
+                <div class="overlay" data-page-node-id="RFgbtAJJIcGLJgSdM5A4Vq">
+                  <div class="bottom" data-page-node-id="PbE27kiJQHANprObdzTWKj">
+                    <div class="phase" id="bPhase" data-page-node-id="YkVjz3YNmFbRwLXSPFEHCz">准备</div>
+                    <div class="sub" id="bSub" data-page-node-id="ORCuHT4KarghjpNh3cCifG">按 空格 开始</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0" data-page-node-id="QdnPd7WTStBbp5QuAnifDa">
+                <div class="card" data-page-node-id="5cIndEppcv3vbGIxAM8QVU">
+                  <h4 data-page-node-id="ypfMgWga4OcDnozylEqqTA">本 轮 进 度</h4>
+                  <div class="bar" id="bBar" data-page-node-id="deAFfamC8lV44h79e5IZ2Y"></div>
+                  <div style="margin-top:10px" class="row" data-page-node-id="NlaxE9gBclzJ3w70ZRIB3C">
+                    <button class="btn" id="bToggle" aria-pressed="false" data-page-node-id="PNcVwfGJ5G42fvjwTDkmGo">开始</button>
+                    <button class="btn" id="bReset" data-page-node-id="1SlCnjiXH4AAIC8sh0PE7N">重置</button>
+                  </div>
+                </div>
+                <div class="card" data-page-node-id="Y4cHsPFV3tmYC6AvgGG4ME">
+                  <h4 data-page-node-id="KTsw619RseMlwvBqvgOeDg">统 计</h4>
+                  <div class="stat" data-page-node-id="RxPmL3U5Btibm6V1LKwlYS"><span data-page-node-id="GUsKjYrV4GRGAEjiXejVIm">当前周期</span><b id="bCycles" data-page-node-id="DRg9ctC2jHgC2bVXAnmuU7">00</b></div>
+                  <div class="stat" data-page-node-id="rRX2TP7jfB1IVbqmVaMAfV"><span data-page-node-id="8hWoGqmpXID0ttAVPDsiAw">本次时长</span><b id="bTime" data-page-node-id="EQ5B5UZOuOIPDo94Ge3PLZ">00:00</b></div>
+                  <div class="stat" data-page-node-id="wPYhfeIgyBLcFlIWziLecE"><span data-page-node-id="qC0ONgUgHK57DDnwfcZhuU">累计呼吸</span><b id="bTotal" data-page-node-id="AEHYr4SEuSgVERSpnVyWF7">0 轮</b></div>
+                  <div class="stat" data-page-node-id="A59xofhqcKpElBI2dfByQQ"><span data-page-node-id="HPo3QBCEvWvU8Q9JJJwDqI">节律</span><b id="bRate" data-page-node-id="aPDFvBY0AhBaLYrKj849dg">4-4-4-4 秒</b></div>
+                </div>
+                <div class="card" style="flex:1;min-height:120px;display:flex;flex-direction:column" data-page-node-id="yaFmz6iJyw186EL5bBcxir">
+                  <h4 data-page-node-id="XaUU1qsFfFQ6dHOPKhh0Pe">系 统 日 志</h4>
+                  <div class="console" id="bLog" style="height:auto;flex:1" data-page-node-id="DFRluwqp3X0cGcsjiKHvSI"><div class="ph t" data-page-node-id="tOSHtYg2UalGNEEyQLBanN">等待记录…</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------- 专注 ---------- -->
+        <section class="win" id="win-focus" role="tabpanel" aria-label="专注计时" data-page-node-id="TIkKF73VxEIPX2DMCcDNNb">
+          <header class="win__bar" data-page-node-id="YJPxxQO1eu4sCLaiN9nMfV">
+            <span class="dots" data-page-node-id="Y89fyGISaxEjScjfkHCgEs"><i data-page-node-id="NmCxn5DkoM4Jny0HjRiKwF"></i><i data-page-node-id="WkyBDAnegtOeDINjGYPpeN"></i><i data-page-node-id="7DGIBb24f5TtWiqI1Pnkk8"></i></span>
+            <span data-page-node-id="ITJMvI30BaWYsqbgtyCVUX">FOCUS.EXE — 专注培育</span>
+            <span class="spacer" data-page-node-id="4g4ynSDUhhRHiakgSu6cNH"></span>
+            <button class="cbtn" data-close title="关闭" data-page-node-id="0z8S9fWQRdwKsAFplUplCw">×</button>
+          </header>
+          <div class="win__body" data-page-node-id="x1dCSw8tusKIzx7NZHYhpZ">
+            <div class="row" data-page-node-id="5LJYhXMh3LRz2ubdLWLnl0">
+              <span class="lbl" data-page-node-id="Vy5DQLyg869BvGR61slU8D">时长</span>
+              <button class="btn" data-min="10" data-page-node-id="k40FTeJnmDWOTSApJX89nX">10 分</button>
+              <button class="btn" data-min="25" aria-pressed="true" data-page-node-id="BRawVItqI8hID9X9JfxdCp">25 分</button>
+              <button class="btn" data-min="45" data-page-node-id="JjCK0LyawS3kwIofzvHuZZ">45 分</button>
+              <span class="hint" data-page-node-id="ldVHHYZTBfXbHsjUIiwhhZ">专注越久，植物长得越高。暂停时，生长也会暂停。</span>
+            </div>
+            <div class="grid2" data-page-node-id="AUa3uajkkV1J1Z5ONxXXFJ">
+              <div class="stage" id="stage-focus" data-page-node-id="vCPEqHxVhPvujnAIDqngXm">
+                <canvas id="cvFocus" data-page-node-id="q2ditAiMzME9ycva5JaMz6"></canvas>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0" data-page-node-id="wianJToj65EPTTYil4Bkkc">
+                <div class="card" data-page-node-id="SAFtdcucI5Aqn1oBSO7nCY">
+                  <h4 data-page-node-id="Y3l2XD7hvlFafcYxqfzIIv">控 制</h4>
+                  <div class="row" data-page-node-id="KD2CRO54K4FwKSzHlTXEfQ">
+                    <button class="btn" id="fToggle" aria-pressed="false" data-page-node-id="Ig3cEGS7oKWI9TAPp2qEqj">开始</button>
+                    <button class="btn" id="fReset" data-page-node-id="CaVAbnQaCYgLE8UJYtfBwQ">重置</button>
+                  </div>
+                  <div style="margin-top:12px" data-page-node-id="tLJPhqCUi79GVOlZAsyaFq"><div class="bar" id="fBar" data-page-node-id="KFlrUR7DEQ2UtroqIiwAEe"></div></div>
+                </div>
+                <div class="card" data-page-node-id="cZWGfLpL1BfBL6ewsqcYJT">
+                  <h4 data-page-node-id="AUj2ne1TJF80CmezXo2Cwg">生 长 状 态</h4>
+                  <div class="stat" data-page-node-id="HuDU7tq4STkOx75IKuO8J6"><span data-page-node-id="rggIargWOPdTlsnfqTVuBT">剩余</span><b id="fLeft" data-page-node-id="zdlDj0AAkvfUWWLGA3yYOy">25:00</b></div>
+                  <div class="stat" data-page-node-id="7vH7KyWcqnUrt8GMwURDmO"><span data-page-node-id="NpMtDwBiEuAEJsFbyG4F6h">完成度</span><b id="fPct" data-page-node-id="fKbSm0UIDzHFsvHdxODm3c">0%</b></div>
+                  <div class="stat" data-page-node-id="yScFrMIJX3xdX5CWqAaH86"><span data-page-node-id="orZwDHdnTt6CudlGL9wDOC">阶段</span><b id="fStage" data-page-node-id="hzUpfBmwDoAZ9DE9kUP1h7">种子</b></div>
+                  <div class="stat" data-page-node-id="QjTAjG6Ynxzu3jceQDabLa"><span data-page-node-id="Y62YVvh9Ejz7OWwjg4odWC">今日专注</span><b id="fToday" data-page-node-id="ORLnt9vmiv9gjw5qvG4haE">0 分</b></div>
+                </div>
+                <div class="card" style="flex:1;min-height:120px;display:flex;flex-direction:column" data-page-node-id="IfbdIXOdTgLGSSzRPBii4l">
+                  <h4 data-page-node-id="TZrwdhK69H32ks1ScyzhvC">系 统 日 志</h4>
+                  <div class="console" id="fLog" style="height:auto;flex:1" data-page-node-id="ztm2CSKR5TH0mEhDdRtr3B"><div class="ph t" data-page-node-id="ZFPe0sx15UsaRGAYZ3mfRq">等待记录…</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------- 环境音 ---------- -->
+        <section class="win" id="win-ambient" role="tabpanel" aria-label="环境音" data-page-node-id="qV1qqB0f7P4cLOKTfz2Cd5">
+          <header class="win__bar" data-page-node-id="4UobJOFziK51IyqtkOAsRA">
+            <span class="dots" data-page-node-id="SaicoDOplgb2VoSsAV4FKX"><i data-page-node-id="sZIAsYoqyW09D7r4ep7on6"></i><i data-page-node-id="3sowVDJFknhBfcHFUV9qO5"></i><i data-page-node-id="lDm2rqTh8AsRPSCKxD8sTz"></i></span>
+            <span data-page-node-id="5I3I4ZEmD0IhAOfnXEoRSS">AMBIENT.DRV — 程序化环境音</span>
+            <span class="spacer" data-page-node-id="uCC75DpnswDZx1y6PS3Bop"></span>
+            <button class="cbtn" data-close title="关闭" data-page-node-id="Zx3zFUIGwwkslN5xqbNqaH">×</button>
+          </header>
+          <div class="win__body" data-page-node-id="FONyLDxvWc5ZIkEH5I3v0g">
+            <div class="row" data-page-node-id="qfcqo9JPohRLIBmoQEwpFk">
+              <button class="btn" id="aPower" aria-pressed="false" data-page-node-id="xVf3ePI5SU0TsGaoj6TCj1">开启音频</button>
+              <span class="lbl" data-page-node-id="eWMKmfjPWyazEbqBChdeZh">主音量</span>
+              <div style="flex:1;min-width:120px;max-width:220px" data-page-node-id="m5KJLpsgfYI3DWnHlEKB5M">
+                <input type="range" id="aVol" min="0" max="100" value="55" aria-label="主音量" data-page-node-id="Bmu2IHSef6HxMGhBDObfMy">
+              </div>
+              <span class="hint" data-page-node-id="ACJrJHRZWH3K7raVHa6V50">所有声音由振荡器实时合成，不加载任何音频文件。</span>
+            </div>
+            <div class="grid2" data-page-node-id="XiIq5QqLNPYWggq9Gl9F0t">
+              <div class="stage" id="stage-ambient" data-page-node-id="NemBcDpm1goAEPiBoTfnOF">
+                <canvas id="cvAmbient" data-page-node-id="KB4L1C2Au9Jq14WtXk7nTw"></canvas>
+                <div class="overlay" data-page-node-id="GgnSNdqFjvwaHMekJHqK1M"><div class="bottom" data-page-node-id="iqBOr59FEEdKd449hCuhB0"><div class="sub" id="aState" data-page-node-id="pqPKVL4GUvAvDfVkTZW6DB">AUDIO: OFF — 点「开启音频」</div></div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0" data-page-node-id="NBcZ5xNTU3hf0SAKSMEESr">
+                <div class="card" data-page-node-id="GB22gDWYAlCGZk57hq1exQ">
+                  <h4 data-page-node-id="iIGHB6B5qhLIFnFvWvrsbh">声 层</h4>
+                  <div class="row" id="aChans" data-page-node-id="xFQZIvGEbGjA7jLviJCnHF">
+                    <button class="btn" data-chan="rain" aria-pressed="false" data-page-node-id="1pAnrAVrM7Ge7OSAuKTl9y">雨</button>
+                    <button class="btn" data-chan="wind" aria-pressed="false" data-page-node-id="16R64lYlGsPKPdsxbqMqaa">风</button>
+                    <button class="btn" data-chan="drone" aria-pressed="false" data-page-node-id="ihAsaPBTTL3A3S6gSC9j7Z">低鸣</button>
+                  </div>
+                  <div style="margin-top:12px" class="row" data-page-node-id="VHsk8L9gCgoqQAva5MtfGi">
+                    <button class="btn" id="aBowl" data-page-node-id="3Ord4DH0cwNBdG6ksDsAcX">敲 钵</button>
+                    <button class="btn" id="aAuto" aria-pressed="false" data-page-node-id="RMH56QM5Z1md5FASdSeJSH">自动钵声</button>
+                  </div>
+                </div>
+                <div class="card" data-page-node-id="bGRFu6SDhXHP5D59b2np8G">
+                  <h4 data-page-node-id="hCt5gjvTsftuSYMlA505MB">频 谱</h4>
+                  <div class="stat" data-page-node-id="KI9SrKlG6fHtRHscGbXkrC"><span data-page-node-id="5OgeqWOM2b2qxqYEgBfNGm">峰值频段</span><b id="aPeak" data-page-node-id="rufSQXY3s8BD20TYNadxnJ">—</b></div>
+                  <div class="stat" data-page-node-id="8HEYjnKD2iFOv1wdzbU1N5"><span data-page-node-id="SQS7I5ETPp7mAIWH0Q5Pwg">能量</span><b id="aEner" data-page-node-id="PSp2Nk35WvOQRtOOYETi7i">0%</b></div>
+                </div>
+                <div class="card" style="flex:1;min-height:0" data-page-node-id="sXeHnRqcw9Fb6J7bya2a26">
+                  <h4 data-page-node-id="RYmfGCti0Wu77NkZd0HfUP">说 明</h4>
+                  <p class="hint" style="margin:0" data-page-node-id="BlhhozCbQzDacSgohYxGMA">戴上耳机效果更好。「低鸣」由两个相差 0.6Hz 的纯音叠加而成，
+                  会形成缓慢的拍频，适合作为冥想底噪。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------- 心念卡 ---------- -->
+        <section class="win" id="win-cards" role="tabpanel" aria-label="正念卡片" data-page-node-id="rW1Hg8j8AraI5UoZC2Ui4z">
+          <header class="win__bar" data-page-node-id="DOcGV27PPBXHFycDJk18tL">
+            <span class="dots" data-page-node-id="7ua2J0oYY8zaJ01bT00Rf5"><i data-page-node-id="DwBEjt4wpXb3IC9nCZEgFo"></i><i data-page-node-id="BOD7iZS7weK2zTcXDVmgGc"></i><i data-page-node-id="u06FDGjU0MTwYpDoyVcFrc"></i></span>
+            <span data-page-node-id="us71Ba6gfiP3MHdMQYVkpj">MINDFUL.TXT — 心念卡</span>
+            <span class="spacer" data-page-node-id="OWHHEcGO0EiVmCDF0MMaiH"></span>
+            <button class="cbtn" data-close title="关闭" data-page-node-id="z0yLHk1TU4Apb4aFoGt6oJ">×</button>
+          </header>
+          <div class="win__body" data-page-node-id="rJagRLptoWHtRcA7exkq7I">
+            <div class="stage" style="flex:1;min-height:200px" data-page-node-id="ZM9RDVmkojkAoQJiZkIDap">
+              <div class="overlay" data-page-node-id="AGdEar5jgWEIEcdDd4OesE">
+                <div class="center" data-page-node-id="zBbqrmFinbOHwXesDttFOT"><div class="prompt" id="cardText" data-page-node-id="fC2jgRmcCkRS3sCMKZnwDO"></div></div>
+              </div>
+            </div>
+            <div class="row" data-page-node-id="qc9ND7JkVc2YQREVklk0TU">
+              <button class="btn" id="cNext" data-page-node-id="7B0o2uyTWEAyaS7tDaK5JD">再抽一张 <span class="k" data-page-node-id="mzTy1akCQEMEhTASUEEQEZ">N</span></button>
+              <button class="btn" id="cSave" data-page-node-id="jwYPJEbpoR2BzOkED1euqp">收藏</button>
+              <span class="hint" id="cCount" data-page-node-id="hRbqYWNhqlEq5FAApV5Eug">已抽取 0 张</span>
+              <span class="hint" id="cFav" data-page-node-id="yHHBFJeCOCZb4PyhrXQIYK"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------- 日志 ---------- -->
+        <section class="win" id="win-log" role="tabpanel" aria-label="修行日志" data-page-node-id="VSzTOgEPvbpinhb28Ev8Sf">
+          <header class="win__bar" data-page-node-id="DVr6xSrg2z5m6P2aHCwcdJ">
+            <span class="dots" data-page-node-id="vkdiuwRT719x76k6kVFzuC"><i data-page-node-id="2PfYN0KvzpZanAqA0WGFG3"></i><i data-page-node-id="CMQKaS5Z3TvvM9YKESBmkG"></i><i data-page-node-id="6Fk4sjsxAKDHwP4I0lX1eH"></i></span>
+            <span data-page-node-id="trlpTiguExsXEXZrxld1Uk">LOGBOOK.DAT — 修行日志</span>
+            <span class="spacer" data-page-node-id="7Gd6K6UJZegKdfQm0uwtuO"></span>
+            <button class="cbtn" data-close title="关闭" data-page-node-id="DRW05WzF4KuagvkSxqng2y">×</button>
+          </header>
+          <div class="win__body" data-page-node-id="GuXAs7Dqc55KGAmXG29lrR">
+            <div class="row stretch" data-page-node-id="W5Ka2blmNXbkDttFWVASaZ">
+              <div class="card" style="flex:1;min-width:150px" data-page-node-id="MDtBcxUIMIsgmodxjGTVqk">
+                <h4 data-page-node-id="gf6xqWEZRqluMBKXpAiLj1">累 计 正 念</h4>
+                <div class="stat" data-page-node-id="xoUkAB2CG4t7WfUDJUsXoP"><span data-page-node-id="6GZYaAFseuveon4l8oSJTs">总时长</span><b id="lMin" data-page-node-id="MdazCRIoBu3UuFd4WnwGO8">0 分</b></div>
+                <div class="stat" data-page-node-id="F37wDkWPK02Y17rTnjOlEc"><span data-page-node-id="VCe2NQa6Bv2tJsQ4Pz0ZFL">呼吸轮次</span><b id="lCycles" data-page-node-id="7zN5wjkHgT4DPFnZEGq610">0</b></div>
+                <div class="stat" data-page-node-id="tYQDthcmYDJJJAZlloyKfc"><span data-page-node-id="MwEBiRAcT2MobuJkfFxABx">完成专注</span><b id="lSess" data-page-node-id="xxfW40zi87IqzaC9aEFhk9">0 次</b></div>
+                <div class="stat" data-page-node-id="hpXmxjWZW7QwmhrgHgQaf3"><span data-page-node-id="NG3fEWV7kbP0BAgtwn9avN">连续天数</span><b id="lStreak" data-page-node-id="X0TN1q52dgjp7C5BGlkHi4">0 天</b></div>
+              </div>
+              <div class="card" style="flex:2;min-width:220px" data-page-node-id="wWran13B0p3DSGhHV7hhoH">
+                <h4 data-page-node-id="xNwcGKxTBnRBdjEFcvZJ8Y">近 14 日 正 念 时 长（分钟）</h4>
+                <div class="chartwrap" data-page-node-id="DgEKErS9do38etnqCeYCu1"><canvas id="cvLog" data-page-node-id="cZE8Ogb4PYtWb0BCMPJuwy"></canvas></div>
+                <div class="dayrow" id="lDays" data-page-node-id="Ivaigx0wDDi2BOq1lEBBJf"></div>
+              </div>
+            </div>
+            <div class="card" style="flex:1;min-height:130px;display:flex;flex-direction:column" data-page-node-id="0FgfZxziHhvt3wQEwFbilG">
+              <h4 data-page-node-id="eAGxmdddFvkdDmK6pxzlDD">全 部 记 录</h4>
+              <div class="console" id="lLog" style="height:auto;flex:1" data-page-node-id="HNG3hesqZGYiYsKU0ug2Hr"></div>
+            </div>
+            <div class="row" data-page-node-id="8mSqDCQl6dQlxP4hqLfKaW">
+              <button class="btn" id="lExport" data-page-node-id="NbvJKyfDJ5mMWRzq92uXQy">导出数据</button>
+              <button class="btn" id="lWipe" data-page-node-id="ePUJDB3QEOq0mZxDb40y5p">清空记录</button>
+              <span class="hint" data-page-node-id="jHUTAuAjN3Vp6JTuv6NO1r">数据保存在本机浏览器（localStorage），不会上传。</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------- 帮助 ---------- -->
+        <section class="win" id="win-help" role="tabpanel" aria-label="帮助" data-page-node-id="BsZJlRauLdaDzsh1OA5BwZ">
+          <header class="win__bar" data-page-node-id="t6dRMciGpRnUhBwpeGBH9I">
+            <span class="dots" data-page-node-id="ndRO2khT8pLZK392kAdwk0"><i data-page-node-id="CKwwryP53FJ5OYNGlzmKBX"></i><i data-page-node-id="sgPyXKDimB7LJ4mSwoqSlB"></i><i data-page-node-id="r5FMIAwtzd3ZvNCBG4uDhe"></i></span>
+            <span data-page-node-id="3Zq9y8fj050Zq4f9iigfuR">README.TXT — 帮助</span>
+            <span class="spacer" data-page-node-id="WYYqjIk7ya36yT8ehSQG0Q"></span>
+            <button class="cbtn" data-close title="关闭" data-page-node-id="vaHoWB62kDQACsEenomhNe">×</button>
+          </header>
+          <div class="win__body" data-page-node-id="4Qcjthm9iJlQGxzGgi0Czo">
+            <div class="card" data-page-node-id="O02kjfKelvWpAbwCAytorn">
+              <h4 data-page-node-id="N1NIuaWsa0nHsXK1kzq26m">快 捷 键</h4>
+              <div class="stat" data-page-node-id="8Pz0VblglxUbGWBCUHGESA"><span data-page-node-id="LEJZRRUA3W3t7WqLrrofgW">切换模块</span><b data-page-node-id="3HvxEHYUlXmVGlz9QJZYec"><kbd data-page-node-id="sthVVt6RgT2VuHMK0Swq0t">1</kbd> <kbd data-page-node-id="5Dcg8JMnfFwwTAJ5Ie0ZD4">2</kbd> <kbd data-page-node-id="0axHZmXQheb1Q9HxhxOT4c">3</kbd> <kbd data-page-node-id="OX1wtUkqib2oYrWXG3HH3J">4</kbd> <kbd data-page-node-id="aIBO3IYEaA7U0JwMLnjmG3">5</kbd> <kbd data-page-node-id="cmgRWt6NbRsGZMjjFENPIX">6</kbd></b></div>
+              <div class="stat" data-page-node-id="v0kHW3hHuJDjOCoQr2ea4b"><span data-page-node-id="jWKNH5oza1SQ1JU1vBMIPu">开始 / 暂停</span><b data-page-node-id="WzrJssJ9IbmwEKHb6paEC5"><kbd data-page-node-id="HA9X2QWZvflNBhpkDbm7ty">空格</kbd></b></div>
+              <div class="stat" data-page-node-id="BnV3ze9ZnxYl6PH2TkZtDZ"><span data-page-node-id="kCTax3ePYRCEwRZWLZA33P">重置当前模块</span><b data-page-node-id="efXBxkelteq2ruvdXGbdFy"><kbd data-page-node-id="V4QQlpGkTUZXF1eEWokmjB">R</kbd></b></div>
+              <div class="stat" data-page-node-id="gc0o0c2XbAqYTJqHNRRmmZ"><span data-page-node-id="VCK0pVc9aC5bVUaOXfGFsm">抽取心念卡</span><b data-page-node-id="1e7n5uVN3V5rmYQjke8hZh"><kbd data-page-node-id="2G0HEOJCKgTm59h8NQqpvD">N</kbd></b></div>
+              <div class="stat" data-page-node-id="L83PL1GIKV0jvQjYBd9yqM"><span data-page-node-id="kQ9lqA9RTiXtw6pYSO78Xg">关闭屏幕</span><b data-page-node-id="jH6VnmGXRj9vo789LeMlSA"><kbd data-page-node-id="j4nt34zCHumlh0KT5lSR6v">P</kbd></b></div>
+            </div>
+            <div class="card" data-page-node-id="xD2IEXitWxXXPuDogNhMkw">
+              <h4 data-page-node-id="AwlA2W58d4HqFxXDZnoGLe">关 于 这 台 机 器</h4>
+              <p class="hint" style="margin:0 0 8px" data-page-node-id="bubKkns1Fgol2LBEUPiomm">
+                ZEN-OS 1.0 是一台虚构的 1986 年产正念终端。显示由 5×7 点阵字库驱动，
+                呼吸引导是逐格点亮的像素曼陀罗，环境音由振荡器与噪声实时合成——没有任何音频文件。
+              </p>
+              <p class="hint" style="margin:0" data-page-node-id="BAIuAhK6EQL3Pys5euHUCp">
+                扫描线、荧光余晖与滚动亮带都只是 CSS。若觉得晃眼，在系统里开启「减弱动态效果」即可关闭。
+              </p>
+            </div>
+            <div class="card" data-page-node-id="CISS6IwhkwB0p4nWs3vo08">
+              <h4 data-page-node-id="lQBcJgFukHohBZtk5sle5a">一 点 提 醒</h4>
+              <p class="hint" style="margin:0" data-page-node-id="XcplOHggqSKRRlvCAqD9pb">呼吸练习请以舒适为度。若感到头晕，请立刻恢复自然呼吸。本程序不提供任何医疗建议。</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="statusbar" data-page-node-id="dYtqhzu0r4FCKh9rAM9OoD">
+        <span data-page-node-id="5qAY7jnxFUiYItFtACIVli">◉ <b id="sMod" data-page-node-id="p96TnzWKIaAmDDEMOO6Uec">BREATHE</b></span>
+        <span class="hide-sm" data-page-node-id="wkGsZ9nGx0Q2aUppLeRLac">MEM <b data-page-node-id="o5HTsboAQrbpGvs5yYjIpV">512K</b></span>
+        <span class="sep" data-page-node-id="0t4aywPWfG5DLC6HHBLsRd"></span>
+        <span class="hide-sm" data-page-node-id="jEgEFsXRqYm8yhCFDQtZra">SESSION <b id="sClock" data-page-node-id="bjgMRlYwAwZQXOGRxmkOcG">00:00:00</b></span>
+        <span class="hide-sm" id="sAudio" data-page-node-id="1nmgz3lTnHV1ffNgOdHj3v">AUDIO <b data-page-node-id="kwqKN3IHBHzNTDKO0Gi4XD">OFF</b></span>
+        <span class="pwr" id="sPower" title="关闭屏幕 (P)" data-page-node-id="eHIHA5BV0HFdmCF0w22SNB">⏻ POWER</span>
+      </div>
+    </div>
+
+    <div class="boot" id="boot" data-page-node-id="ylmdrp9p4Hd2WBAIir2AdD">
+      <div class="boot__head" data-page-node-id="XYuBzTzPTLszrodKmVIfDt">ZEN-OS 1.0  —  MINDFUL SYSTEMS INC.
+════════════════════════════════════════</div>
+      <div id="bootLog" data-page-node-id="5nFXLoRaiLYpFbkljUMd80"></div>
+      <div class="boot__hint" id="bootHint" data-page-node-id="6r12clUTsnXDrWNKTLIyG6"></div>
+    </div>
+
+    <div class="fx" data-page-node-id="6UNlZGSzsukD7LbRZjGh5x">
+      <div class="fx fx-scan" data-page-node-id="uLThPclb2TTxwr6aHyGSfn"></div>
+      <div class="fx fx-mask" data-page-node-id="UmBteyc7oC8WlUMy8rDAnA"></div>
+      <div class="fx-band" data-page-node-id="TmmrgiAkAspKONFWhLfJ1Z"></div>
+      <div class="fx fx-flick" data-page-node-id="d9L8f0LexHp8aMOAZvOTwu"></div>
+      <div class="fx fx-glow" data-page-node-id="JXvbCOZqfTEee7nWWfeYjD"></div>
+    </div>
+
+    <div class="power on" id="power" data-page-node-id="HPYI6eE1WXbANiExpCtR9c"><div class="line" data-page-node-id="naG9YV206d3mNFC0jEw0DP"></div></div>
+    <div class="toast" id="toast" data-page-node-id="HULUEFZNbSzlPF3jsPDRSv"></div>
+  </div>
+ </div>
+</div>
+
+<script type="module">
+/* =========================================================
+   ZEN-OS 1.0 — 复古正念终端
+   单文件 / 零依赖 / 5×7 点阵字库 / 程序化音频合成
+   ========================================================= */
+
+/* ---------- 5×7 点阵字库 ---------- */
+const FONT = {
+'0':['01110','10001','10011','10101','11001','10001','01110'],
+'1':['00100','01100','00100','00100','00100','00100','01110'],
+'2':['01110','10001','00001','00010','00100','01000','11111'],
+'3':['11111','00010','00100','00010','00001','10001','01110'],
+'4':['00010','00110','01010','10010','11111','00010','00010'],
+'5':['11111','10000','11110','00001','00001','10001','01110'],
+'6':['00110','01000','10000','11110','10001','10001','01110'],
+'7':['11111','00001','00010','00100','01000','01000','01000'],
+'8':['01110','10001','10001','01110','10001','10001','01110'],
+'9':['01110','10001','10001','01111','00001','00010','01100'],
+'A':['01110','10001','10001','11111','10001','10001','10001'],
+'B':['11110','10001','10001','11110','10001','10001','11110'],
+'C':['01110','10001','10000','10000','10000','10001','01110'],
+'D':['11100','10010','10001','10001','10001','10010','11100'],
+'E':['11111','10000','10000','11110','10000','10000','11111'],
+'F':['11111','10000','10000','11110','10000','10000','10000'],
+'G':['01110','10001','10000','10111','10001','10001','01111'],
+'H':['10001','10001','10001','11111','10001','10001','10001'],
+'I':['01110','00100','00100','00100','00100','00100','01110'],
+'J':['00111','00010','00010','00010','00010','10010','01100'],
+'K':['10001','10010','10100','11000','10100','10010','10001'],
+'L':['10000','10000','10000','10000','10000','10000','11111'],
+'M':['10001','11011','10101','10101','10001','10001','10001'],
+'N':['10001','10001','11001','10101','10011','10001','10001'],
+'O':['01110','10001','10001','10001','10001','10001','01110'],
+'P':['11110','10001','10001','11110','10000','10000','10000'],
+'Q':['01110','10001','10001','10001','10101','10010','01101'],
+'R':['11110','10001','10001','11110','10100','10010','10001'],
+'S':['01111','10000','10000','01110','00001','00001','11110'],
+'T':['11111','00100','00100','00100','00100','00100','00100'],
+'U':['10001','10001','10001','10001','10001','10001','01110'],
+'V':['10001','10001','10001','10001','10001','01010','00100'],
+'W':['10001','10001','10001','10101','10101','11011','10001'],
+'X':['10001','10001','01010','00100','01010','10001','10001'],
+'Y':['10001','10001','01010','00100','00100','00100','00100'],
+'Z':['11111','00001','00010','00100','01000','10000','11111'],
+' ':['00000','00000','00000','00000','00000','00000','00000'],
+':':['00000','01100','01100','00000','01100','01100','00000'],
+'.':['00000','00000','00000','00000','00000','01100','01100'],
+'-':['00000','00000','00000','11111','00000','00000','00000'],
+'_':['00000','00000','00000','00000','00000','00000','11111'],
+'+':['00000','00100','00100','11111','00100','00100','00000'],
+'/':['00001','00010','00010','00100','01000','01000','10000'],
+'!':['00100','00100','00100','00100','00100','00000','00100'],
+'?':['01110','10001','00001','00110','00100','00000','00100'],
+'%':['11001','11010','00010','00100','01000','01011','10011'],
+'*':['00000','10101','01110','11111','01110','10101','00000'],
+',':['00000','00000','00000','00000','01100','00100','01000'],
+'=':['00000','00000','11111','00000','11111','00000','00000'],
+'(':['00010','00100','01000','01000','01000','00100','00010'],
+')':['01000','00100','00010','00010','00010','00100','01000']
+};
+function textW(s, scale, sp){ sp = sp===undefined?1:sp; return Math.max(0,(s.length*(5+sp)-sp))*scale; }
+function drawText(ctx, str, x, y, scale, color, opt){
+  opt = opt||{};
+  const s = String(str).toUpperCase();
+  const sp = opt.sp===undefined?1:opt.sp;
+  const w = textW(s, scale, sp);
+  let sx = x;
+  if(opt.align==='center') sx = x - w/2;
+  else if(opt.align==='right') sx = x - w;
+  const sy = opt.valign==='middle' ? y - (7*scale)/2 : y;
+  ctx.fillStyle = color;
+  const unit = (5+sp)*scale;
+  for(let i=0;i<s.length;i++){
+    const g = FONT[s[i]] || FONT['?'];
+    for(let r=0;r<7;r++){
+      const row = g[r];
+      for(let c=0;c<5;c++){
+        if(row[c]==='1') ctx.fillRect(Math.round(sx+i*unit+c*scale), Math.round(sy+r*scale), scale, scale);
+      }
+    }
+  }
+  return w;
+}
+
+/* ---------- 工具 ---------- */
+const $  = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.prototype.slice.call((r||document).querySelectorAll(s));
+const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
+const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+const pad2 = n => String(n).padStart(2,'0');
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const DAYKEY = d => { d = d||new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); };
+function fmtClock(sec){ sec=Math.max(0,Math.floor(sec)); return pad2(Math.floor(sec/3600))+':'+pad2(Math.floor(sec/60)%60)+':'+pad2(sec%60); }
+function fmtMS(sec){ sec=Math.max(0,Math.ceil(sec)); return pad2(Math.floor(sec/60))+':'+pad2(sec%60); }
+
+function fit(cv){
+  const dpr = Math.min(2, window.devicePixelRatio||1);
+  const r = cv.getBoundingClientRect();
+  const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+  if(cv.width!==Math.round(w*dpr) || cv.height!==Math.round(h*dpr)){
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.imageSmoothingEnabled = false;
+  return {ctx,w,h};
+}
+/* 像素格：留 1px 缝，形成点阵屏观感 */
+function px(ctx,x,y,cell,color){
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, Math.max(1,cell-1), Math.max(1,cell-1));
+}
+const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const dither = (i,j)=> BAYER[(j&3)*4+(i&3)]/16;
+
+/* ---------- 持久化 ---------- */
+const SKEY = 'zenos.v1';
+function loadState(){
+  let d=null;
+  try{ d = JSON.parse(localStorage.getItem(SKEY)||'null'); }catch(e){ d=null; }
+  if(!d || typeof d!=='object') d={};
+  d.totalSec = d.totalSec||0;
+  d.cycles   = d.cycles||0;
+  d.sessions = d.sessions||0;
+  d.days     = d.days||{};
+  d.entries  = d.entries||[];
+  d.favs     = d.favs||[];
+  d.cards    = d.cards||0;
+  return d;
+}
+let S = loadState();
+let saveTimer=null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }, 220);
+}
+function today(){
+  const k=DAYKEY();
+  if(!S.days[k]) S.days[k]={sec:0,cycles:0,sessions:0};
+  return S.days[k];
+}
+function streak(){
+  let n=0; const d=new Date();
+  for(let i=0;i<400;i++){
+    const k=DAYKEY(d); const rec=S.days[k];
+    if(rec && (rec.sec>0 || rec.cycles>0)) n++;
+    else if(i>0) break;
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
+function logEntry(kind, text, mod){
+  const now=new Date();
+  const stamp = pad2(now.getHours())+':'+pad2(now.getMinutes());
+  S.entries.unshift({t:Date.now(), kind:kind, text:text});
+  if(S.entries.length>400) S.entries.length=400;
+  save();
+  const el = mod==='focus' ? $('#fLog') : $('#bLog');
+  if(el){
+    const ph = el.querySelector('.ph'); if(ph) ph.remove();
+    const line=document.createElement('div');
+    line.innerHTML='<span class="t">['+stamp+']</span> '+text;
+    el.prepend(line);
+    while(el.childElementCount>90 && el.lastElementChild) el.lastElementChild.remove();
+  }
+  renderLog();
+}
+
+/* ---------- 音频引擎（全程序化合成，无音频文件） ---------- */
+const AudioSys = (function(){
+  let ctx=null, bus=null, master=null, sfxGain=null, analyser=null, freqData=null;
+  let enabled=false, volume=.55, autoBowl=false, built=false;
+  const chanOn = { rain:false, wind:false, drone:false };
+  const chans = {};
+  let bowlTimer=null, dropTimer=null;
+
+  function noiseBuffer(kind){
+    const len = Math.floor(ctx.sampleRate*4);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    let b0=0,b1=0,b2=0;
+    for(let i=0;i<len;i++){
+      const w = Math.random()*2-1;
+      if(kind==='brown'){ b0=(b0+.02*w)/1.02; d[i]=b0*3.4; }
+      else if(kind==='pink'){
+        b0=.99765*b0+.099*w; b1=.963*b1+.2965*w; b2=.57*b2+1.0526*w;
+        d[i]=(b0+b1+b2+w*.1848)*.13;
+      } else d[i]=w*.55;
+    }
+    return buf;
+  }
+
+  function build(){
+    if(built) return; built = true;
+    // 雨：白噪声 + 高频雨滴
+    (function(){
+      const src=ctx.createBufferSource(); src.buffer=noiseBuffer('white'); src.loop=true;
+      const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=520;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=6800;
+      const g=ctx.createGain(); g.gain.value=0;
+      src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(bus); src.start();
+      chans.rain=g;
+    })();
+    // 风：调制增益与输出增益必须分开，否则 LFO 会绕过静音
+    (function(){
+      const src=ctx.createBufferSource(); src.buffer=noiseBuffer('brown'); src.loop=true;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=430; lp.Q.value=.8;
+      const mod=ctx.createGain(); mod.gain.value=.5;
+      const out=ctx.createGain(); out.gain.value=0;
+      src.connect(lp); lp.connect(mod); mod.connect(out); out.connect(bus); src.start();
+      const lfo=ctx.createOscillator(); lfo.frequency.value=.065;
+      const lg=ctx.createGain(); lg.gain.value=330;
+      lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
+      const lfo2=ctx.createOscillator(); lfo2.frequency.value=.11;
+      const lg2=ctx.createGain(); lg2.gain.value=.42;
+      lfo2.connect(lg2); lg2.connect(mod.gain); lfo2.start();
+      chans.wind=out;
+    })();
+    // 低鸣：双纯音拍频
+    (function(){
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=680;
+      const g=ctx.createGain(); g.gain.value=0;
+      [110,110.6,165].forEach(function(f,i){
+        const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=f;
+        const og=ctx.createGain(); og.gain.value = i===2?.18:.5;
+        o.connect(og); og.connect(lp); o.start();
+      });
+      lp.connect(g); g.connect(bus);
+      chans.drone=g;
+    })();
+  }
+
+  function init(){
+    if(ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    ctx = new AC();
+    bus = ctx.createGain(); bus.gain.value = 1;
+    master = ctx.createGain(); master.gain.value = 0;
+    sfxGain = ctx.createGain(); sfxGain.gain.value = .7;
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 256; analyser.smoothingTimeConstant = .78;
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+    bus.connect(master); master.connect(ctx.destination);
+    bus.connect(analyser);                 // 分析点在音量之前 → 静音时频谱依然可见
+    sfxGain.connect(master);
+    build();
+    dropTimer = setTimeout(drop, 400);
+  }
+  function ramp(node, v, tc){
+    if(!node) return;
+    node.gain.cancelScheduledValues(ctx.currentTime);
+    node.gain.setTargetAtTime(v, ctx.currentTime, tc||.25);
+  }
+  function apply(){
+    if(!ctx) return;
+    Object.keys(chanOn).forEach(function(k){
+      const target = chanOn[k] ? (k==='drone'?.30:(k==='wind'?.55:.42)) : 0;
+      ramp(chans[k], target, .35);
+    });
+  }
+  function drop(){
+    if(ctx && enabled && chanOn.rain){
+      const t=ctx.currentTime;
+      const o=ctx.createOscillator(); o.type='sine';
+      o.frequency.value = 1500+Math.random()*2600;
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(.02+Math.random()*.03, t+.004);
+      g.gain.exponentialRampToValueAtTime(.0001, t+.07);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t+.11);
+    }
+    dropTimer = setTimeout(drop, 55+Math.random()*230);
+  }
+  function bowl(){
+    if(!ctx || !enabled) return;
+    const t=ctx.currentTime+.02;
+    const base = 205+Math.random()*45;
+    [1,2.02,2.98,4.11,5.43].forEach(function(p,i){
+      const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=base*p;
+      const g=ctx.createGain();
+      const amp=.17/(i+1.25);
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(amp, t+.05);
+      g.gain.exponentialRampToValueAtTime(.0001, t+6.2-i*.75);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t+7);
+    });
+  }
+  function blip(freq, dur, type, gain){
+    if(!ctx || !enabled) return;
+    const t=ctx.currentTime;
+    const o=ctx.createOscillator(); o.type=type||'square'; o.frequency.setValueAtTime(freq||880,t);
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(gain||.035,t);
+    g.gain.exponentialRampToValueAtTime(.0001, t+(dur||.05));
+    o.connect(g); g.connect(sfxGain); o.start(t); o.stop(t+(dur||.05)+.02);
+  }
+  function chime(){
+    if(!ctx || !enabled) return;
+    const t=ctx.currentTime+.01;
+    [523.25,659.25,783.99,1046.5].forEach(function(f,i){
+      const o=ctx.createOscillator(); o.type='triangle'; o.frequency.value=f;
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0,t+i*.13);
+      g.gain.linearRampToValueAtTime(.11,t+i*.13+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,t+i*.13+1.5);
+      o.connect(g); g.connect(sfxGain); o.start(t+i*.13); o.stop(t+i*.13+1.7);
+    });
+  }
+
+  /* 有些浏览器首次 resume() 会静默失败，在下一次用户手势时再补一次 */
+  function ensureRunning(){
+    if(!ctx || ctx.state!=='suspended') return;
+    const kick=function(){
+      if(!ctx) return;
+      if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
+      if(ctx.state!=='suspended'){
+        window.removeEventListener('pointerdown', kick);
+        window.removeEventListener('keydown', kick);
+      }
+    };
+    window.addEventListener('pointerdown', kick);
+    window.addEventListener('keydown', kick);
+  }
+
+  return {
+    get ctx(){return ctx},
+    get analyser(){return analyser},
+    get data(){return freqData},
+    get enabled(){return enabled},
+    get autoBowl(){return autoBowl},
+    get chans(){return chanOn},
+    init: init,
+    /* 注意：不要 await resume()。某些环境下（无用户手势 / 无音频设备）
+       resume() 的 Promise 会一直挂起，导致开关状态永远切不过去。 */
+    togglePower: function(){
+      init();
+      if(!ctx) { toast('这台机器没有可用的音频设备'); return false; }
+      if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
+      enabled = !enabled;
+      ramp(master, enabled?volume:0, .25);
+      if(!enabled){ autoBowl=false; clearTimeout(bowlTimer); }
+      else { apply(); if(autoBowl) this.scheduleBowl(); blip(660,.06,'square',.04); ensureRunning(); }
+      return enabled;
+    },
+    setVolume: function(v){ volume=clamp(v,0,1); if(enabled) ramp(master, volume, .08); },
+    setChan: function(name, on){
+      init();
+      if(!ctx) return;
+      chanOn[name]=on; apply();
+    },
+    bowl: bowl,
+    setAutoBowl: function(on){
+      autoBowl=on; clearTimeout(bowlTimer);
+      if(on && enabled) this.scheduleBowl();
+    },
+    scheduleBowl: function(){
+      clearTimeout(bowlTimer);
+      const self=this;
+      bowlTimer=setTimeout(function(){ if(autoBowl && enabled){ bowl(); self.scheduleBowl(); } }, 38000+Math.random()*26000);
+    },
+    blip: blip,
+    chime: chime
+  };
+})();
+
+/* ---------- 呼吸 ---------- */
+const PATTERNS = {
+  box:   { label:'箱式 4-4-4-4', seq:[['吸气',4],['屏息',4],['呼气',4],['屏息',4]] },
+  relax: { label:'放松 4-7-8',   seq:[['吸气',4],['屏息',7],['呼气',8]] },
+  calm:  { label:'平衡 6-6',     seq:[['吸气',6],['呼气',6]] },
+  deep:  { label:'深长 5-2-7',   seq:[['吸气',5],['屏息',2],['呼气',7]] }
+};
+const B = { key:'box', idx:0, t:0, running:false, cycles:0, elapsed:0 };
+function bSeq(){ return PATTERNS[B.key].seq; }
+function bValue(){
+  const seq=bSeq(), ph=seq[B.idx], dur=ph[1], p=clamp(B.t/dur,0,1);
+  const name=ph[0];
+  if(name==='吸气') return ease(p);
+  if(name==='呼气') return ease(1-p);
+  return (B.idx>0 && seq[B.idx-1][0]==='呼气') ? 0 : 1;
+}
+function bTick(dt){
+  if(!B.running) return;
+  B.t+=dt; B.elapsed+=dt;
+  const seq=bSeq();
+  if(B.t>=seq[B.idx][1]){
+    B.t=0; B.idx=(B.idx+1)%seq.length;
+    if(B.idx===0){
+      B.cycles++; S.cycles++; today().cycles++;
+      logEntry('cycle','呼吸周期 '+pad2(B.cycles)+' 完成 · '+PATTERNS[B.key].label);
+      save();
+      AudioSys.blip(720,.07,'square',.03);
+    }
+  }
+}
+function bRender(now){
+  const cv=$('#cvBreathe');
+  const {ctx,w,h}=fit(cv);
+  ctx.clearRect(0,0,w,h);
+  // 底部留出字幕区，曼陀罗只在上方呼吸
+  const capH = clamp(Math.round(h*0.20), 44, 66);
+  const ah = Math.max(64, h - capH);
+  const R = Math.min(w, ah)/2 * 0.94;             // 满吸时的外半径（像素）
+  const cell = clamp(Math.round(R/22), 5, 13);
+  const cols = Math.max(10, Math.floor(w/cell)), rows = Math.max(8, Math.floor(ah/cell));
+  const ox = Math.floor((w-cols*cell)/2), oy = Math.floor((ah-rows*cell)/2);
+  const cx=(cols-1)/2, cy=(rows-1)/2;
+  const RAD = R/cell;                              // 半径折算成格数
+  const v = bValue();
+  const t = now/1000;
+  const idle = !B.running;
+  const inner = (0.30 + 0.03*v)*RAD;
+  const outer = (0.46 + 0.52*v)*RAD;
+  const ringW = Math.max(.5, outer-inner);
+  const feather = Math.min(cell*1.4, ringW*0.34);  // 边缘抖动按环宽自适应
+  const holeR = inner*cell;
+
+  for(let j=0;j<rows;j++){
+    for(let i=0;i<cols;i++){
+      const d = Math.hypot(i-cx, j-cy);
+      if(d>outer || d<inner) continue;
+      const eo = outer-d;
+      if(eo<feather && eo/feather < dither(i,j)) continue;
+      const ei = d-inner;
+      if(ei<feather && ei/feather < dither(i,j)) continue;
+      const rel = (d-inner)/ringW;
+      const band = Math.sin(rel*20 - t*1.5 + v*4.2);
+      let col;
+      if(rel<.24)       col = idle?'#2c5c3e':'#ffc46b';
+      else if(rel<.38)  col = idle?'#255232':'#ffb347';
+      else if(band>.55) col = idle?'#1f4a2e':'#c9ffd9';
+      else if(band>-.1) col = idle?'#1a3f27':'#8bffb0';
+      else              col = idle?'#123021':'#2f7a4c';
+      // 稀疏闪点：呼吸之外的微小生命感
+      if(!idle && dither((i+((t*7)|0))&3,(j+((t*5)|0))&3) > .94 && rel>.45) col='#f2fff6';
+      px(ctx, ox+i*cell, oy+j*cell, cell, col);
+    }
+  }
+
+  // 内孔读数
+  const seq=bSeq(), ph=seq[B.idx];
+  const remain = B.running ? Math.max(1, Math.ceil(ph[1]-B.t)) : ph[1];
+  const scale = clamp(Math.round(holeR*0.23), 5, 16);
+  ctx.globalAlpha = idle ? .40 : 1;
+  drawText(ctx, String(remain), w/2, ah/2, scale, idle?'#3f8a58':'#eafff1', {align:'center', valign:'middle'});
+  ctx.globalAlpha = 1;
+}
+
+/* ---------- 专注 ---------- */
+const F = { total:25*60, left:25*60, running:false, done:false, min:25 };
+function fTick(dt){
+  if(!F.running) return;
+  F.left-=dt;
+  if(F.left<=0){
+    F.left=0; F.running=false; F.done=true;
+    S.sessions++; today().sessions++;
+    logEntry('focus','专注完成 · '+F.min+' 分钟，植物已开花','focus');
+    save(); AudioSys.chime(); toast('专注完成 — 植物开花了');
+  }
+}
+function fProgress(){ return 1 - F.left/F.total; }
+function fRender(now){
+  const {ctx,w,h}=fit($('#cvFocus'));
+  ctx.clearRect(0,0,w,h);
+  const t=now/1000;
+  const p = F.done?1:fProgress();
+
+  // 背景尘埃
+  const cell = clamp(Math.round(Math.min(w,h)/46), 4, 9);
+  const cols=Math.floor(w/cell), rows=Math.floor(h/cell);
+  for(let i=0;i<cols;i++){
+    for(let j=0;j<rows;j++){
+      const n = Math.sin(i*12.9898+j*78.233)*43758.5453;
+      const f = n - Math.floor(n);
+      if(f>.965){
+        ctx.globalAlpha = (.3+.7*Math.abs(Math.sin(t*(.6+f)+f*10)))*.5;
+        px(ctx, i*cell, j*cell, cell, '#1f5c39');
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+
+  // 大号倒计时（点阵）
+  const dscale = clamp(Math.round(Math.min(w/11, h/7)/9), 6, 20);
+  const txt = (F.running||F.done) ? fmtMS(F.left) : fmtMS(F.total);
+  const ty = h*0.10;
+  ctx.globalAlpha=.22;
+  drawText(ctx, txt, w/2+2, ty+3, dscale, '#0a2a19', {align:'center'});
+  ctx.globalAlpha=1;
+  drawText(ctx, txt, w/2, ty, dscale, F.done?'#ffc46b':(F.running?'#eafff1':'#6fd694'), {align:'center'});
+
+  // 进度条
+  const bw=Math.min(w*.62,420), bx=(w-bw)/2, by=ty+dscale*7+10, blocks=34;
+  const on=Math.round(p*blocks);
+  for(let i=0;i<blocks;i++) px(ctx, bx+i*(bw/blocks), by, bw/blocks, i<on?'#ffc46b':'#163a26');
+
+  // 花盆：上宽下窄的像素盆，带盆沿与土面
+  const groundY = h - Math.max(16, h*.085);
+  const potW = Math.min(w*.34, 150), potX=(w-potW)/2;
+  const insets=[0, .8, 1.4, 1.9];
+  const shades=['#5a4227','#4a3520','#3a2a18','#2c1f11'];
+  for(let r=0;r<4;r++){
+    const pad = cell*insets[r];
+    for(let x=pad; x<potW-pad; x+=cell){
+      px(ctx, potX+x, groundY+r*cell, cell, shades[r]);
+    }
+  }
+  // 土面
+  for(let x=cell; x<potW-cell; x+=cell){
+    if(((x/cell)|0)%2===0) px(ctx, potX+x, groundY-cell, cell, '#3d2c17');
+  }
+
+  // 茎：生长上限卡在进度条下方，别长到倒计时数字上
+  const stemX = w/2;
+  const maxH = Math.max(cell*3, groundY - cell - (by + cell*7));
+  const stemH = Math.round(p*maxH/cell)*cell;
+  const seg = [];
+  for(let y=0;y<=stemH;y+=cell){
+    const wob = Math.round(Math.sin(y/(cell*3.2))*1.35)*cell;
+    seg.push([stemX+wob, groundY-cell-y]);
+    px(ctx, stemX+wob, groundY-cell-y, cell, p>=1?'#8bffb0':'#4fae6e');
+  }
+  // 叶
+  [.26,.46,.66,.84].forEach(function(fr,k){
+    if(p<=fr || seg.length<3) return;
+    const idx = Math.min(seg.length-1, Math.max(1, Math.round(fr*seg.length)));
+    const lx=seg[idx][0], ly=seg[idx][1];
+    const dir = k%2===0?1:-1;
+    for(let s=1;s<=3;s++){
+      px(ctx, lx+dir*cell*s, ly-((s===2)?cell:0), cell, '#63d98a');
+      if(s<3) px(ctx, lx+dir*cell*s, ly+cell*((s===1)?0:1), cell, '#3f9c60');
+    }
+  });
+  // 花：半径 2 格的八瓣，中间镂空，避免糊成一块
+  if(p>=.995){
+    const last = seg.length?seg[seg.length-1]:[stemX,groundY];
+    const fx=last[0], fy=last[1];
+    for(let k=0;k<8;k++){
+      const a = k/8*Math.PI*2 - Math.PI/2;
+      px(ctx, fx+Math.round(Math.cos(a)*2)*cell, fy+Math.round(Math.sin(a)*2)*cell, cell,
+         k%2 ? '#ff8fb0' : '#ffc46b');
+    }
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(pt){
+      px(ctx, fx+pt[0]*cell, fy+pt[1]*cell, cell, '#e0708f');
+    });
+    px(ctx, fx, fy, cell, '#fff6d8');
+    ctx.globalAlpha = .16+.10*Math.sin(t*2.2);
+    ctx.fillStyle='#ffc46b';
+    ctx.fillRect(fx-cell*2, fy-cell*2, cell*5, cell*5);
+    ctx.globalAlpha=1;
+  }
+  // 盆沿微光
+  ctx.globalAlpha=.25+.12*Math.sin(t*1.4);
+  ctx.fillStyle='#ffc46b';
+  ctx.fillRect(potX, groundY-1, potW, 2);
+  ctx.globalAlpha=1;
+}
+function syncFocus(){
+  $('#fLeft').textContent = (F.running||F.done) ? fmtMS(F.left) : fmtMS(F.total);
+  const p=fProgress();
+  $('#fPct').textContent = Math.round(p*100)+'%';
+  $('#fStage').textContent = F.done?'已开花':(p>.85?'结蕾':p>.6?'抽叶':p>.3?'幼苗':p>.02?'发芽':'种子');
+  const bar=$('#fBar');
+  const on=Math.round(p*bar.children.length);
+  Array.prototype.forEach.call(bar.children, function(el,i){ el.classList.toggle('on', i<on); });
+  const btn=$('#fToggle');
+  btn.textContent = F.running?'暂停':(F.done?'再来一次':'开始');
+  btn.setAttribute('aria-pressed', String(F.running));
+  $('#fToday').textContent = Math.round((today().sec||0)/60)+' 分';
+}
+
+/* ---------- 环境音频谱 ---------- */
+function aRender(){
+  const {ctx,w,h}=fit($('#cvAmbient'));
+  ctx.clearRect(0,0,w,h);
+  const bars=30, gap=Math.max(2,Math.round(w*.004));
+  const bw=(w-gap*(bars+1))/bars;
+  const cell=Math.max(4, Math.round(h/26));
+  const rows=Math.max(4, Math.floor((h-cell*3)/cell));
+  const an=AudioSys.analyser, data=AudioSys.data;
+  const sr=(an && an.context) ? an.context.sampleRate : 48000;
+  const binHz=sr/(an?an.fftSize:256);
+  let energy=0, cNum=0, cDen=0;
+  if(an && data){
+    an.getByteFrequencyData(data);
+    for(let k=1;k<data.length;k++){ cNum += k*binHz*data[k]; cDen += data[k]; }
+  }
+  const centroid = cDen>0 ? cNum/cDen : 0;   // 谱质心：比"峰值频段"更能说明音色
+  for(let i=0;i<bars;i++){
+    let val=0;
+    if(data){
+      const a=Math.floor(Math.pow(i/bars,1.7)*(data.length*0.62));
+      const b=Math.max(a+1, Math.floor(Math.pow((i+1)/bars,1.7)*(data.length*0.62)));
+      let m=0;
+      for(let k=a;k<b && k<data.length;k++){ if(data[k]>m) m=data[k]; }
+      val=m/255;
+    }
+    energy+=val;
+    const lit=Math.round(val*rows);
+    for(let r=0;r<rows;r++){
+      const x=gap+i*(bw+gap), y=h-cell-r*cell;
+      const rel=r/rows;
+      let col='#123021';
+      if(r<lit){
+        col = rel>.82?'#ff8fb0' : rel>.6?'#ffc46b' : rel>.3?'#8bffb0' : '#3f9a63';
+      } else if(r===lit && lit>0){
+        col='#c9ffd9';
+      }
+      px(ctx,x,y,Math.max(2,bw),col);
+    }
+  }
+  // 待机扫描：未开启音频时给点生命感，但不伪造频谱数据
+  if(!AudioSys.enabled){
+    const sweep = (performance.now()/1000*0.32)%1;
+    for(let i=0;i<bars;i++){
+      const g = Math.max(0, 1-Math.abs(i/bars-sweep)*7);
+      if(g<=0) continue;
+      const lit = Math.max(1, Math.round(g*3));
+      for(let r=0;r<lit;r++){
+        px(ctx, gap+i*(bw+gap), h-cell-r*cell, Math.max(2,bw), r===lit-1?'#8bffb0':'#2f7a4c');
+      }
+    }
+  }
+  const pct=Math.round((energy/bars)*100);
+  const pk=$('#aPeak');
+  if(pk){
+    pk.textContent = pct<4 ? '—'
+      : (centroid>=1000 ? (centroid/1000).toFixed(1)+' kHz' : Math.round(centroid)+' Hz');
+  }
+  const en=$('#aEner'); if(en) en.textContent = pct+'%';
+}
+
+/* ---------- 日志与图表 ---------- */
+function last14(){
+  const out=[]; const d=new Date();
+  for(let i=13;i>=0;i--){
+    const dd=new Date(d); dd.setDate(d.getDate()-i);
+    const k=DAYKEY(dd); const rec=S.days[k];
+    out.push({k:k, d:dd, min: rec?Math.round(rec.sec/60):0});
+  }
+  return out;
+}
+function renderChart(){
+  const days=last14();
+  $('#lDays').innerHTML = days.map(function(d){ return '<span>'+d.d.getDate()+'</span>'; }).join('');
+  const cv=$('#cvLog');
+  if(!cv || !cv.getBoundingClientRect().width) return;
+  const {ctx,w,h}=fit(cv);
+  ctx.clearRect(0,0,w,h);
+  const max=Math.max(20, Math.max.apply(null, days.map(function(d){return d.min;})));
+  const cell=Math.max(3, Math.round(w/110));
+  const labScale=clamp(Math.round(w/430), 1, 3);   // 柱顶数值：小字号，避免互相压叠
+  const baseY=h-cell*3;
+  const rows=Math.max(4, Math.floor((baseY-cell*3-labScale*7-cell*2)/cell));
+  const bw=w/days.length;
+  days.forEach(function(d,i){
+    const cx=i*bw+bw/2;
+    const barW=Math.max(cell*2, Math.round(bw*.58));
+    const lit=Math.round((d.min/max)*rows);
+    for(let r=0;r<rows;r++){
+      const y=baseY-cell-r*cell, x=cx-barW/2;
+      let col='#10291b';
+      if(r<lit){
+        const rel=r/rows;
+        col = rel>.85?'#ffc46b': rel>.45?'#8bffb0':'#3f9a63';
+      }
+      px(ctx,x,y,barW,col);
+    }
+    if(lit>0){
+      drawText(ctx, String(d.min), cx, baseY-cell-lit*cell-cell*1.4-labScale*7, labScale, '#ffc46b', {align:'center'});
+    }
+    if(d.k===DAYKEY()){
+      ctx.fillStyle='#ffc46b';
+      ctx.fillRect(cx-barW/2, baseY+cell*0.5, barW, 2);
+    }
+  });
+  ctx.fillStyle='#245c39';
+  ctx.fillRect(0, baseY+cell, w, 2);
+}
+function renderLog(){
+  const el=$('#lLog');
+  if(el){
+    const stamp=function(n){
+      const d=new Date(n);
+      return pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    };
+    const html = S.entries.slice(0,80).map(function(e){
+      return '<div><span class="t">'+stamp(e.t)+'</span> '+e.text+'</div>';
+    }).join('');
+    el.innerHTML = html || '<div class="t">暂无记录。完成一次呼吸或专注，这里就会有内容。</div>';
+  }
+  $('#lMin').textContent    = Math.round(S.totalSec/60)+' 分';
+  $('#lCycles').textContent = S.cycles;
+  $('#lSess').textContent   = S.sessions+' 次';
+  $('#lStreak').textContent = streak()+' 天';
+  $('#bTotal').textContent  = S.cycles+' 轮';
+  $('#cCount').textContent  = '已抽取 '+S.cards+' 张';
+  $('#cFav').textContent    = S.favs.length ? ('收藏 '+S.favs.length+' 条') : '';
+  renderChart();
+}
+
+/* ---------- 心念卡 ---------- */
+const CARDS = [
+  '此刻，你不需要解决任何事。只需要存在。',
+  '把注意力放在脚底与地面接触的那一小块温度上。',
+  '呼吸不需要被控制，它只是被允许发生。',
+  '你正在做的这件事，就是唯一需要做的事。',
+  '如果念头来了，就像看窗外飘过的云——不追，也不赶。',
+  '肩膀松下来一点。下巴松下来一点。眉心松下来一点。',
+  '你现在的位置，就是全部世界的中心，也是全部世界的边缘。',
+  '不必让今天变得更好。只要看清它本来的样子。',
+  '数三样此刻能听见的声音。声音之间的空隙，也是答案。',
+  '焦虑常常来自未来，而你的身体一直留在现在。',
+  '允许自己慢下来。慢不是落后，是另一种到达。',
+  '把手放在胸口，感受心跳。它从你出生起就没停过。',
+  '有些事只能等它自己成熟，就像你等一次完整的呼气。',
+  '你不需要为休息辩解。休息是过程的一部分。',
+  '念头不是事实。它只是一串可以观察到的电信号。',
+  '此刻的紧绷，往往是因为你在提前承担还没发生的事。',
+  '做一次深长的呼气，比十次勉强的吸气更有用。',
+  '你不必喜欢当下，只需要不逃开它。',
+  '屏幕之外，还有一个更大的世界在等你抬头。',
+  '感到无聊时，试着把注意力放到手指的细微感觉上。',
+  '承认「我现在很难受」，比强迫自己「应该平静」更有力量。',
+  '把今天的任务减到一件。只做那一件。',
+  '你现在读到的这句话，已经陪了你几秒钟的呼吸。',
+  '机器会关机。你没有必要一直待机。'
+];
+const C = { typing:false, idx:-1, timer:null };
+function drawCard(){
+  clearTimeout(C.timer);
+  let i = C.idx;
+  do { i = Math.floor(Math.random()*CARDS.length); } while(CARDS.length>1 && i===C.idx);
+  C.idx=i; S.cards++; save();
+  const text=CARDS[i];
+  const el=$('#cardText');
+  el.textContent='';
+  C.typing=true;
+  let n=0;
+  (function step(){
+    n++;
+    el.innerHTML = text.slice(0,n) + '<span class="cur"></span>';
+    if(n<text.length) C.timer=setTimeout(step, 38+Math.random()*30);
+    else { el.textContent=text; C.typing=false; }
+  })();
+  AudioSys.blip(980,.04,'square',.025);
+  renderLog();
+}
+
+/* ---------- 模块切换 ---------- */
+const MODS=['breathe','focus','ambient','cards','log','help'];
+let active='breathe';
+function switchMod(m){
+  if(MODS.indexOf(m)<0) return;
+  active=m;
+  $$('.win').forEach(function(w){ w.classList.toggle('active', w.id==='win-'+m); });
+  $$('.tab').forEach(function(t){ t.setAttribute('aria-selected', String(t.dataset.mod===m)); });
+  $('#sMod').textContent=m.toUpperCase();
+  AudioSys.blip(560,.035,'square',.02);
+  if(m==='log') renderLog();
+  if(m==='cards' && C.idx<0) drawCard();
+}
+let toastTimer=null;
+function toast(msg){
+  const el=$('#toast');
+  el.innerHTML=msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+
+/* ---------- 电源 ---------- */
+function powerToggle(off){
+  const p=$('#power');
+  if(off===undefined) off = !p.classList.contains('on');
+  p.classList.remove('anim-in','anim-out');
+  void p.offsetWidth;
+  if(off){
+    p.classList.add('on','anim-out');
+    AudioSys.blip(220,.18,'sawtooth',.05);
+  } else {
+    p.classList.add('on','anim-in');
+    setTimeout(function(){ p.classList.remove('on'); }, 430);
+    AudioSys.blip(660,.09,'square',.04);
+  }
+}
+
+/* ---------- 开机自检 ---------- */
+let booted=false;
+const BOOT=[
+  ['MAIN MEMORY TEST : 640K','ok'],
+  ['DETECTING CO-PROCESSOR ......... MIND-387 FOUND','ok'],
+  ['MOUNTING /dev/breath ........... OK','ok'],
+  ['MOUNTING /dev/focus ............ OK','ok'],
+  ['MOUNTING /dev/ambient .......... OK','ok'],
+  ['CALIBRATING INNER SENSORS ...... OK','ok'],
+  ['LOADING 5x7 BITMAP FONT .......  OK','ok'],
+  ['SYNTHESIZING AUDIO DRIVERS ..... OK','ok'],
+  ['LOADING MINDFUL.EXE ............ OK','ok'],
+  ['',''],
+  ['ALL SYSTEMS CALM.','dim']
+];
+function dismissBoot(){
+  if(booted) return;
+  booted=true;
+  const hint=$('#bootHint'); if(hint) hint.textContent='';
+  const b=$('#boot');
+  if(b){ b.classList.add('done'); setTimeout(function(){ b.style.display='none'; }, 340); }
+  AudioSys.init();
+  toast('欢迎回来。按 <b>空格</b> 开始一次呼吸。');
+}
+async function boot(){
+  const log=$('#bootLog'), hint=$('#bootHint');
+  window.addEventListener('keydown', dismissBoot);
+  document.addEventListener('pointerdown', dismissBoot);
+  await sleep(420);
+  for(let n=0;n<BOOT.length;n++){
+    if(booted) return;
+    const txt=BOOT[n][0], cls=BOOT[n][1];
+    if(txt===''){
+      log.appendChild(document.createTextNode('\n'));
+      await sleep(90); continue;
+    }
+    const div=document.createElement('div');
+    if(cls==='ok') div.className='ok';
+    if(cls==='dim') div.className='dim';
+    log.appendChild(div);
+    if(txt.indexOf('MAIN MEMORY')===0){
+      for(let k=0;k<=640;k+=64){
+        if(booted) return;
+        div.textContent='MAIN MEMORY TEST : '+String(k).padStart(6,'0')+'K';
+        await sleep(34);
+      }
+      div.textContent='MAIN MEMORY TEST : 000640K OK';
+      continue;
+    }
+    const body=txt.replace(/\s+OK$/,'');
+    const tail=txt.slice(-3)===' OK' ? ' OK' : '';
+    div.textContent=body;
+    await sleep(70+Math.random()*90);
+    if(tail) div.textContent=body+tail;
+    await sleep(50);
+  }
+  if(booted) return;
+  hint.innerHTML='按任意键继续 <span class="cursor"></span>　<span style="color:#3f8a58">(任意点击或按键)</span>';
+}
+
+/* ---------- 绑定 ---------- */
+function syncAudioUI(){
+  const on=AudioSys.enabled;
+  $('#aPower').textContent = on?'关闭音频':'开启音频';
+  $('#aPower').setAttribute('aria-pressed', String(on));
+  $('#aState').textContent = on?'AUDIO: ON':'AUDIO: OFF — 点「开启音频」';
+  $('#sAudio').innerHTML = 'AUDIO <b>'+(on?'ON':'OFF')+'</b>';
+}
+async function ensureAudio(){
+  if(!AudioSys.enabled) await AudioSys.togglePower();
+  syncAudioUI();
+}
+function bindUI(){
+  $$('.tab').forEach(function(t){ t.addEventListener('click', function(){ switchMod(t.dataset.mod); }); });
+  $$('[data-close]').forEach(function(b){
+    b.addEventListener('click', function(){
+      toast('无法关闭正念。请继续呼吸。');
+      AudioSys.blip(180,.14,'sawtooth',.05);
+    });
+  });
+
+  // 呼吸
+  const bbar=$('#bBar');
+  for(let i=0;i<24;i++) bbar.appendChild(document.createElement('i'));
+  $$('[data-pattern]').forEach(function(b){
+    b.addEventListener('click', function(){
+      B.key=b.dataset.pattern; B.idx=0; B.t=0;
+      $$('[data-pattern]').forEach(function(o){ o.setAttribute('aria-pressed', String(o===b)); });
+      $('#bRate').textContent = PATTERNS[B.key].seq.map(function(s){return s[1];}).join('-')+' 秒';
+      logEntry('sys','切换呼吸模式：'+PATTERNS[B.key].label);
+      AudioSys.blip(760,.05,'square',.03);
+    });
+  });
+  $('#bToggle').addEventListener('click', function(){
+    B.running=!B.running;
+    if(B.running) AudioSys.blip(880,.06,'square',.035);
+    syncBreatheLive();
+  });
+  $('#bReset').addEventListener('click', function(){
+    B.running=false; B.idx=0; B.t=0; B.cycles=0; B.elapsed=0;
+    syncBreatheLive(); toast('呼吸计数已重置'); AudioSys.blip(300,.08,'square',.03);
+  });
+
+  // 专注
+  const fbar=$('#fBar');
+  for(let i=0;i<34;i++) fbar.appendChild(document.createElement('i'));
+  $$('[data-min]').forEach(function(b){
+    b.addEventListener('click', function(){
+      F.min=+b.dataset.min; F.total=F.min*60; F.left=F.total; F.running=false; F.done=false;
+      $$('[data-min]').forEach(function(o){ o.setAttribute('aria-pressed', String(o===b)); });
+      syncFocus(); AudioSys.blip(700,.05,'square',.03);
+    });
+  });
+  $('#fToggle').addEventListener('click', function(){
+    if(F.done){ F.done=false; F.left=F.total; F.running=true; }
+    else F.running=!F.running;
+    if(F.running) AudioSys.blip(880,.06,'square',.035);
+    syncFocus();
+  });
+  $('#fReset').addEventListener('click', function(){
+    F.running=false; F.done=false; F.left=F.total; syncFocus();
+    toast('计时器已重置'); AudioSys.blip(300,.08,'square',.03);
+  });
+
+  // 环境音
+  $('#aPower').addEventListener('click', async function(){
+    await AudioSys.togglePower();
+    syncAudioUI();
+    if(AudioSys.enabled && !Object.keys(AudioSys.chans).some(function(k){ return AudioSys.chans[k]; })){
+      AudioSys.setChan('rain', true);
+      $('[data-chan="rain"]').setAttribute('aria-pressed','true');
+    }
+  });
+  $('#aVol').addEventListener('input', function(e){ AudioSys.setVolume(+e.target.value/100); });
+  $$('[data-chan]').forEach(function(b){
+    b.addEventListener('click', async function(){
+      const next = b.getAttribute('aria-pressed')!=='true';
+      b.setAttribute('aria-pressed', String(next));
+      AudioSys.setChan(b.dataset.chan, next);
+      if(next) await ensureAudio();
+    });
+  });
+  $('#aBowl').addEventListener('click', async function(){
+    await ensureAudio();
+    AudioSys.bowl();
+  });
+  $('#aAuto').addEventListener('click', async function(){
+    await ensureAudio();
+    const on=!AudioSys.autoBowl;
+    AudioSys.setAutoBowl(on);
+    $('#aAuto').setAttribute('aria-pressed', String(on));
+  });
+
+  // 心念卡
+  $('#cNext').addEventListener('click', drawCard);
+  $('#cSave').addEventListener('click', function(){
+    if(C.idx<0) return;
+    const txt=CARDS[C.idx];
+    if(S.favs.indexOf(txt)>=0){ toast('这条已经收藏过了'); return; }
+    S.favs.push(txt); save(); renderLog();
+    toast('已收藏到本地'); AudioSys.blip(1046,.06,'square',.03);
+  });
+
+  // 日志
+  $('#lExport').addEventListener('click', function(){
+    const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='zenos-log-'+DAYKEY()+'.json';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+    toast('已导出 JSON 文件');
+  });
+  $('#lWipe').addEventListener('click', function(){
+    if(!window.confirm('确定清空所有记录？此操作不可撤销。')) return;
+    S = {totalSec:0,cycles:0,sessions:0,days:{},entries:[],favs:[],cards:0};
+    save(); renderLog(); toast('记录已清空');
+  });
+
+  $('#sPower').addEventListener('click', function(){ powerToggle(); });
+  window.addEventListener('resize', function(){ renderLog(); });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) renderLog(); });
+}
+
+/* ---------- 主循环 ---------- */
+let last=performance.now(), sessionSec=0, clockAcc=0, uiAcc=0, saveAcc=0;
+function syncBreatheLive(){
+  const seq=bSeq(), ph=seq[B.idx];
+  if(B.running){
+    const remain=Math.max(1,Math.ceil(ph[1]-B.t));
+    $('#bPhase').textContent=ph[0];
+    $('#bSub').textContent='剩余 '+remain+' 秒 · 第 '+pad2(B.cycles+1)+' 轮';
+    const frac=1-(ph[1]-B.t)/ph[1];
+    const bar=$('#bBar'), on=Math.round(frac*bar.children.length);
+    Array.prototype.forEach.call(bar.children, function(el,i){ el.classList.toggle('on', i<on); });
+  } else {
+    $('#bPhase').textContent = B.cycles>0?'已暂停':'准备';
+    $('#bSub').textContent = B.cycles>0?('已完成 '+pad2(B.cycles)+' 轮 · 空格继续'):'按 空格 开始';
+    Array.prototype.forEach.call($('#bBar').children, function(el){ el.classList.remove('on'); });
+  }
+  $('#bCycles').textContent=pad2(B.cycles);
+  $('#bTime').textContent=fmtMS(B.elapsed);
+}
+function loop(now){
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  if(!document.hidden){
+    sessionSec+=dt; clockAcc+=dt; uiAcc+=dt; saveAcc+=dt;
+    bTick(dt); fTick(dt);
+    if(B.running || F.running){ S.totalSec+=dt; today().sec+=dt; }
+
+    if(active==='breathe') bRender(now);
+    else if(active==='focus') fRender(now);
+    else if(active==='ambient') aRender();
+
+    if(uiAcc>.12){
+      uiAcc=0;
+      syncBreatheLive();
+      if(active==='focus') syncFocus();
+    }
+    if(clockAcc>.5){
+      clockAcc=0;
+      $('#sClock').textContent=fmtClock(sessionSec);
+      const d=new Date();
+      document.title='MINDFUL.EXE — '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    }
+    if(saveAcc>10){ saveAcc=0; save(); }
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- 键盘 ---------- */
+window.addEventListener('keydown', function(e){
+  if(!booted) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const k=e.key.toLowerCase();
+  if(k===' '){
+    e.preventDefault();
+    if(active==='focus') $('#fToggle').click();
+    else if(active==='breathe') $('#bToggle').click();
+    else switchMod('breathe');
+    return;
+  }
+  if(k>='1' && k<='6'){ switchMod(MODS[+k-1]); return; }
+  if(k==='r'){ (active==='focus'?$('#fReset'):$('#bReset')).click(); return; }
+  if(k==='n'){ switchMod('cards'); drawCard(); return; }
+  if(k==='p'){ powerToggle(); return; }
+  if(k==='escape'){ switchMod('breathe'); return; }
+});
+
+/* ---------- 初始化 ---------- */
+function init(){
+  bindUI();
+  syncBreatheLive();
+  syncFocus();
+  renderLog();
+  switchMod('breathe');
+  requestAnimationFrame(function(t){ last=t; loop(t); });
+  powerToggle(false);            // 开机：先亮一条线，再展开
+  setTimeout(boot, 520);
+}
+window.__diag = {
+  get mod(){ return active; },
+  get breathe(){ return {key:B.key, idx:B.idx, t:+B.t.toFixed(2), running:B.running, cycles:B.cycles, value:+bValue().toFixed(3)}; },
+  get focus(){ return {total:F.total, left:+F.left.toFixed(1), running:F.running, done:F.done, progress:+fProgress().toFixed(3)}; },
+  get audio(){ return {enabled:AudioSys.enabled, ctx:!!AudioSys.ctx, state:AudioSys.ctx?AudioSys.ctx.state:'none', chans:AudioSys.chans}; },
+  get store(){ return S; },
+  get booted(){ return booted; },
+  get canvasSizes(){
+    return ['cvBreathe','cvFocus','cvAmbient','cvLog'].map(function(id){
+      const c=document.getElementById(id); const r=c.getBoundingClientRect();
+      return {id:id, w:Math.round(r.width), h:Math.round(r.height), bw:c.width, bh:c.height, visible:r.width>0&&r.height>0};
+    });
+  },
+  setFocus: function(sec){ F.total=sec; F.left=sec; F.done=false; F.running=false; syncFocus(); },
+  skipBoot: dismissBoot,
+  setBreathe: function(key, idx, t){ B.key=key; B.idx=idx||0; B.t=t||0; B.running=true; }
+};
+init();
+</script>
+</body>
+</html>
