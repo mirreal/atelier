@@ -202,6 +202,7 @@ function renderEntry(p, n) {
 function render(pages, opts) {
   const groups = group(pages);
   const name = opts.title;
+  const mark = opts.mark || "";
   const works = pages.length;
   const sections = groups.filter((g) => g.name).length || 1;
   const stamp = pages.reduce((a, p) => (p.mtime > a ? p.mtime : a), new Date(0));
@@ -223,6 +224,7 @@ function render(pages, opts) {
     : "这里还没有作品";
 
   const heroPre = listing ? `\n    <pre>${esc(listing)}</pre>` : "";
+  const lockup = `    <div class="lockup">\n${mark ? `      ${mark}\n` : ""}      <h1>${esc(name)}</h1>\n    </div>`;
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -230,6 +232,7 @@ function render(pages, opts) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="scripts/build-index.mjs">
+${opts.icon ? `<link rel="icon" href="${esc(opts.icon)}" type="image/svg+xml">\n` : ""}${opts.touch ? `<link rel="apple-touch-icon" href="${esc(opts.touch)}">\n` : ""}<meta name="theme-color" content="#f6f1e7">
 <title>${esc(name)}</title>
 ${opts.desc ? `<meta name="description" content="${esc(opts.desc)}">\n` : ""}<style>
 :root{
@@ -266,6 +269,9 @@ body::after{
 .hero h1{
   font-size:clamp(30px,6vw,50px);line-height:1.2;margin:0 0 10px;font-weight:600;letter-spacing:.03em;
 }
+.hero .lockup{display:flex;align-items:center;gap:20px;margin-bottom:10px}
+.hero .lockup h1{margin:0}
+.hero .lockup .mark{width:52px;height:52px;flex:none;display:block}
 .hero .sub{color:var(--ink-3);font-size:15.5px;font-style:italic;margin:0 0 34px}
 .hero .sub b{color:var(--ink-2);font-style:normal;font-weight:600}
 .hero pre{
@@ -347,6 +353,8 @@ footer .gen{opacity:.75}
   .wrap{padding:0 20px}
   .hero{padding:76px 0 40px}
   .hero pre{font-size:10.5px;padding:14px 12px}
+  .hero .lockup{gap:14px}
+  .hero .lockup .mark{width:42px;height:42px}
   .entry a{grid-template-columns:34px 1fr;gap:4px 12px;padding:16px 8px 16px 0;margin-left:0}
   .entry .title{font-size:18px}
 }
@@ -360,7 +368,7 @@ footer .gen{opacity:.75}
 <header class="hero">
   <div class="wrap">
     <span class="tag">Index</span>
-    <h1>${esc(name)}</h1>
+${lockup}
     <p class="sub">${opts.desc ? esc(opts.desc) : summary}</p>${heroPre}
   </div>
 </header>
@@ -411,6 +419,28 @@ ${body.join("\n\n")}
 
 /* ----------------------------------------------------------------- main */
 
+/**
+ * 读取 site/favicon.svg，作为页头 logo 内联进索引页 ——
+ * favicon 和 logo 只有这一份源文件，改一处两处都跟着变。
+ */
+async function readMark(siteDir) {
+  const file = path.join(siteDir, "favicon.svg");
+  if (!existsSync(file)) return "";
+  let svg = (await readFile(file, "utf8"))
+    .trim()
+    .replace(/<\?xml[^>]*\?>\s*/g, "")
+    .replace(/\s+role="[^"]*"/gi, "")
+    .replace(/\s+aria-label="[^"]*"/gi, "");
+  if (!/<svg\b/i.test(svg)) return "";
+  if (!/<svg\b[^>]*\bclass\s*=/i.test(svg)) svg = svg.replace(/<svg\b/i, '<svg class="mark"');
+  return svg.replace(/<svg\b/i, '<svg aria-hidden="true" focusable="false"');
+}
+
+/** 输出文件 → 站点内某个文件的相对路径（正斜杠）。 */
+function hrefTo(from, to) {
+  return path.relative(from, to).split(path.sep).join("/");
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const log = (m) => { if (!opts.quiet) console.log(m); };
@@ -428,7 +458,18 @@ async function main() {
     console.error(`build-index: ${path.relative(ROOT, opts.site)} 下没有找到任何含 index.html 的目录`);
   }
 
-  const html = render(pages, { ...opts, title });
+  const outDir = path.dirname(opts.out);
+  const iconPath = path.join(opts.site, "favicon.svg");
+  const touchPath = path.join(opts.site, "apple-touch-icon.png");
+  const mark = await readMark(opts.site);
+
+  const html = render(pages, {
+    ...opts,
+    title,
+    mark,
+    icon: existsSync(iconPath) ? hrefTo(outDir, iconPath) : null,
+    touch: existsSync(touchPath) ? hrefTo(outDir, touchPath) : null,
+  });
   const current = existsSync(opts.out) ? readFileSync(opts.out, "utf8") : null;
   const outRel = path.relative(ROOT, opts.out) || opts.out;
 
