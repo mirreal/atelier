@@ -107,20 +107,25 @@ function firstMatch(html, re) {
   return m ? collapse(decode(m[1])) : "";
 }
 
+/** 文件名兜底标题：about-me.html → about me */
+const humanize = (s) => s.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+
 /** 解析一个页面，取出索引需要的元信息。 */
-async function readMeta(file, rel) {
+async function readMeta(file, rel, isFile) {
   const html = await readFile(file, "utf8");
+  const fallback = isFile ? humanize(path.basename(rel, path.extname(rel))) : rel;
   const raw = firstMatch(html, /<title\b[^>]*>([\s\S]*?)<\/title>/i)
     || metaContent(html, "og:title")
     || firstMatch(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
 
   // "逻辑哲学论 · 一架梯子" → 主标题 + 副标
   const split = raw.match(/^(.*?)\s*[·・—–|｜]\s*(.+)$/);
-  const title = (split ? split[1] : raw) || rel;
+  const title = (split ? split[1] : raw) || fallback;
 
   return {
     rel,
     file,
+    isFile,
     title,
     kicker: split ? split[2] : "",
     desc: metaContent(html, "description") || metaContent(html, "og:description"),
@@ -131,11 +136,27 @@ async function readMeta(file, rel) {
 /* ------------------------------------------------------------ 目录遍历 */
 
 const SKIP = new Set(["node_modules", "dist", "build", "out", "coverage", "vendor"]);
+const SKIP_FILES = new Set(["404.html", "500.html"]);
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 
 const isSkipped = (name) => name.startsWith(".") || SKIP.has(name);
 
-async function collect(siteDir) {
+/** 目录里的某个文件算不算一个独立页面（该目录的 index.html 除外，它就是目录本身）。 */
+function isPageFile(name, abs, outPath) {
+  const lower = name.toLowerCase();
+  if (!lower.endsWith(".html")) return false;
+  if (lower === "index.html") return false;
+  if (name.startsWith(".") || SKIP_FILES.has(lower)) return false;
+  return abs !== outPath;
+}
+
+/**
+ * 遍历 site：
+ *   1. 子目录里的 index.html  → 目录本身算一页
+ *   2. 目录下的其他 .html     → 各自算一页
+ * site/index.html 是索引页自己，永远不算条目。
+ */
+async function collect(siteDir, outPath) {
   const pages = [];
   async function walk(dir, rel) {
     let items;
@@ -145,15 +166,30 @@ async function collect(siteDir) {
       if (rel) console.error(`build-index: 跳过无法读取的目录 ${rel}/ (${e.code})`);
       return;
     }
-    const dirs = items.filter((d) => d.isDirectory() && !isSkipped(d.name));
-    dirs.sort((a, b) => collator.compare(a.name, b.name));
+
+    const here = [];
+
+    // 独立 HTML 文件（该目录的 index.html 不算，它由下面的目录条目代表）
+    for (const f of items) {
+      if (!f.isFile()) continue;
+      const abs = path.join(dir, f.name);
+      if (!isPageFile(f.name, abs, outPath)) continue;
+      here.push(await readMeta(abs, rel ? `${rel}/${f.name}` : f.name, true));
+    }
+
+    // 子目录：有 index.html 的算一页，同时继续往下找
+    const dirs = items
+      .filter((d) => d.isDirectory() && !isSkipped(d.name))
+      .sort((a, b) => collator.compare(a.name, b.name));
     for (const d of dirs) {
       const childRel = rel ? `${rel}/${d.name}` : d.name;
       const childAbs = path.join(dir, d.name);
       const entry = path.join(childAbs, "index.html");
-      if (existsSync(entry)) pages.push(await readMeta(entry, childRel));
-      await walk(childAbs, childRel); // 目录里可能还有子目录
+      if (existsSync(entry) && entry !== outPath) here.push(await readMeta(entry, childRel, false));
+      await walk(childAbs, childRel);
     }
+
+    pages.push(...here);
   }
   await walk(siteDir, "");
   return pages.sort((a, b) => collator.compare(a.rel, b.rel));
@@ -166,20 +202,25 @@ const esc = (s) =>
 
 const pad = (n) => String(n).padStart(2, "0");
 
-/** 按首层目录分组；全部都在顶层时不分组，直接平铺。 */
+/** 目录条目指向目录本身，独立文件指向文件。 */
+const entryHref = (p) => (p.isFile ? p.rel : p.rel + "/");
+
+/** 按首层目录分组；全都在顶层时不分组，直接平铺。 */
 function group(pages) {
-  if (!pages.some((p) => p.rel.includes("/"))) return [{ name: "", items: pages }];
   const map = new Map();
   for (const p of pages) {
-    const key = p.rel.split("/")[0];
+    const key = p.rel.includes("/") ? p.rel.split("/")[0] : "";
     if (!map.has(key)) map.set(key, { name: key, items: [] });
     map.get(key).items.push(p);
   }
-  return [...map.values()].sort((a, b) => collator.compare(a.name, b.name));
+  const groups = [...map.values()];
+  if (groups.length === 1 && groups[0].name === "") return groups;
+  // 顶层条目（无组名）排在最前，其余按组名排序
+  return groups.sort((a, b) => (a.name ? 1 : 0) - (b.name ? 1 : 0) || collator.compare(a.name, b.name));
 }
 
 function renderEntry(p, n) {
-  const href = p.rel + "/";
+  const href = entryHref(p);
   const search = [p.title, p.kicker, p.rel].join(" ").toLowerCase();
   const lines = [
     `      <li class="entry" data-search="${esc(search)}">`,
@@ -192,7 +233,7 @@ function renderEntry(p, n) {
   lines.push(`          </span>`);
   if (p.desc) lines.push(`          <span class="desc">${esc(p.desc)}</span>`);
   lines.push(
-    `          <span class="path">${esc(p.rel)}/</span>`,
+    `          <span class="path">${esc(href)}</span>`,
     `        </a>`,
     `      </li>`
   );
@@ -216,12 +257,12 @@ function render(pages, opts) {
   }) : [];
 
   const listing = pages
-    .map((p, i) => `   ${pad(i + 1)}  ${p.rel}/`)
+    .map((p, i) => `   ${pad(i + 1)}  ${entryHref(p)}`)
     .join("\n");
 
   const summary = works
-    ? `共 <b>${works}</b> 篇作品，收在 <b>${sections}</b> 个目录里`
-    : "这里还没有作品";
+    ? `共 <b>${works}</b> 个页面，收在 <b>${sections}</b> 个目录里`
+    : "这里还没有页面";
 
   const heroPre = listing ? `\n    <pre>${esc(listing)}</pre>` : "";
   const lockup = `    <div class="lockup">\n${mark ? `      ${mark}\n` : ""}      <h1>${esc(name)}</h1>\n    </div>`;
@@ -375,18 +416,18 @@ ${lockup}
 
 <main class="wrap">
 ${works ? `  <div class="find">
-    <input id="q" type="search" placeholder="筛选标题或目录名…" aria-label="筛选作品" autocomplete="off">
+    <input id="q" type="search" placeholder="筛选标题或文件名…" aria-label="筛选页面" autocomplete="off">
     <span class="count" id="count"></span>
   </div>
-  <p class="none" id="none">没有匹配的作品。</p>
-` : `  <p class="blank">在 <code>site/</code> 下新建一个目录，放一个 <code>index.html</code>，然后运行 <code>npm run index</code>。</p>
+  <p class="none" id="none">没有匹配的页面。</p>
+` : `  <p class="blank">在 <code>site/</code> 下新建一个目录（或放一个 <code>.html</code> 文件），然后运行 <code>npm run index</code>。</p>
 `}
 ${body.join("\n\n")}
 </main>
 
 <footer>
   <div class="wrap">
-    ${updated ? `<div>索引于 ${updated} · ${works} 篇 / ${sections} 节</div>\n    ` : ""}<div><a href="./" style="color:inherit">回到顶部</a></div>
+    ${updated ? `<div>索引于 ${updated} · ${works} 个页面 / ${sections} 个目录</div>\n    ` : ""}<div><a href="./" style="color:inherit">回到顶部</a></div>
   </div>
 </footer>
 
@@ -405,7 +446,7 @@ ${body.join("\n\n")}
       row.classList.toggle("hide",!ok);
       if(ok) hit++;
     });
-    counter.textContent=hit===rows.length?(rows.length+" 篇"):(hit+" / "+rows.length+" 篇");
+    counter.textContent=hit===rows.length?(rows.length+" 个页面"):(hit+" / "+rows.length+" 个页面");
     none.style.display=hit?"none":"block";
   }
   q.addEventListener("input",apply);
@@ -453,9 +494,9 @@ async function main() {
     title = existsSync(pkg) ? JSON.parse(readFileSync(pkg, "utf8")).name || path.basename(ROOT) : path.basename(opts.site);
   }
 
-  const pages = await collect(opts.site);
+  const pages = await collect(opts.site, opts.out);
   if (!pages.length) {
-    console.error(`build-index: ${path.relative(ROOT, opts.site)} 下没有找到任何含 index.html 的目录`);
+    console.error(`build-index: ${path.relative(ROOT, opts.site)} 下没有找到任何页面`);
   }
 
   const outDir = path.dirname(opts.out);
@@ -475,7 +516,7 @@ async function main() {
 
   if (current === html) {
     if (!opts.force) {
-      log(`· 索引已是最新：${outRel}（${pages.length} 篇）`);
+      log(`· 索引已是最新：${outRel}（${pages.length} 个页面）`);
       return;
     }
     log(`· 内容无变化，按 --force 重写：${outRel}`);
@@ -485,7 +526,7 @@ async function main() {
   }
   await writeFile(opts.out, html, "utf8");
   log(`${current === null ? "已创建" : "已更新"}：${outRel}`);
-  for (const p of pages) log(`  · ${p.rel}/  —  ${p.title}${p.kicker ? " · " + p.kicker : ""}`);
+  for (const p of pages) log(`  · ${entryHref(p)}  —  ${p.title}${p.kicker ? " · " + p.kicker : ""}`);
 }
 
 main().catch((e) => fail(e.stack ?? String(e)));

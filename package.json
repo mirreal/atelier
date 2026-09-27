@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "静态站点，site/ 下每篇作品一个目录，索引页由脚本生成",
+  "description": "static site generator for Atelier",
   "scripts": {
     "index": "node scripts/build-index.mjs",
     "index:check": "node scripts/build-index.mjs --check"
