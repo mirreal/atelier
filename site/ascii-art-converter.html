@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASCII Art 转换器</title>
+<style>
+  :root{
+    --bg:#faf8f5;
+    --panel:#fffefb;
+    --ink:#2b2723;
+    --muted:#857c70;
+    --line:#e9e2d8;
+    --accent:#c0881c;
+    --accent-soft:#fbf3e4;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(43,39,35,.05), 0 8px 24px rgba(43,39,35,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:1180px;margin:0 auto;padding:32px 20px 56px}
+
+  header{margin-bottom:24px}
+  h1{margin:0;font-size:22px;letter-spacing:.02em;font-weight:650}
+  .sub{margin:6px 0 0;color:var(--muted);font-size:13.5px}
+
+  main{display:grid;grid-template-columns:296px 1fr;gap:20px;align-items:start}
+  @media (max-width:880px){
+    main{grid-template-columns:1fr}
+    .app{padding:20px 14px 40px}
+  }
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .controls{padding:18px}
+  .group{margin-bottom:18px}
+  .group:last-child{margin-bottom:0}
+  .label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;color:var(--muted);margin-bottom:8px}
+  .label b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;font-size:13px}
+  .hint{margin:8px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:#e9e2d8}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;
+    background:var(--accent);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.18)
+  }
+  input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:#e9e2d8}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}
+
+  select{
+    width:100%;padding:9px 10px;font:inherit;font-size:14px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:10px;cursor:pointer
+  }
+  select:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .switch{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;font-size:14px;padding:4px 0}
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .track{
+    flex:0 0 auto;width:38px;height:22px;border-radius:99px;background:#e3ddd3;position:relative;transition:background .18s
+  }
+  .track::after{
+    content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .18s
+  }
+  .switch input:checked + .track{background:var(--accent)}
+  .switch input:checked + .track::after{transform:translateX(16px)}
+  .switch input:focus-visible + .track{outline:2px solid var(--accent);outline-offset:2px}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 14px;font:inherit;font-size:13.5px;border-radius:10px;cursor:pointer;
+    border:1px solid var(--line);background:#fff;color:var(--ink);transition:background .15s,border-color .15s
+  }
+  .btn:hover{background:#f6f1ea;border-color:#ded5c8}
+  .btn:active{background:#efe8de}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:#a9761a;border-color:#a9761a}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn-row{display:flex;flex-wrap:wrap;gap:8px}
+  .btn-row .btn{flex:1 1 auto}
+
+  .seg{display:flex;gap:3px;padding:3px;background:#f1ece4;border-radius:11px}
+  .segbtn{
+    flex:1 1 0;padding:7px 8px;font:inherit;font-size:13.5px;border:0;border-radius:8px;
+    background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s
+  }
+  .segbtn.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(43,39,35,.10)}
+  .segbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+  textarea{
+    width:100%;padding:9px 10px;font:inherit;font-size:14px;line-height:1.5;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:10px;resize:vertical;min-height:44px
+  }
+  textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  .trow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .cfield{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);cursor:pointer}
+  .cfield input[type=color]{
+    width:34px;height:26px;padding:0;border:1px solid var(--line);border-radius:7px;background:#fff;cursor:pointer
+  }
+
+  .drop{
+    border:1.5px dashed #d9d0c2;border-radius:var(--radius);padding:26px 16px;text-align:center;
+    background:#fffdf8;cursor:pointer;transition:border-color .15s,background .15s
+  }
+  .drop:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .drop strong{display:block;font-size:14px;font-weight:600}
+  .drop span{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
+
+  .filebar{display:none;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fffdf8}
+  .filebar.on{display:flex}
+  .filebar .meta{flex:1 1 auto;min-width:0;font-size:12.5px;color:var(--muted);line-height:1.35}
+  .filebar .meta b{display:block;color:var(--ink);font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .filebar .btn{padding:6px 10px;font-size:12.5px}
+
+  .stage{padding:14px}
+  .stage-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
+  .stats{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;flex:1 1 auto}
+  .canvas-wrap{
+    border-radius:10px;overflow:hidden;border:1px solid var(--line);
+    background:#fffdf9;transition:background .2s
+  }
+  .canvas-wrap.dark{background:#141210;border-color:#141210}
+  canvas{display:block;width:100%;height:auto}
+  .empty{
+    padding:56px 20px;text-align:center;color:var(--muted);font-size:13.5px
+  }
+  .empty p{margin:0 0 14px}
+
+  .overlay{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(250,248,245,.86);backdrop-filter:blur(2px);z-index:20;font-size:15px;color:var(--accent);font-weight:600
+  }
+  .overlay.on{display:flex}
+
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);
+    background:#2b2723;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>ASCII Art 转换器</h1>
+    <p class="sub">把图片转成字符画 —— 拖进来、粘进来、或者点一下选一张</p>
+  </header>
+
+  <main>
+    <section class="panel controls">
+      <div class="group">
+        <div class="seg" role="tablist" aria-label="输入模式">
+          <button class="segbtn on" id="mImage" type="button" role="tab" aria-selected="true">图片</button>
+          <button class="segbtn" id="mText" type="button" role="tab" aria-selected="false">文字</button>
+        </div>
+      </div>
+
+      <div class="group" id="gImage">
+        <div class="drop" id="drop" role="button" tabindex="0" aria-label="上传图片，支持拖放或点击选择文件">
+          <strong>拖放图片到这里</strong>
+          <span>或点击选择文件 · 也可直接 Ctrl/⌘+V 粘贴</span>
+        </div>
+        <div class="filebar" id="filebar">
+          <div class="meta"><b id="fname">—</b><span id="fdim"></span></div>
+          <button class="btn" id="replace" type="button">更换</button>
+        </div>
+        <input type="file" id="file" accept="image/*" class="sr" aria-hidden="true" tabindex="-1">
+      </div>
+
+      <div class="group" id="gText" hidden>
+        <div class="label"><span>文字内容</span></div>
+        <textarea id="txt" rows="2" placeholder="输入要转换的文字，回车换行">ASCII</textarea>
+        <div class="label" style="margin:12px 0 8px"><span>字体</span></div>
+        <select id="font" aria-label="字体">
+          <option value="sans">黑体 · 无衬线</option>
+          <option value="serif">宋体 · 衬线</option>
+          <option value="rounded">圆体</option>
+          <option value="kai">楷体</option>
+          <option value="mono">等宽</option>
+          <option value="script">手写体</option>
+        </select>
+        <div class="trow">
+          <label class="switch">
+            <input type="checkbox" id="bold"><span class="track"></span><span>粗体</span>
+          </label>
+          <label class="cfield">颜色 <input type="color" id="tcolor" value="#2b2723" aria-label="文字颜色"></label>
+        </div>
+        <p class="hint">字号按内容自动撑满画布；彩色模式下字符取这里的颜色。</p>
+      </div>
+
+      <div class="group">
+        <div class="label"><span>分辨率</span><b id="resVal">100 列</b></div>
+        <input type="range" id="res" min="20" max="300" step="1" value="100" aria-label="输出字符列数">
+        <p class="hint">列数越大越细腻，字符也越多。</p>
+      </div>
+
+      <div class="group">
+        <div class="label"><span>字符集</span></div>
+        <select id="charset" aria-label="字符集">
+          <option value="standard">标准 (10 级)</option>
+          <option value="detailed">精细 (70 级)</option>
+          <option value="blocks">方块 █▓▒░</option>
+          <option value="minimal">极简 (5 级)</option>
+        </select>
+      </div>
+
+      <div class="group">
+        <label class="switch">
+          <input type="checkbox" id="invert"><span class="track"></span><span>反色</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="gray" checked><span class="track"></span><span>灰度模式（单色）</span>
+        </label>
+      </div>
+
+      <div class="group btn-row">
+        <button class="btn" id="demo" type="button">示例图</button>
+        <button class="btn" id="reset" type="button">重置设置</button>
+      </div>
+    </section>
+
+    <section class="panel stage">
+      <div class="stage-head">
+        <div class="stats" id="stats">尚未生成字符画</div>
+        <div class="btn-row">
+          <button class="btn" id="copy" type="button" disabled>复制</button>
+          <button class="btn primary" id="save" type="button" disabled>下载 .txt</button>
+        </div>
+      </div>
+      <div class="canvas-wrap" id="wrap">
+        <div class="empty" id="empty">
+          <p>还没有内容。左侧上传一张图片，或切到「文字」输入几个字。</p>
+          <button class="btn" id="emptyDemo" type="button">生成示例图</button>
+        </div>
+        <canvas id="out" hidden></canvas>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">松手即导入</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var CHARSETS = {
+    standard: '@%#*+=-:. ',
+    detailed: '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`\'. ',
+    blocks:   '\u2588\u2593\u2592\u2591 ',
+    minimal:  '#+-. '
+  };
+  var FONT = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Courier New", monospace';
+  var FONTS = {
+    sans:    '"PingFang SC","Helvetica Neue",Helvetica,Arial,sans-serif',
+    serif:   '"Songti SC",SimSun,Georgia,"Times New Roman",serif',
+    rounded: '"Yuanti SC","Hiragino Sans GB","PingFang SC",sans-serif',
+    kai:     '"Kaiti SC",STKaiti,KaiTi,serif',
+    mono:    'Menlo,Consolas,"Courier New",monospace',
+    script:  '"Snell Roundhand","Brush Script MT","Segoe Script",cursive'
+  };
+  var MAX_ROWS = 320;
+  var TEXT_W = 1400;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var elFile = $('file'), elDrop = $('drop'), elFilebar = $('filebar'), elFname = $('fname'), elFdim = $('fdim');
+  var elMImage = $('mImage'), elMText = $('mText'), elGImage = $('gImage'), elGText = $('gText');
+  var elTxt = $('txt'), elFont = $('font'), elBold = $('bold'), elColor = $('tcolor');
+  var elRes = $('res'), elResVal = $('resVal'), elCharset = $('charset'), elInvert = $('invert'), elGray = $('gray');
+  var elWrap = $('wrap'), elCanvas = $('out'), elEmpty = $('empty'), elStats = $('stats');
+  var elCopy = $('copy'), elSave = $('save'), elToast = $('toast'), elOverlay = $('overlay');
+
+  var measure = document.createElement('canvas').getContext('2d');
+  var sampler = document.createElement('canvas');
+  var sctx = sampler.getContext('2d', { willReadFrequently: true });
+  var ctx = elCanvas.getContext('2d');
+
+  var mode = 'image';     // 'image' | 'text'
+  var source = null;      // HTMLImageElement 或 HTMLCanvasElement
+  var sourceKind = null;  // 'image' | 'text'
+  var srcW = 0, srcH = 0;
+  var art = null;         // { cols, rows, lines:[], colors:[] | null }
+  var text = '';
+
+  /* ---------- 小工具 ---------- */
+  var toastTimer = 0;
+  function toast(msg){
+    elToast.textContent = msg;
+    elToast.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ elToast.classList.remove('on'); }, 1900);
+  }
+  function clamp255(v){ return v < 0 ? 0 : v > 255 ? 255 : v | 0; }
+
+  // 颜色模式画在深色底上，过暗的颜色会看不见，按亮度抬到 35% 以上
+  function lift(r, g, b){
+    var m = Math.max(r, g, b);
+    if (m <= 0) return 'rgb(58,54,50)';
+    var target = (0.35 + 0.65 * (m / 255)) * 255;
+    var s = target / m;
+    return 'rgb(' + clamp255(r * s) + ',' + clamp255(g * s) + ',' + clamp255(b * s) + ')';
+  }
+
+  // 逐级折半降采样，比一步 drawImage 到目标尺寸少很多锯齿
+  function downscale(src, w, h, tw, th){
+    var cw = w, ch = h, cur = src;
+    while (cw > tw * 2 && ch > th * 2){
+      var nw = Math.max(tw, cw >> 1), nh = Math.max(th, ch >> 1);
+      var tmp = document.createElement('canvas');
+      tmp.width = nw; tmp.height = nh;
+      var t = tmp.getContext('2d');
+      t.imageSmoothingEnabled = true; t.imageSmoothingQuality = 'high';
+      t.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
+      cur = tmp; cw = nw; ch = nh;
+    }
+    return { canvas: cur, w: cw, h: ch };
+  }
+
+  /* ---------- 导入 ---------- */
+  function loadImageFromFile(f){
+    if (!f || !/^image\//.test(f.type)) { toast('这不是图片文件'); return; }
+    if (mode !== 'image') setMode('image');
+    var url = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function(){
+      setSource(img, f.name || '图片', img.naturalWidth, img.naturalHeight, 'image');
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); toast('图片读取失败'); };
+    img.src = url;
+  }
+
+  function setSource(src, name, w, h, kind){
+    source = src; srcW = w; srcH = h; sourceKind = kind;
+    elFname.textContent = name;
+    elFdim.textContent = w + ' × ' + h + ' px';
+    elFilebar.classList.add('on');
+    elDrop.style.display = 'none';
+    elEmpty.hidden = true;
+    elCanvas.hidden = false;
+    elCopy.disabled = elSave.disabled = false;
+    build();
+  }
+
+  function clearStage(){
+    source = null; sourceKind = null; art = null; text = '';
+    elFilebar.classList.remove('on');
+    elDrop.style.display = '';
+    elEmpty.hidden = false;
+    elCanvas.hidden = true;
+    elCopy.disabled = elSave.disabled = true;
+    elStats.textContent = '尚未生成字符画';
+  }
+
+  function makeDemo(){
+    var c = document.createElement('canvas');
+    c.width = 720; c.height = 480;
+    var g = c.getContext('2d');
+    var sky = g.createLinearGradient(0, 0, 0, 480);
+    sky.addColorStop(0, '#1b2440'); sky.addColorStop(0.45, '#7b4b6b');
+    sky.addColorStop(0.72, '#e08a4e'); sky.addColorStop(1, '#f6d59a');
+    g.fillStyle = sky; g.fillRect(0, 0, 720, 480);
+
+    var sun = g.createRadialGradient(360, 300, 8, 360, 300, 130);
+    sun.addColorStop(0, '#fff6dc'); sun.addColorStop(0.35, '#ffd27a'); sun.addColorStop(1, 'rgba(255,190,110,0)');
+    g.fillStyle = sun; g.fillRect(0, 0, 720, 480);
+    g.beginPath(); g.arc(360, 300, 52, 0, Math.PI * 2); g.fillStyle = '#fff3d0'; g.fill();
+
+    g.fillStyle = 'rgba(30,24,40,.92)';
+    g.beginPath();
+    g.moveTo(-20, 480); g.lineTo(120, 250); g.lineTo(210, 330); g.lineTo(300, 210); g.lineTo(430, 480);
+    g.closePath(); g.fill();
+    g.beginPath();
+    g.moveTo(330, 480); g.lineTo(500, 265); g.lineTo(600, 350); g.lineTo(700, 240); g.lineTo(760, 480);
+    g.closePath(); g.fill();
+
+    g.fillStyle = 'rgba(20,16,28,.96)'; g.fillRect(0, 392, 720, 88);
+    g.fillStyle = 'rgba(255,214,140,.5)';
+    for (var i = 0; i < 26; i++){
+      var y = 400 + (i % 7) * 11;
+      g.fillRect(300 + (i % 5) * 14 - 40, y, 40 + (i % 4) * 22, 2);
+    }
+    return c;
+  }
+
+  /* ---------- 文字 → 源画布 ---------- */
+  function buildText(){
+    var raw = elTxt.value || '';
+    var lines = raw.split('\n');
+    var has = false;
+    for (var i = 0; i < lines.length; i++){ if (lines[i].trim() !== '') { has = true; break; } }
+    if (!has){ clearStage(); return; }
+
+    var fam = FONTS[elFont.value] || FONTS.sans;
+    var weight = elBold.checked ? '700' : '400';
+    var mc = document.createElement('canvas').getContext('2d');
+    mc.font = weight + ' 100px ' + fam;
+    var maxW = 1;
+    for (var k = 0; k < lines.length; k++) maxW = Math.max(maxW, mc.measureText(lines[k]).width || 1);
+
+    // 先按固定留白估字号，再按字号回调留白，最后定一次字号
+    var pad = 40;
+    var fs = Math.max(10, Math.min(360, (TEXT_W - pad * 2) / (maxW / 100)));
+    pad = Math.round(Math.max(14, Math.min(60, fs * 0.22)));
+    fs = Math.max(10, Math.min(360, (TEXT_W - pad * 2) / (maxW / 100)));
+
+    var lh = Math.max(12, Math.round(fs * 1.18));
+    var H = Math.max(48, Math.round(pad * 2 + (lines.length - 1) * lh + fs * 1.24));
+
+    var c = document.createElement('canvas');
+    c.width = TEXT_W; c.height = H;
+    var g = c.getContext('2d');
+    g.fillStyle = '#ffffff';
+    g.fillRect(0, 0, TEXT_W, H);
+    g.font = weight + ' ' + fs + 'px ' + fam;
+    g.textAlign = 'center';
+    g.textBaseline = 'top';
+    g.fillStyle = elColor.value || '#2b2723';
+    for (var j = 0; j < lines.length; j++) g.fillText(lines[j], TEXT_W / 2, pad + j * lh);
+
+    var label = lines[0].trim().slice(0, 18) || '文字';
+    setSource(c, '文字「' + label + '」', TEXT_W, H, 'text');
+  }
+
+  function setMode(m){
+    mode = m;
+    elMImage.classList.toggle('on', m === 'image');
+    elMText.classList.toggle('on', m === 'text');
+    elMImage.setAttribute('aria-selected', m === 'image' ? 'true' : 'false');
+    elMText.setAttribute('aria-selected', m === 'text' ? 'true' : 'false');
+    elGImage.hidden = m !== 'image';
+    elGText.hidden = m !== 'text';
+    $('demo').textContent = m === 'image' ? '示例图' : '示例文字';
+    $('emptyDemo').textContent = m === 'image' ? '生成示例图' : '生成示例文字';
+    if (m === 'text') buildText();
+    else if (sourceKind !== 'image') clearStage();
+  }
+
+  /* ---------- 生成字符画 ---------- */
+  function metrics(cols){
+    var stageW = elWrap.clientWidth || 640;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var targetW = Math.min(2200, Math.max(420, stageW * dpr));
+    var fs = Math.max(5, Math.min(26, targetW / (cols * 0.62)));
+    measure.font = fs + 'px ' + FONT;
+    var cellW = measure.measureText('M').width || fs * 0.6;
+    var cellH = Math.max(1, Math.ceil(fs * 1.08));
+    return { fs: fs, cellW: cellW, cellH: cellH };
+  }
+
+  function build(){
+    if (!source) return;
+    var cols = +elRes.value;
+    var m = metrics(cols);
+    var rows = Math.round(cols * (srcH / srcW) * (m.cellW / m.cellH));
+    rows = Math.max(1, Math.min(MAX_ROWS, rows));
+
+    sampler.width = cols; sampler.height = rows;
+    sctx.setTransform(1, 0, 0, 1, 0, 0);
+    sctx.imageSmoothingEnabled = true; sctx.imageSmoothingQuality = 'high';
+    sctx.fillStyle = '#ffffff';
+    sctx.fillRect(0, 0, cols, rows);
+    var pre = downscale(source, srcW, srcH, cols, rows);
+    sctx.drawImage(pre.canvas, 0, 0, pre.w, pre.h, 0, 0, cols, rows);
+
+    var data;
+    try { data = sctx.getImageData(0, 0, cols, rows).data; }
+    catch (e) { toast('无法读取像素（跨域限制）'); return; }
+
+    var ramp = CHARSETS[elCharset.value] || CHARSETS.standard;
+    var n = ramp.length;
+    var invert = elInvert.checked;
+    var gray = elGray.checked;
+
+    var lines = [], colors = gray ? null : [], chars = 0;
+    for (var y = 0; y < rows; y++){
+      var line = '';
+      for (var x = 0; x < cols; x++){
+        var i = (y * cols + x) * 4;
+        var r = data[i], g = data[i + 1], b = data[i + 2];
+        var v = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        if (invert) v = 1 - v;
+        // 单色：墨量随暗度增加（白纸黑字）；彩色：墨量随亮度增加（深底彩字）
+        if (!gray) v = 1 - v;
+        var idx = Math.round(v * (n - 1));
+        line += ramp.charAt(idx < 0 ? 0 : idx > n - 1 ? n - 1 : idx);
+        if (colors) colors.push(lift(r, g, b));
+      }
+      lines.push(line);
+      chars += line.length;
+    }
+
+    art = { cols: cols, rows: rows, lines: lines, colors: colors, m: m };
+    text = lines.join('\n');
+    elStats.textContent = cols + ' × ' + rows + ' 字符 · 共 ' + chars.toLocaleString('en-US') + ' 个 · 原图 ' + srcW + '×' + srcH;
+    draw();
+  }
+
+  function draw(){
+    if (!art) return;
+    var cols = art.cols, rows = art.rows, m = art.m;
+    var w = Math.max(1, Math.ceil(cols * m.cellW));
+    var h = Math.max(1, Math.ceil(rows * m.cellH));
+    if (elCanvas.width !== w) elCanvas.width = w;
+    if (elCanvas.height !== h) elCanvas.height = h;
+
+    var gray = elGray.checked;
+    elWrap.classList.toggle('dark', !gray);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = gray ? '#fffdf9' : '#141210';
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = m.fs + 'px ' + FONT;
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+
+    if (gray){
+      ctx.fillStyle = '#2b2723';
+      for (var y = 0; y < rows; y++) ctx.fillText(art.lines[y], 0, y * m.cellH);
+    } else {
+      for (var yy = 0; yy < rows; yy++){
+        var py = yy * m.cellH, base = yy * cols;
+        for (var xx = 0; xx < cols; xx++){
+          var ch = art.lines[yy].charAt(xx);
+          if (ch === ' ') continue;
+          ctx.fillStyle = art.colors[base + xx];
+          ctx.fillText(ch, xx * m.cellW, py);
+        }
+      }
+    }
+  }
+
+  /* ---------- 导出 ---------- */
+  function copyText(){
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast('已复制到剪贴板'); }, fallbackCopy);
+    } else fallbackCopy();
+  }
+  function fallbackCopy(){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    toast(ok ? '已复制到剪贴板' : '复制失败，请手动选中文本');
+  }
+  function saveText(){
+    if (!text) return;
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'ascii-art.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    toast('已保存 ascii-art.txt');
+  }
+
+  /* ---------- 事件 ---------- */
+  elMImage.addEventListener('click', function(){ setMode('image'); });
+  elMText.addEventListener('click', function(){ setMode('text'); });
+
+  var txTimer = 0;
+  function scheduleText(){
+    clearTimeout(txTimer);
+    txTimer = setTimeout(buildText, 150);
+  }
+  elTxt.addEventListener('input', scheduleText);
+  elFont.addEventListener('change', buildText);
+  elBold.addEventListener('change', buildText);
+  elColor.addEventListener('input', scheduleText);
+
+  function openPicker(){ elFile.value = ''; elFile.click(); }
+  elDrop.addEventListener('click', openPicker);
+  elDrop.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPicker(); }
+  });
+  $('replace').addEventListener('click', openPicker);
+  elFile.addEventListener('change', function(){ loadImageFromFile(elFile.files && elFile.files[0]); });
+
+  var dragDepth = 0;
+  window.addEventListener('dragenter', function(e){
+    if (!e.dataTransfer || !e.dataTransfer.types || Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') < 0) return;
+    e.preventDefault(); dragDepth++; elOverlay.classList.add('on');
+  });
+  window.addEventListener('dragover', function(e){
+    if (!e.dataTransfer) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+  });
+  window.addEventListener('dragleave', function(){
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) elOverlay.classList.remove('on');
+  });
+  window.addEventListener('drop', function(e){
+    if (!e.dataTransfer) return;
+    e.preventDefault(); dragDepth = 0; elOverlay.classList.remove('on');
+    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadImageFromFile(f);
+  });
+
+  window.addEventListener('paste', function(e){
+    if (!e.clipboardData) return;
+    var items = e.clipboardData.items || [];
+    for (var i = 0; i < items.length; i++){
+      if (items[i].type && items[i].type.indexOf('image/') === 0){
+        var f = items[i].getAsFile();
+        if (f) { loadImageFromFile(f); e.preventDefault(); }
+        return;
+      }
+    }
+  });
+
+  elRes.addEventListener('input', function(){ elResVal.textContent = elRes.value + ' 列'; build(); });
+  elCharset.addEventListener('change', build);
+  elInvert.addEventListener('change', build);
+  elGray.addEventListener('change', build);
+  elCopy.addEventListener('click', copyText);
+  elSave.addEventListener('click', saveText);
+
+  $('demo').addEventListener('click', function(){ useDemo(); });
+  $('emptyDemo').addEventListener('click', function(){ useDemo(); });
+  function useDemo(){
+    if (mode === 'text'){
+      elTxt.value = '你好\nASCII';
+      buildText();
+      return;
+    }
+    var c = makeDemo();
+    setSource(c, '示例图（日落山景）', c.width, c.height, 'image');
+  }
+
+  $('reset').addEventListener('click', function(){
+    elRes.value = 100; elResVal.textContent = '100 列';
+    elCharset.value = 'standard'; elInvert.checked = false; elGray.checked = true;
+    if (sourceKind === 'text') buildText();
+    else if (source) build();
+    toast('设置已重置');
+  });
+
+  var rzTimer = 0;
+  window.addEventListener('resize', function(){
+    clearTimeout(rzTimer);
+    rzTimer = setTimeout(draw, 120);
+  });
+  if (window.ResizeObserver){
+    new ResizeObserver(function(){
+      clearTimeout(rzTimer);
+      rzTimer = setTimeout(draw, 120);
+    }).observe(elWrap);
+  }
+})();
+</script>
+</body>
+</html>
