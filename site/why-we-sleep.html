@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>我们为什么要睡觉 · 互动导读</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#FAF7F2; --bg-soft:#F3EEE5; --surface:#FFFFFF;
+  --ink:#1D2739; --ink-2:#4E5B70; --ink-3:#8B95A6;
+  --line:#E6DFD3; --line-2:#D8CFBE;
+  --amber:#B87A14; --amber-bg:#F7EEDC; --amber-line:#E8D6AE;
+  --deep:#2C4A78; --rem:#7C5EA8; --n2:#7A9CC4; --n1:#AEC3DA; --wake:#DED3C0;
+  --night:#141B2B; --night-2:#1C2537; --night-3:#232E44;
+  --n-ink:#E9E4DB; --n-ink-2:#98A3B8; --n-line:#2E3A52;
+  --good:#3F7A5C; --bad:#B5483A;
+  --r:14px; --r-sm:9px;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{margin:0;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit}
+svg{display:block}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ---------- progress + nav ---------- */
+.pbar{position:fixed;top:0;left:0;height:2px;background:var(--amber);width:0;z-index:60;transition:width .1s linear}
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(250,247,242,.86);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1080px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:20px;height:56px}
+.brand{font-size:14px;font-weight:600;letter-spacing:.01em;white-space:nowrap;display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--ink);display:block}
+.nav-links{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{font-size:13px;color:var(--ink-2);text-decoration:none;padding:5px 9px;border-radius:7px;white-space:nowrap;transition:background .18s,color .18s}
+.nav-links a:hover{background:var(--bg-soft);color:var(--ink)}
+.nav-links a.on{background:var(--ink);color:#fff}
+
+/* ---------- hero ---------- */
+.hero{padding:130px 0 60px}
+.hero-grid{display:grid;grid-template-columns:1fr 400px;gap:56px;align-items:center}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:18px}
+h1{font-size:clamp(40px,6vw,68px);letter-spacing:-.03em;line-height:1.08}
+.hero-sub{font-size:14px;color:var(--ink-3);margin-top:14px;letter-spacing:.02em}
+.hero-lede{font-size:17px;color:var(--ink-2);margin-top:26px;max-width:52ch;line-height:1.8}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.hero-meta span{font-size:12px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);padding:5px 12px;border-radius:99px}
+.hero-vis{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 20px 16px}
+.hero-vis .cap{font-size:11px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;font-weight:600}
+
+/* ---------- stat strip ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:64px}
+.stat{background:var(--surface);padding:22px 20px}
+.stat b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;color:var(--amber)}
+.stat span{display:block;font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.5}
+
+/* ---------- sections ---------- */
+.sec{padding:88px 0;scroll-margin-top:68px}
+.hero{scroll-margin-top:68px}
+.sec.night{background:var(--night);color:var(--n-ink)}
+.sec.night .sec-lede{color:var(--n-ink-2)}
+.sec-head{margin-bottom:36px;max-width:74ch}
+.sec-num{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--amber);margin-bottom:14px}
+h2{font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em}
+.sec-lede{font-size:16px;color:var(--ink-2);margin-top:14px;line-height:1.8}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.night .panel{background:var(--night-2);border-color:var(--n-line)}
+
+/* ---------- controls ---------- */
+.ctl-row{display:flex;flex-wrap:wrap;gap:26px;margin-bottom:22px}
+.ctl{flex:1 1 220px;min-width:180px}
+.ctl-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:9px}
+.ctl-top label{font-size:13px;color:var(--ink-2);font-weight:500}
+.ctl-top output{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--amber)}
+.night .ctl-top label{color:var(--n-ink-2)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:var(--line-2)}
+.night input[type=range]::-webkit-slider-runnable-track{background:var(--n-line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:var(--surface);border:2px solid var(--amber);box-shadow:0 1px 4px rgba(29,39,57,.18);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12)}
+input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:var(--line-2)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--surface);border:2px solid var(--amber)}
+
+.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.chart-scroll svg{min-width:640px;width:100%;height:auto}
+.scroll-hint{display:none;font-size:12px;text-align:center;margin:8px 0 0;letter-spacing:.04em}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.night .legend{border-color:var(--n-line)}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);background:none;border:0;padding:2px 0;font-family:inherit;cursor:default}
+.night .lg{color:var(--n-ink-2)}
+.lg i{width:14px;height:3px;border-radius:2px;display:block;flex-shrink:0}
+.lg.dash i{background:none!important;border-top:3px dashed currentColor;height:0}
+
+.readout{margin-top:18px;padding:15px 18px;background:var(--bg-soft);border-radius:var(--r-sm);border-left:3px solid var(--amber);font-size:14px;color:var(--ink-2);line-height:1.75;min-height:76px}
+.night .readout{background:var(--night-3);color:var(--n-ink-2)}
+.readout b{color:var(--ink);font-weight:600}
+.night .readout b{color:var(--n-ink)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{font-size:13px;font-family:inherit;padding:7px 15px;border-radius:99px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:all .18s}
+.chip:hover{border-color:var(--ink-3)}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.night .chip{background:transparent;border-color:var(--n-line);color:var(--n-ink-2)}
+.night .chip[aria-pressed=true]{background:var(--n-ink);border-color:var(--n-ink);color:var(--night)}
+
+/* ---------- stat tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px}
+.tile{background:var(--bg-soft);border-radius:var(--r-sm);padding:15px 16px}
+.night .tile{background:var(--night-3)}
+.tile b{display:block;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.tile span{display:block;font-size:12px;color:var(--ink-3);margin-top:4px}
+.night .tile span{color:var(--n-ink-2)}
+.tile.good b{color:var(--good)} .tile.bad b{color:var(--bad)} .tile.amb b{color:var(--amber)}
+
+/* ---------- cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0;overflow:hidden}
+.card>button{width:100%;text-align:left;font-family:inherit;font-size:inherit;background:none;border:0;padding:20px 22px;cursor:pointer;display:flex;align-items:center;gap:13px;color:inherit}
+.card>button:hover{background:var(--bg-soft)}
+.card .ico{width:34px;height:34px;border-radius:9px;background:var(--amber-bg);display:grid;place-items:center;flex-shrink:0}
+.card h3{font-size:15.5px;flex:1}
+.ev{font-size:11px;padding:3px 9px;border-radius:99px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.ev-s{background:#E4F0E9;color:var(--good)}
+.ev-m{background:var(--amber-bg);color:var(--amber)}
+.ev-w{background:#F6E4E1;color:var(--bad)}
+.card-bd{display:none;padding:0 22px 22px;font-size:14px;color:var(--ink-2);line-height:1.78}
+.card.open .card-bd{display:block}
+.card.open>button{background:var(--bg-soft)}
+.card-bd em{font-style:normal;color:var(--ink);font-weight:600}
+.caret{transition:transform .2s;flex-shrink:0;color:var(--ink-3)}
+.card.open .caret{transform:rotate(180deg)}
+
+/* ---------- compare bars ---------- */
+.cmp{display:grid;gap:22px;margin-top:6px}
+.cmp-grp h4{font-size:13px;color:var(--ink-3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.night .cmp-grp h4{color:var(--n-ink-2)}
+.bar-row{display:grid;grid-template-columns:104px 1fr 58px;gap:14px;align-items:center;margin-bottom:11px}
+.bar-row>span:first-child{font-size:13.5px;color:var(--ink-2)}
+.night .bar-row>span:first-child{color:var(--n-ink-2)}
+.bar-track{height:26px;background:var(--bg-soft);border-radius:6px;overflow:hidden}
+.night .bar-track{background:var(--night-3)}
+.bar-fill{height:100%;border-radius:6px;transition:width .55s cubic-bezier(.22,.7,.3,1)}
+.bar-val{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;color:var(--ink)}
+.night .bar-val{color:var(--n-ink)}
+
+/* ---------- checklist ---------- */
+.check{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.chk{display:flex;gap:13px;align-items:flex-start;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer;transition:all .18s;text-align:left;font-family:inherit;font-size:14.5px;color:var(--ink-2);line-height:1.65;width:100%}
+.chk:hover{border-color:var(--line-2)}
+.chk .box{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line-2);flex-shrink:0;margin-top:3px;display:grid;place-items:center;transition:all .18s}
+.chk .box svg{opacity:0;transition:opacity .18s}
+.chk[aria-pressed=true]{background:var(--amber-bg);border-color:var(--amber-line);color:var(--ink)}
+.chk[aria-pressed=true] .box{background:var(--amber);border-color:var(--amber)}
+.chk[aria-pressed=true] .box svg{opacity:1}
+.chk b{font-weight:600;color:var(--ink);display:block;font-size:14.5px}
+.chk small{display:block;font-size:12.5px;color:var(--ink-3);margin-top:3px;line-height:1.55}
+
+/* ---------- critique table ---------- */
+.crit{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.crit-row{display:grid;grid-template-columns:1.15fr 1fr 78px;gap:0;border-top:1px solid var(--line)}
+.crit-row:first-child{border-top:0}
+.crit-row>div{padding:15px 18px;font-size:13.5px;line-height:1.68}
+.crit-row>div:nth-child(2){border-left:1px solid var(--line);color:var(--ink-2)}
+.crit-row>div:nth-child(3){border-left:1px solid var(--line);display:grid;place-items:center}
+.crit-head>div{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-soft)}
+.crit-row .claim{color:var(--ink);font-weight:500}
+
+/* ---------- quiz ---------- */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;margin-bottom:14px}
+.q-h{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;gap:11px;align-items:baseline}
+.q-h i{font-style:normal;color:var(--amber);font-size:13px;font-weight:700;flex-shrink:0}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;font-family:inherit;font-size:14.5px;padding:13px 17px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:all .16s;line-height:1.6}
+.opt:hover:not(:disabled){border-color:var(--ink-3);background:var(--bg-soft)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good);background:#EAF3EE;color:#245239;font-weight:500}
+.opt.wrong{border-color:var(--bad);background:#F8E9E6;color:#7E3126}
+.opt.dim{opacity:.45}
+.exp{margin-top:15px;padding:15px 17px;background:var(--bg-soft);border-radius:var(--r-sm);font-size:13.5px;color:var(--ink-2);line-height:1.75;display:none;border-left:3px solid var(--amber)}
+.exp.show{display:block}
+.exp b{color:var(--ink)}
+.score{margin-top:22px;padding:20px 24px;background:var(--ink);color:#fff;border-radius:var(--r);font-size:15px;display:none}
+.score.show{display:block}
+.score b{font-size:22px;font-weight:600}
+
+/* ---------- footer ---------- */
+footer{background:var(--night);color:var(--n-ink-2);padding:60px 0 70px;font-size:13.5px;line-height:1.8}
+footer h4{color:var(--n-ink);font-size:14px;margin-bottom:12px}
+footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:34px}
+footer a{color:var(--n-ink);text-decoration:none;border-bottom:1px solid var(--n-line)}
+footer a:hover{border-color:var(--n-ink)}
+.fnote{margin-top:34px;padding-top:22px;border-top:1px solid var(--n-line);font-size:12.5px;color:#6F7B90}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-vis{max-width:440px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:620px){
+  .wrap,.nav-in{padding:0 20px}
+  .hero{padding:104px 0 40px}
+  .sec{padding:64px 0}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat{padding:17px 15px}
+  .stat b{font-size:22px}
+  .crit-row{grid-template-columns:1fr;gap:0}
+  .crit-row>div:nth-child(2),.crit-row>div:nth-child(3){border-left:0;border-top:1px dashed var(--line)}
+  .crit-row>div:nth-child(3){justify-items:start;padding-top:0}
+  .crit-head{display:none}
+  .bar-row{grid-template-columns:84px 1fr 48px;gap:10px}
+  .panel{padding:18px}
+  .brand{display:none}
+  .nav-links{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="pbar" id="pbar"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><i></i><span>我们为什么要睡觉</span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#systems">双系统</a>
+      <a href="#arch">睡眠结构</a>
+      <a href="#caffeine">咖啡因</a>
+      <a href="#debt">睡眠债</a>
+      <a href="#body">身体</a>
+      <a href="#dreams">梦</a>
+      <a href="#hygiene">睡眠卫生</a>
+      <a href="#critique">争议</a>
+      <a href="#quiz">测验</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">互动导读 · 睡眠科学</p>
+        <h1>我们为什么<br>要睡觉</h1>
+        <p class="hero-sub">Why We Sleep · Matthew Walker · 2017</p>
+        <p class="hero-lede">这本书想说服你一件事：睡眠不是待办清单上的最后一项，而是支撑其他所有事情的那一项。下面用六个可以动手的小实验，把书里的核心论证过一遍——包括它被学界质疑的部分。</p>
+        <div class="hero-meta"><span>6 个互动模块</span><span>约 12 分钟</span><span>零依赖 · 可离线</span></div>
+      </div>
+      <div class="hero-vis">
+        <p class="cap">一夜的睡眠深度</p>
+        <svg viewBox="0 0 360 212" role="img" aria-label="一夜睡眠分期示意：深睡集中在前半夜，快速眼动睡眠集中在后半夜">
+          <defs>
+            <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7C5EA8" stop-opacity=".20"/>
+              <stop offset="100%" stop-color="#2C4A78" stop-opacity=".04"/>
+            </linearGradient>
+          </defs>
+          <g stroke="#E6DFD3" stroke-width="1">
+            <line x1="34" y1="34" x2="344" y2="34"/><line x1="34" y1="72" x2="344" y2="72"/>
+            <line x1="34" y1="110" x2="344" y2="110"/><line x1="34" y1="148" x2="344" y2="148"/>
+          </g>
+          <g font-size="9" fill="#8B95A6" text-anchor="end">
+            <text x="28" y="37">醒</text><text x="28" y="75">REM</text><text x="28" y="113">浅</text><text x="28" y="151">深</text>
+          </g>
+          <path d="M34 34 L46 34 L46 72 L58 72 L58 110 L72 110 L72 148 L104 148 L104 110 L116 110 L116 72 L128 72 L128 110 L142 110 L142 148 L168 148 L168 110 L184 110 L184 72 L196 72 L196 110 L208 110 L208 148 L226 148 L226 110 L240 110 L240 72 L256 72 L256 110 L266 110 L266 148 L280 148 L280 110 L292 110 L292 72 L308 72 L308 110 L320 110 L320 72 L344 72 L344 160 L34 160 Z" fill="url(#hg)"/>
+          <path d="M34 34 L46 34 L46 72 L58 72 L58 110 L72 110 L72 148 L104 148 L104 110 L116 110 L116 72 L128 72 L128 110 L142 110 L142 148 L168 148 L168 110 L184 110 L184 72 L196 72 L196 110 L208 110 L208 148 L226 148 L226 110 L240 110 L240 72 L256 72 L256 110 L266 110 L266 148 L280 148 L280 110 L292 110 L292 72 L308 72 L308 110 L320 110 L320 72 L344 72" fill="none" stroke="#2C4A78" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          <g font-size="9" fill="#8B95A6" text-anchor="middle">
+            <text x="34" y="200">23:00</text><text x="189" y="200">3:00</text><text x="344" y="200">7:00</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b>90 分钟</b><span>一个睡眠周期的平均长度</span></div>
+      <div class="stat"><b>4–6 次</b><span>一夜经历的周期数</span></div>
+      <div class="stat"><b>7–9 小时</b><span>多数成年人的建议区间</span></div>
+      <div class="stat"><b>2 个系统</b><span>昼夜节律 + 腺苷压力</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- 01 双系统 -->
+<section class="sec" id="systems">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01 / 双系统</span>
+      <h2>决定你什么时候困的，是两股力量的叠加</h2>
+      <p class="sec-lede">书的第一章建立了全书最重要的模型：一个是随日出日落摆动的<strong>昼夜节律</strong>，另一个是清醒越久攒得越多的<strong>腺苷睡眠压力</strong>。困意不是它们中某一个说了算，而是两者的合力。拖动下面的滑块，改一下你的作息，看曲线怎么变。</p>
+    </div>
+    <div class="panel">
+      <div class="ctl-row">
+        <div class="ctl">
+          <div class="ctl-top"><label for="rSleep">入睡时间</label><output id="oSleep">23:00</output></div>
+          <input type="range" id="rSleep" min="20" max="28" step="0.25" value="23" aria-describedby="sysOut">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="rWake">起床时间</label><output id="oWake">07:00</output></div>
+          <input type="range" id="rWake" min="4" max="12" step="0.25" value="7" aria-describedby="sysOut">
+        </div>
+      </div>
+      <div class="chart-scroll">
+        <svg id="sysSvg" viewBox="0 0 820 380" role="img" aria-label="24 小时内昼夜节律、腺苷睡眠压力与合成睡意曲线"></svg>
+      </div>
+      <p class="scroll-hint" style="color:var(--ink-3)">← 左右滑动查看完整图表 →</p>
+      <div class="legend">
+        <span class="lg"><i style="background:#B87A14"></i>昼夜节律（警觉度）</span>
+        <span class="lg"><i style="background:#2C4A78"></i>腺苷睡眠压力</span>
+        <span class="lg dash" style="color:#1D2739"><i></i>合成睡意</span>
+        <span class="lg"><i style="background:#EFE7D8;border:1px solid #E6DFD3"></i>睡眠时段</span>
+      </div>
+      <p class="readout" id="sysOut"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 睡眠结构 -->
+<section class="sec night" id="arch">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02 / 睡眠结构</span>
+      <h2>一夜不是一块整觉，而是一条波浪</h2>
+      <p class="sec-lede">睡眠在深睡（N3）、浅睡（N1/N2）与快速眼动（REM）之间循环，每轮约 90 分钟。关键在于分布并不均匀：<strong>深睡压在前半夜，REM 挤在后半夜</strong>。所以熬夜和早醒，损失的完全不是同一种睡眠。拖动两根线，看看你会失去什么。</p>
+    </div>
+    <div class="panel">
+      <div class="chart-scroll">
+        <svg id="archSvg" viewBox="0 0 820 420" role="img" aria-label="一夜睡眠分期图，可拖动入睡与起床界线查看损失"></svg>
+      </div>
+      <p class="scroll-hint" style="color:var(--n-ink-2)">← 左右滑动查看完整图表 →</p>
+      <div class="ctl-row" style="margin-top:20px">
+        <div class="ctl">
+          <div class="ctl-top"><label for="rBed">入睡</label><output id="oBed">23:00</output></div>
+          <input type="range" id="rBed" min="0" max="240" step="5" value="0">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="rGet">起床</label><output id="oGet">06:40</output></div>
+          <input type="range" id="rGet" min="240" max="480" step="5" value="460">
+        </div>
+      </div>
+      <div class="tiles" id="archTiles"></div>
+      <p class="readout" id="archOut"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 咖啡因 -->
+<section class="sec" id="caffeine">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03 / 咖啡因</span>
+      <h2>咖啡因没有消除困意，只是让你听不见它</h2>
+      <p class="sec-lede">腺苷还在累积，只是受体被占住了。咖啡因在体内的半衰期约 5–6 小时——但真正的问题在于个体差异：肝脏代谢酶 CYP1A2 的活性可以相差十倍以上。算一下你下午那杯，到睡觉时还剩多少。</p>
+    </div>
+    <div class="panel">
+      <div class="ctl-row">
+        <div class="ctl">
+          <div class="ctl-top"><label for="rCafT">喝下的时间</label><output id="oCafT">15:00</output></div>
+          <input type="range" id="rCafT" min="6" max="24" step="0.5" value="15">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="rCafD">剂量</label><output id="oCafD">200 mg</output></div>
+          <input type="range" id="rCafD" min="50" max="400" step="10" value="200">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="rCafH">半衰期</label><output id="oCafH">5.5 h</output></div>
+          <input type="range" id="rCafH" min="3" max="8" step="0.5" value="5.5">
+        </div>
+      </div>
+      <div class="chart-scroll">
+        <svg id="cafSvg" viewBox="0 0 820 340" role="img" aria-label="咖啡因在体内的残留浓度随时间变化的曲线"></svg>
+      </div>
+      <p class="scroll-hint" style="color:var(--ink-3)">← 左右滑动查看完整图表 →</p>
+      <div class="tiles" id="cafTiles"></div>
+      <p class="readout" id="cafOut"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 睡眠债 -->
+<section class="sec" id="debt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04 / 睡眠债</span>
+      <h2>最危险的地方在于：你会适应，然后感觉不到</h2>
+      <p class="sec-lede">书中引用的一项实验里，被试连续 10 天每晚只睡 6 小时，认知表现最终退化到相当于连续 24 小时不睡的水平——而他们自己给出的主观困倦评分却趋于平稳。客观在持续下滑，主观却以为自己已经习惯了。拖动滑块看看这个分叉。</p>
+    </div>
+    <div class="panel">
+      <div class="ctl-row">
+        <div class="ctl">
+          <div class="ctl-top"><label for="rDebtH">每晚睡多久</label><output id="oDebtH">6.0 h</output></div>
+          <input type="range" id="rDebtH" min="3" max="9" step="0.25" value="6">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="rDebtD">连续多少天</label><output id="oDebtD">10 天</output></div>
+          <input type="range" id="rDebtD" min="1" max="21" step="1" value="10">
+        </div>
+      </div>
+      <div class="chart-scroll">
+        <svg id="debtSvg" viewBox="0 0 820 340" role="img" aria-label="主观困倦与客观表现随睡眠债累积的分叉曲线"></svg>
+      </div>
+      <p class="scroll-hint" style="color:var(--ink-3)">← 左右滑动查看完整图表 →</p>
+      <div class="tiles" id="debtTiles"></div>
+      <p class="readout" id="debtOut"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 身体 -->
+<section class="sec" id="body">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">05 / 身体</span>
+      <h2>长期缺觉，代价写在每个系统上</h2>
+      <p class="sec-lede">这是全书最有冲击力、也最需要小心阅读的部分。下面每张卡都标了证据强度——<strong>方向上的共识</strong>与<strong>具体数字的可信度</strong>是两回事，书的批评者主要针对的正是后者。</p>
+    </div>
+    <div class="cards" id="bodyCards"></div>
+  </div>
+</section>
+
+<!-- 06 梦 -->
+<section class="sec night" id="dreams">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">06 / 梦与 REM</span>
+      <h2>REM 是一间化学上安全的情绪处理室</h2>
+      <p class="sec-lede">进入 REM 时，去甲肾上腺素与血清素几乎完全停止分泌——这是大脑在清醒时绝无仅有的状态。书中认为，正是这个"去压力"的化学环境，让情绪记忆可以被重新加工：内容保留下来，情绪强度却被削掉。</p>
+    </div>
+    <div class="panel">
+      <div class="cmp">
+        <div class="cmp-grp">
+          <h4>一段不愉快的记忆</h4>
+          <div class="bar-row"><span>内容清晰度</span><div class="bar-track"><div class="bar-fill" id="bC1" style="width:100%;background:#7A9CC4"></div></div><span class="bar-val" id="vC1">100%</span></div>
+          <div class="bar-row"><span>情绪强度</span><div class="bar-track"><div class="bar-fill" id="bE1" style="width:100%;background:#B5483A"></div></div><span class="bar-val" id="vE1">100%</span></div>
+        </div>
+        <div class="cmp-grp">
+          <h4>经过一夜含充足 REM 的睡眠之后</h4>
+          <div class="bar-row"><span>内容清晰度</span><div class="bar-track"><div class="bar-fill" id="bC2" style="width:88%;background:#7A9CC4"></div></div><span class="bar-val" id="vC2">88%</span></div>
+          <div class="bar-row"><span>情绪强度</span><div class="bar-track"><div class="bar-fill" id="bE2" style="width:32%;background:#B5483A"></div></div><span class="bar-val" id="vE2">32%</span></div>
+        </div>
+      </div>
+      <div class="ctl-row" style="margin-top:26px;margin-bottom:0">
+        <div class="ctl">
+          <div class="ctl-top"><label for="rRem">这一夜的 REM 是否充足</label><output id="oRem">充足</output></div>
+          <input type="range" id="rRem" min="0" max="100" step="1" value="100">
+        </div>
+      </div>
+      <p class="readout" id="remOut"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 睡眠卫生 -->
+<section class="sec" id="hygiene">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">07 / 睡眠卫生</span>
+      <h2>全书争议最少、也最值得照做的部分</h2>
+      <p class="sec-lede">书末附了 12 条建议，与临床睡眠卫生指南高度重合。这也是唯一一块连批评者都不怎么反对的内容。点一下，看看你已经做到几条。</p>
+    </div>
+    <div class="check" id="hygList"></div>
+    <p class="readout" id="hygOut" style="max-width:640px"></p>
+  </div>
+</section>
+
+<!-- 08 争议 -->
+<section class="sec" id="critique">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">08 / 争议</span>
+      <h2>这本书有一个必须说明的问题</h2>
+      <p class="sec-lede">2019 年，研究者 Alexey Guzey 发表了一篇详细核查，仅针对全书篇幅不到 4% 的第一章，就指出了多处事实错误与数据夸大。这不意味着"睡眠不重要"——它意味着<strong>方向可以信，数字要打问号</strong>。下表把两者分开列。</p>
+    </div>
+    <div class="crit" id="critTable"></div>
+    <p class="readout" style="margin-top:20px;max-width:760px">阅读这本书比较稳妥的方式：把它的核心主张（睡眠是记忆、情绪、代谢与免疫的底层支撑）当作值得认真对待的方向；把每一个具体的百分比、倍数和因果句式当作待核实项。真要处理失眠或打鼾憋气，请找医生或 CBT-I，而不是畅销书。</p>
+  </div>
+</section>
+
+<!-- 09 测验 -->
+<section class="sec" id="quiz">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">09 / 测验</span>
+      <h2>五道题，看看留下了什么</h2>
+      <p class="sec-lede">选完立即出结果。答错不要紧，解析里写了为什么。</p>
+    </div>
+    <div id="quizBox"></div>
+    <div class="score" id="quizScore"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>这份导读的依据</h4>
+        <p>核心框架取自 Matthew Walker《Why We Sleep》（2017）与中译本《我们为什么要睡觉？》。书中的关键论断、12 条睡眠建议、以及 2019 年起的学界批评，均按公开资料核对后写入。</p>
+      </div>
+      <div>
+        <h4>关于争议</h4>
+        <p>主要批评来源为 Alexey Guzey 的《Matthew Walker's "Why We Sleep" Is Riddled with Scientific and Factual Errors》，以及此后围绕书中数据、引用与利益披露的公开讨论。</p>
+      </div>
+      <div>
+        <h4>这不是医疗建议</h4>
+        <p>慢性失眠、阻塞性睡眠呼吸暂停、不宁腿、与情绪障碍共病的睡眠问题，都需要专业评估。一线非药物治疗是 CBT-I（失眠认知行为治疗），请就医而非自行处理。</p>
+      </div>
+    </div>
+    <p class="fnote">页面内所有图表均为示意模型，用于说明机制，不构成对个体的预测。数值区间参考公开研究，个体差异可能很大。</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var NS='http://www.w3.org/2000/svg';
+function el(n,a){var e=document.createElementNS(NS,n);if(a)for(var k in a)e.setAttribute(k,a[k]);return e;}
+function txt(s,a){var t=el('text',a);t.textContent=s;return t;}
+function fmt(h){h=((h%24)+24)%24;var H=Math.floor(h),M=Math.round((h-H)*60);if(M===60){M=0;H=(H+1)%24;}return (H<10?'0':'')+H+':'+(M<10?'0':'')+M;}
+function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+function lerp(a,b,t){return a+(b-a)*t;}
+
+/* ============ 01 双系统 ============ */
+var sysSvg=$('sysSvg');
+function circadian(h){return 50+42*Math.sin(2*Math.PI*(h-9)/24)-14*Math.exp(-Math.pow((h-14.5)/2.8,2));}
+function aden(h,ss,se){
+  var D=((se-ss)+24)%24; if(D<0.5)D+=24; var W=24-D, Pmax=95, Pmin=15, f;
+  var sh=(((h-ss)%24)+24)%24;                 // 距入睡已过的小时数
+  if(sh<D){ f=sh/D; return Pmax-(Pmax-Pmin)*(1-Math.exp(-2.0*f))/(1-Math.exp(-2.0)); }
+  f=(((h-se)%24)+24)%24/W;                     // 距起床已过的小时数
+  return Pmin+(Pmax-Pmin)*f;
+}
+function sleepiness(h,ss,se){return clamp(0.65*aden(h,ss,se)+0.42*(100-circadian(h))-22,0,100);}
+
+function drawSys(){
+  var ss=parseFloat($('rSleep').value), se=parseFloat($('rWake').value);
+  if(se<=ss)se+=24;                            // 起床时刻跨过午夜，顺延到次日
+  var s=sysSvg; while(s.firstChild)s.removeChild(s.firstChild);
+  var X0=64,X1=790,Y0=24,Y1=324;
+  var x=function(h){return X0+h/24*(X1-X0);}, y=function(v){return Y1-v/100*(Y1-Y0);};
+
+  // 睡眠时段背景
+  var bx0=x(ss%24), bx1=x(se%24);
+  if(ss<24&&se<=24&&bx1>bx0){ s.appendChild(el('rect',{x:bx0,y:Y0,width:bx1-bx0,height:Y1-Y0,fill:'#EFE7D8'})); }
+  else{
+    s.appendChild(el('rect',{x:bx0,y:Y0,width:X1-bx0,height:Y1-Y0,fill:'#EFE7D8'}));
+    s.appendChild(el('rect',{x:X0,y:Y0,width:bx1-X0,height:Y1-Y0,fill:'#EFE7D8'}));
+  }
+  // 网格
+  [0,25,50,75,100].forEach(function(v){
+    s.appendChild(el('line',{x1:X0,y1:y(v),x2:X1,y2:y(v),stroke:'#E6DFD3','stroke-width':1}));
+    s.appendChild(txt(v,{x:X0-12,y:y(v)+4,'text-anchor':'end','font-size':11,fill:'#8B95A6'}));
+  });
+  for(var hh=0;hh<=24;hh+=3){
+    s.appendChild(el('line',{x1:x(hh),y1:Y0,x2:x(hh),y2:Y1,stroke:'#EDE6DA','stroke-width':1}));
+    s.appendChild(txt((hh===24?'24:00':(hh<10?'0':'')+hh+':00'),{x:x(hh),y:Y1+22,'text-anchor':'middle','font-size':11,fill:'#8B95A6'}));
+  }
+  s.appendChild(txt('相对水平',{x:X0-12,y:Y0-8,'text-anchor':'end','font-size':10,fill:'#8B95A6'}));
+
+  function line(fn,color,w,dash){
+    var d='';
+    for(var i=0;i<=240;i++){var h=i*0.1;d+=(i?'L':'M')+x(h).toFixed(1)+' '+y(fn(h)).toFixed(1);}
+    var p=el('path',{d:d,fill:'none',stroke:color,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round'});
+    if(dash)p.setAttribute('stroke-dasharray',dash);
+    s.appendChild(p);
+  }
+  line(function(h){return aden(h,ss,se);},'#2C4A78',2.4);
+  line(circadian,'#B87A14',2.4);
+  line(function(h){return sleepiness(h,ss,se);},'#1D2739',2.6,'5 4');
+
+  // 入睡/起床标记
+  [ss%24,se%24].forEach(function(h){
+    s.appendChild(el('line',{x1:x(h),y1:Y0,x2:x(h),y2:Y1,stroke:'#B87A14','stroke-width':1.5,'stroke-dasharray':'3 3',opacity:.75}));
+  });
+  s.appendChild(txt('入睡',{x:x(ss%24),y:Y0+12,'text-anchor':x(ss%24)>X1-40?'end':'start','font-size':11,fill:'#B87A14','font-weight':600}));
+  s.appendChild(txt('起床',{x:x(se%24),y:Y0+12,'text-anchor':x(se%24)>X1-40?'end':'start','font-size':11,fill:'#B87A14','font-weight':600}));
+
+  // 悬停探针
+  var probe=el('g',{opacity:0}); probe.id='sysProbe';
+  var pl=el('line',{y1:Y0,y2:Y1,stroke:'#1D2739','stroke-width':1,opacity:.35});
+  var pd=el('circle',{r:4,fill:'#1D2739'});
+  probe.appendChild(pl); probe.appendChild(pd); s.appendChild(probe);
+  var tip=el('g',{opacity:0}); tip.id='sysTip';
+  var tr=el('rect',{rx:6,fill:'#1D2739',height:22,width:104});
+  var tt=txt('',{x:0,y:15,'font-size':12,fill:'#fff','text-anchor':'middle'});
+  tip.appendChild(tr); tip.appendChild(tt); s.appendChild(tip);
+
+  s.onpointermove=function(e){
+    var r=s.getBoundingClientRect();
+    var vx=(e.clientX-r.left)/r.width*820;
+    if(vx<X0||vx>X1){probe.setAttribute('opacity',0);tip.setAttribute('opacity',0);return;}
+    var h=(vx-X0)/(X1-X0)*24;
+    probe.setAttribute('opacity',1);
+    pl.setAttribute('x1',x(h)); pl.setAttribute('x2',x(h));
+    pd.setAttribute('cx',x(h)); pd.setAttribute('cy',y(sleepiness(h,ss,se)));
+    tip.setAttribute('opacity',1);
+    var tx=clamp(x(h)-52,X0,X1-104);
+    tr.setAttribute('x',tx); tr.setAttribute('y',Y0+2); tt.setAttribute('x',tx+52);
+    tt.textContent=fmt(h)+' · 睡意 '+Math.round(sleepiness(h,ss,se));
+  };
+  s.onpointerleave=function(){probe.setAttribute('opacity',0);tip.setAttribute('opacity',0);};
+
+  // 读数
+  var d=D_of(ss,se);
+  var msg='你设定的是 <b>'+fmt(ss)+' 入睡、'+fmt(se)+' 起床</b>，睡了约 <b>'+d.toFixed(1)+' 小时</b>。';
+  if(d<6) msg+='这已经落在多数研究指出的风险区间里。注意图上：腺苷在睡前会冲到接近满值，但节律还没完全落下来——两股力量没有对齐，入睡往往要靠"硬撑到崩"。';
+  else if(d<7.5) msg+='偏短。图上能看到起床时腺苷尚未清完，这正是很多人靠咖啡才能撑过上午的原因——债没有被还掉，只是被遮住了。';
+  else if(d<=10) msg+='这是一个比较合理的窗口。留意下午 2 点前后那个小凹陷：节律的午后低谷叠上午餐后的腺苷，是全天第二个困点。';
+  else msg+='这个窗口偏长了。多数成年人的需求落在 7–9 小时，长期大幅超出并不等于更恢复——睡眠时长与健康指标之间更接近 U 型关系，两头都不理想。';
+  if(ss>=24||ss<1) msg+=' 另外，入睡时间已经推到午夜之后，腺苷压力会堆到接近饱和——周末再用暴睡去补，只会把生物钟推得更乱。';
+  $('sysOut').innerHTML=msg;
+  $('oSleep').textContent=fmt(ss); $('oWake').textContent=fmt(se);
+}
+function D_of(ss,se){var d=((se-ss)+24)%24;if(d<0.5)d+=24;return d;}
+['rSleep','rWake'].forEach(function(id){$(id).addEventListener('input',drawSys);});
+
+/* ============ 02 睡眠结构 ============ */
+var CYCLES=[
+  [['W',5],['N1',5],['N2',18],['N3',40],['N2',17],['R',5]],
+  [['N2',15],['N3',32],['N2',25],['R',20]],
+  [['N2',20],['N3',22],['N2',28],['R',20]],
+  [['N2',25],['N3',12],['N2',28],['R',30]],
+  [['N2',22],['R',45],['N1',10],['W',16]]
+];
+var SEGS=[];
+(function(){var t=0;CYCLES.forEach(function(c){c.forEach(function(p){SEGS.push({st:p[0],a:t,b:t+p[1]});t+=p[1];});});})();
+var TOTAL=SEGS[SEGS.length-1].b; // 460
+var STAGE={W:{n:'清醒',c:'#DED3C0',i:0},R:{n:'REM',c:'#7C5EA8',i:1},N1:{n:'浅睡 N1',c:'#AEC3DA',i:2},N2:{n:'浅睡 N2',c:'#7A9CC4',i:3},N3:{n:'深睡 N3',c:'#2C4A78',i:4}};
+var TOT={W:0,R:0,N1:0,N2:0,N3:0};
+SEGS.forEach(function(s){TOT[s.st]+=s.b-s.a;});
+
+function drawArch(){
+  var bed=parseFloat($('rBed').value), get=parseFloat($('rGet').value);
+  if(get<=bed+20)get=bed+20;
+  var s=$('archSvg'); while(s.firstChild)s.removeChild(s.firstChild);
+  var X0=72,X1=790,Y0=46,LANE=44,GAP=26;
+  var BOT=Y0+5*LANE+4*GAP;
+  var x=function(m){return X0+m/480*(X1-X0);};
+  var center=function(i){return Y0+LANE/2+i*(LANE+GAP);};   // i=0 清醒(顶) … i=4 深睡(底)
+
+  // 轨道底
+  ['W','R','N1','N2','N3'].forEach(function(k){
+    var cy=center(STAGE[k].i);
+    s.appendChild(el('rect',{x:X0,y:cy-LANE/2,width:X1-X0,height:LANE,rx:6,fill:'#1C2537'}));
+    s.appendChild(txt(STAGE[k].n,{x:X0-12,y:cy+4,'text-anchor':'end','font-size':11,fill:'#98A3B8'}));
+  });
+
+  // 时间刻度（置于轨道下方，避免与入睡/起床标签相撞）
+  for(var m=0;m<=480;m+=60){
+    s.appendChild(el('line',{x1:x(m),y1:Y0-8,x2:x(m),y2:BOT+12,stroke:'#2E3A52','stroke-width':1}));
+    s.appendChild(txt(fmt(23+m/60),{x:x(m),y:BOT+30,'text-anchor':'middle','font-size':11,fill:'#98A3B8'}));
+  }
+
+  // 段
+  SEGS.forEach(function(sg){
+    var cy=center(STAGE[sg.st].i);
+    var xa=x(sg.a), xb=x(sg.b);
+    var lo=Math.max(sg.a,bed), hi=Math.min(sg.b,get);
+    var kept=hi-lo;
+    if(kept>0){
+      s.appendChild(el('rect',{x:x(lo),y:cy-LANE/2,width:Math.max(xb-xa>kept/1?x(hi)-x(lo):1,1),height:LANE,rx:5,fill:STAGE[sg.st].c}));
+    }
+    if(kept<sg.b-sg.a){
+      // 失去的部分
+      var l1=Math.max(sg.a,0),h1=Math.min(sg.b,bed);
+      var l2=Math.max(sg.a,get),h2=Math.min(sg.b,TOTAL);
+      [[l1,h1],[l2,h2]].forEach(function(r){
+        if(r[1]>r[0]) s.appendChild(el('rect',{x:x(r[0]),y:cy-LANE/2,width:Math.max(x(r[1])-x(r[0]),1),height:LANE,rx:5,fill:'#232E44',stroke:'#2E3A52','stroke-dasharray':'4 3'}));
+      });
+    }
+  });
+
+  // 界限
+  [[bed,'入睡'],[get,'起床']].forEach(function(p){
+    var px=x(p[0]);
+    s.appendChild(el('line',{x1:px,y1:Y0-16,x2:px,y2:BOT+12,stroke:'#E9E4DB','stroke-width':2}));
+    s.appendChild(el('circle',{cx:px,cy:Y0-16,r:6,fill:'#E9E4DB'}));
+    s.appendChild(txt(p[1],{x:px,y:Y0-28,'text-anchor':'middle','font-size':11.5,fill:'#E9E4DB','font-weight':600}));
+  });
+
+  // 统计
+  var kept={W:0,R:0,N1:0,N2:0,N3:0};
+  SEGS.forEach(function(sg){var lo=Math.max(sg.a,bed),hi=Math.min(sg.b,get);if(hi>lo)kept[sg.st]+=hi-lo;});
+  var lostR=TOT.R-kept.R, lostD=TOT.N3-kept.N3;
+  var lf=function(v){var r=Math.round(v);return (r>0?'−'+r:'0')+' 分';};
+  $('archTiles').innerHTML=
+    '<div class="tile good"><b>'+Math.round(kept.R)+' 分</b><span>保住的 REM（共 '+Math.round(TOT.R)+' 分）</span></div>'+
+    '<div class="tile good"><b>'+Math.round(kept.N3)+' 分</b><span>保住的深睡（共 '+Math.round(TOT.N3)+' 分）</span></div>'+
+    '<div class="tile '+(lostR>15?'bad':'')+'"><b>'+lf(lostR)+'</b><span>失去的 REM</span></div>'+
+    '<div class="tile '+(lostD>15?'bad':'')+'"><b>'+lf(lostD)+'</b><span>失去的深睡</span></div>';
+
+  var t='总时长 <b>'+((get-bed)/60).toFixed(1)+' 小时</b>。';
+  if(lostR>lostD+10) t+='你主要砍掉的是后半夜的 <b>REM</b>（−'+Math.round(lostR)+' 分钟）。这是早起的典型代价：深睡大多已经在前半夜拿到，而 REM 还排在后面。连续几晚这样，情绪耐受度会先出问题。';
+  else if(lostD>lostR+10) t+='你主要砍掉的是前半夜的 <b>深睡</b>（−'+Math.round(lostD)+' 分钟）。这是熬夜的典型代价：身体修复与部分记忆固化都排在最前面的几个周期里。';
+  else if(lostR+lostD>25) t+='两头都在损失：<b>REM −'+Math.round(lostR)+' 分钟，深睡 −'+Math.round(lostD)+' 分钟</b>。把窗口压缩得太窄时，两种睡眠都拿不满。';
+  else t+='这是一个相对完整的窗口，两种睡眠基本都拿到了。';
+  $('archOut').innerHTML=t;
+  $('oBed').textContent=fmt(23+bed/60); $('oGet').textContent=fmt(23+get/60);
+}
+['rBed','rGet'].forEach(function(id){$(id).addEventListener('input',drawArch);});
+
+/* ============ 03 咖啡因 ============ */
+function drawCaf(){
+  var t0=parseFloat($('rCafT').value), dose=parseFloat($('rCafD').value), hl=parseFloat($('rCafH').value);
+  var s=$('cafSvg'); while(s.firstChild)s.removeChild(s.firstChild);
+  var X0=64,X1=790,Y0=30,Y1=270;
+  var maxD=dose;
+  var x=function(h){return X0+h/24*(X1-X0);}, y=function(v){return Y1-v/maxD*(Y1-Y0);};
+  var conc=function(h){return dose*Math.pow(0.5,h/hl);};
+
+  [0,.25,.5,.75,1].forEach(function(f){
+    var v=maxD*f;
+    s.appendChild(el('line',{x1:X0,y1:y(v),x2:X1,y2:y(v),stroke:'#E6DFD3','stroke-width':1}));
+    s.appendChild(txt(Math.round(v)+'mg',{x:X0-12,y:y(v)+4,'text-anchor':'end','font-size':11,fill:'#8B95A6'}));
+  });
+  for(var h=0;h<=24;h+=4){
+    s.appendChild(el('line',{x1:x(h),y1:Y0,x2:x(h),y2:Y1,stroke:'#EDE6DA','stroke-width':1}));
+    s.appendChild(txt('+'+h+'h',{x:x(h),y:Y1+22,'text-anchor':'middle','font-size':11,fill:'#8B95A6'}));
+  }
+
+  var d='';
+  for(var i=0;i<=240;i++){var h=i*0.1;d+=(i?'L':'M')+x(h).toFixed(1)+' '+y(conc(h)).toFixed(1);}
+  s.appendChild(el('path',{d:d+('L'+x(24)+' '+Y1+'L'+X0+' '+Y1+'Z'),fill:'#F2E4C9',opacity:.55}));
+  s.appendChild(el('path',{d:d,fill:'none',stroke:'#B87A14','stroke-width':2.6,'stroke-linecap':'round'}));
+
+  // 25mg 参考线
+  var thr=25;
+  if(thr<maxD){
+    s.appendChild(el('line',{x1:X0,y1:y(thr),x2:X1,y2:y(thr),stroke:'#3F7A5C','stroke-width':1.4,'stroke-dasharray':'5 4'}));
+    s.appendChild(txt('≈25 mg 参考线',{x:X1-4,y:y(thr)-7,'text-anchor':'end','font-size':11,fill:'#3F7A5C'}));
+  }
+
+  // 到 23:00 睡觉时的残留
+  var hoursToBed=((23-t0)+24)%24; if(hoursToBed<0.1)hoursToBed=24;
+  var left=conc(hoursToBed);
+  var halfLifeLeft=Math.log(Math.max(left,0.01)/thr)/Math.log(2)*hl;
+  var bx=x(hoursToBed);
+  s.appendChild(el('line',{x1:bx,y1:Y0,x2:bx,y2:Y1,stroke:'#2C4A78','stroke-width':1.6,'stroke-dasharray':'3 3'}));
+  s.appendChild(el('circle',{cx:bx,cy:y(left),r:5,fill:'#2C4A78'}));
+  s.appendChild(txt('23:00 睡前',{x:bx,y:Y0-8,'text-anchor':bx>X1-70?'end':'middle','font-size':11,fill:'#2C4A78','font-weight':600}));
+
+  $('cafTiles').innerHTML=
+    '<div class="tile amb"><b>'+Math.round(dose)+' mg</b><span>喝下的剂量</span></div>'+
+    '<div class="tile amb"><b>'+hoursToBed.toFixed(1)+' h</b><span>距睡觉还有</span></div>'+
+    '<div class="tile '+(left>50?'bad':(left>25?'amb':'good'))+'"><b>'+Math.round(left)+' mg</b><span>睡前体内残留</span></div>'+
+    '<div class="tile '+(halfLifeLeft>0?'':'good')+'"><b>'+(halfLifeLeft>0?halfLifeLeft.toFixed(1)+' h':'已达标')+'</b><span>'+(halfLifeLeft>0?'还需多久降到 25mg':'睡前已低于参考线')+'</span></div>';
+
+  var m='你在 <b>'+fmt(t0)+'</b> 摄入 <b>'+Math.round(dose)+' mg</b> 咖啡因（半衰期按 '+hl+' 小时算）。';
+  if(left>50) m+='到 23:00 时体内仍剩 <b>'+Math.round(left)+' mg</b>，约合喝下量的 '+Math.round(left/dose*100)+'%。这个剂量足以明显推迟入睡、压缩深睡——你可能会觉得"睡得着"，但睡眠结构已经变了。';
+  else if(left>25) m+='到 23:00 还剩 <b>'+Math.round(left)+' mg</b>，处在影响入睡的临界带。把最后一杯往前挪一两个小时，效果通常比换枕头明显。';
+  else m+='到 23:00 只剩 <b>'+Math.round(left)+' mg</b>，影响相对有限。';
+  m+=' 另外要记住：半衰期的个体差异可以到十倍，这里的数值是人群平均，不是你的个人值。';
+  $('cafOut').innerHTML=m;
+  $('oCafT').textContent=fmt(t0); $('oCafD').textContent=Math.round(dose)+' mg'; $('oCafH').textContent=hl+' h';
+}
+['rCafT','rCafD','rCafH'].forEach(function(id){$(id).addEventListener('input',drawCaf);});
+
+/* ============ 04 睡眠债 ============ */
+function drawDebt(){
+  var hrs=parseFloat($('rDebtH').value), days=parseInt($('rDebtD').value,10);
+  var perDay=Math.max(0,8-hrs), total=perDay*days;
+  var s=$('debtSvg'); while(s.firstChild)s.removeChild(s.firstChild);
+  var X0=64,X1=790,Y0=30,Y1=270;
+  var x=function(d){return X0+(d-1)/Math.max(days-1,1)*(X1-X0);}, y=function(v){return Y1-v/100*(Y1-Y0);};
+
+  [0,25,50,75,100].forEach(function(v){
+    s.appendChild(el('line',{x1:X0,y1:y(v),x2:X1,y2:y(v),stroke:'#E6DFD3','stroke-width':1}));
+    s.appendChild(txt(v,{x:X0-12,y:y(v)+4,'text-anchor':'end','font-size':11,fill:'#8B95A6'}));
+  });
+  var step=days<=7?1:(days<=14?2:3);
+  for(var d=1;d<=days;d+=step){
+    s.appendChild(txt('D'+d,{x:x(d),y:Y1+22,'text-anchor':'middle','font-size':11,fill:'#8B95A6'}));
+  }
+
+  var subj=function(debt){return 85*(1-Math.exp(-debt/4));};
+  var obj=function(debt){return clamp(6.5*Math.pow(debt,0.85),0,100);};
+
+  function pl(fn,color,w,dash){
+    var dd='';
+    for(var i=1;i<=days;i++){
+      var debt=perDay*(i-1);
+      dd+=(i>1?'L':'M')+x(i).toFixed(1)+' '+y(fn(debt)).toFixed(1);
+    }
+    var p=el('path',{d:dd,fill:'none',stroke:color,'stroke-width':2.8,'stroke-linecap':'round','stroke-linejoin':'round'});
+    if(dash)p.setAttribute('stroke-dasharray',dash);
+    s.appendChild(p);
+  }
+  pl(subj,'#7A9CC4',2.8,'6 4');
+  pl(obj,'#B5483A',3);
+
+  // 终点标记
+  var xe=x(days);
+  s.appendChild(el('circle',{cx:xe,cy:y(subj(total)),r:5,fill:'#7A9CC4'}));
+  s.appendChild(el('circle',{cx:xe,cy:y(obj(total)),r:5,fill:'#B5483A'}));
+
+  var crossAt=null;
+  for(var k=0;k<=200;k++){var dbt=k*0.5;if(obj(dbt)>subj(dbt)){crossAt=dbt;break;}}
+  if(crossAt!==null&&crossAt<=total&&days>2){
+    var cd=crossAt/perDay;
+    if(cd>=1&&cd<=days){
+      var cx=x(cd);
+      s.appendChild(el('line',{x1:cx,y1:Y0,x2:cx,y2:Y1,stroke:'#B5483A','stroke-width':1.2,'stroke-dasharray':'4 4',opacity:.7}));
+      s.appendChild(txt('客观开始超过主观',{x:clamp(cx,X0+6,X1-6),y:Y0+12,'text-anchor':cx>X1-130?'end':'start','font-size':11,fill:'#B5483A','font-weight':600}));
+    }
+  }
+
+  $('debtTiles').innerHTML=
+    '<div class="tile amb"><b>'+perDay.toFixed(1)+' h</b><span>每天欠下的</span></div>'+
+    '<div class="tile '+(total>=20?'bad':'amb')+'"><b>'+total.toFixed(1)+' h</b><span>累计睡眠债</span></div>'+
+    '<div class="tile bad"><b>'+Math.round(obj(total))+'</b><span>客观功能受损（0–100）</span></div>'+
+    '<div class="tile amb"><b>'+Math.round(subj(total))+'</b><span>主观困倦（0–100）</span></div>';
+
+  var m='每晚 '+hrs.toFixed(1)+' 小时，连续 '+days+' 天，累计欠下 <b>'+total.toFixed(1)+' 小时</b>。';
+  if(total<5) m+='还在可控范围。图上两条线贴得很近——这个阶段主观感受基本是准的。';
+  else if(total<15) m+='注意两条线开始分开：<b>你的主观困倦已经涨得比实际损害快</b>，此时你会觉得很困，但功能其实还好。';
+  else if(total<25) m+='这是最危险的一段。主观困倦已经趋近平台，你会开始觉得"我适应了、我能扛"——而客观曲线还在往上走。书里那个 10 天 6 小时的实验，落在这一带。';
+  else m+='已经进入两者交叉之后的区域：<b>客观受损超过了你主观感受到的程度</b>。这时的典型特征是低估自己的错误率——判断力下降，恰恰让你察觉不到判断力在下降。';
+  m+=' 需要说明：这是一条用于说明机制的示意曲线，不是对个人的预测模型。';
+  $('debtOut').innerHTML=m;
+  $('oDebtH').textContent=hrs.toFixed(1)+' h'; $('oDebtD').textContent=days+' 天';
+}
+['rDebtH','rDebtD'].forEach(function(id){$(id).addEventListener('input',drawDebt);});
+
+/* ============ 05 身体 ============ */
+var BODY=[
+  {t:'大脑与记忆',ev:'s',evt:'证据强',ic:'M7 3h10v18l-5-4-5 4z',
+   d:'学习之后的睡眠不是"休息"，而是固化过程的一部分。书中描述：睡前学的内容会在 NREM 深睡中被重放、迁移到长期存储；而 REM 则更多参与模式提取与创造性关联。<em>这也是全书证据最扎实的一块</em>——睡眠对记忆巩固的作用有多条实验支持。<br><br>实际含义：考前通宵往往得不偿失，你保住了复习时间，却关掉了存档过程。'},
+  {t:'心血管',ev:'m',evt:'证据中等',ic:'M12 20s-7-4.6-7-9.4A4 4 0 0112 8a4 4 0 017 2.6C19 15.4 12 20 12 20z',
+   d:'书中引用的一项大样本观察研究发现，45 岁以上、每晚睡不足 6 小时的人群，心肌梗死风险显著升高（书中给出的幅度是约 200%）。<br><br><em>需要注意</em>：这是观察性研究的关联，不是"熬夜一晚就会心梗"的因果。批评者认为书中对这类数字的表述强度超出了证据本身。方向可信，倍数存疑。'},
+  {t:'免疫',ev:'m',evt:'证据中等',ic:'M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z',
+   d:'书中最常被引用的一项实验是：单晚只睡 4 小时，自然杀伤细胞（NK 细胞）活性下降约 70%。此外，睡眠不足者在接种疫苗后的抗体反应也更弱。<br><br><em>需要注意</em>：NK 细胞数据来自单一研究、样本量有限，70% 这个数字的普适性被质疑。但"睡眠影响免疫应答"这个方向有多条独立证据支持。'},
+  {t:'代谢与体重',ev:'m',evt:'证据中等',ic:'M13 2L4 14h6l-1 8 9-12h-6z',
+   d:'缺觉会同时推高饥饿素（ghrelin）、压低瘦素（leptin）——简单说，让你更饿、更晚才觉得饱，同时更偏向高糖高脂的食物。长期睡眠不足还与胰岛素敏感性下降相关。<br><br><em>实际含义</em>：如果正在控制体重却总在深夜找东西吃，先检查睡眠，再检查饮食。'},
+  {t:'情绪与心理',ev:'s',evt:'证据强',ic:'M12 3a9 9 0 100 18 9 9 0 000-18z M9 10h.01 M15 10h.01 M8.5 14.5a4.5 4.5 0 007 0',
+   d:'睡眠不足会放大杏仁核对负性刺激的反应，同时削弱前额叶对它的抑制——用大白话说，<em>情绪更容易被点着，而刹车更弱</em>。这也是 REM 缺失最先表现出来的地方。<br><br>书中还引用了睡眠剥夺对抑郁的复杂作用，但作者对这一疗法的描述被批评为不准确，可能让患者回避有效的治疗手段。'},
+  {t:'阿尔茨海默',ev:'w',evt:'有争议',ic:'M3 12h3l2-5 3 10 3-7 2 2h5',
+   d:'书中提出：深睡期间类淋巴系统清除代谢废物（包括 β-淀粉样蛋白）的效率最高，因此长期缺觉可能增加阿尔茨海默风险。<br><br><em>这是全书中因果表述最激进的部分之一</em>。"睡眠不足导致阿尔茨海默"远未被确立，现有证据主要来自观察性研究与动物模型，方向可能成立，但机制链条上还有大量空白。'}
+];
+(function(){
+  var box=$('bodyCards');
+  BODY.forEach(function(b,i){
+    var d=document.createElement('div'); d.className='card';
+    d.innerHTML='<button type="button" aria-expanded="false" aria-controls="bd'+i+'">'+
+      '<span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B87A14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="'+b.ic+'"/></svg></span>'+
+      '<h3>'+b.t+'</h3><span class="ev ev-'+b.ev+'">'+b.evt+'</span>'+
+      '<svg class="caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>'+
+      '<div class="card-bd" id="bd'+i+'">'+b.d+'</div>';
+    var btn=d.querySelector('button');
+    btn.addEventListener('click',function(){
+      var on=d.classList.toggle('open');
+      btn.setAttribute('aria-expanded',on?'true':'false');
+    });
+    box.appendChild(d);
+  });
+})();
+
+/* ============ 06 REM ============ */
+function drawRem(){
+  var v=parseFloat($('rRem').value)/100;
+  var content=lerp(0,88,v), emo=lerp(100,32,v);
+  $('bC2').style.width=content.toFixed(0)+'%'; $('vC2').textContent=Math.round(content)+'%';
+  $('bE2').style.width=emo.toFixed(0)+'%'; $('vE2').textContent=Math.round(emo)+'%';
+  var m;
+  if(v>0.8) m='REM 充足。内容基本保留（'+Math.round(content)+'%），但情绪强度被削到 '+Math.round(emo)+'%——<b>你记得发生了什么，但它不再那么咬人</b>。书中把这个过程形容为"把情绪从记忆上剥下来"。';
+  else if(v>0.4) m='REM 打了折扣。内容还能记住，但情绪强度降不下来（'+Math.round(emo)+'%）。这就是缺觉时"想开了"变难的原因——不是心态问题，是加工过程没跑完。';
+  else m='REM 严重不足。记忆保留了（'+Math.round(content)+'%），但情绪几乎没被处理（'+Math.round(emo)+'%）。<b>你会一遍遍想起同一件事，而且每次都还是那么难受</b>——因为内容存下来了，情绪标签却还挂在上头。';
+  $('remOut').innerHTML=m;
+  $('oRem').textContent=v>0.8?'充足':(v>0.4?'偏少':'严重不足');
+}
+$('rRem').addEventListener('input',drawRem);
+
+/* ============ 07 睡眠卫生 ============ */
+var HYG=[
+  ['固定作息','每天在同一时间上床与起床，周末误差不超过 1 小时'],
+  ['规律运动','每天不少于 30 分钟，但睡前 2–3 小时停止剧烈运动'],
+  ['限制咖啡因','咖啡、可乐、茶、巧克力都算；午后尤其要控制'],
+  ['远离尼古丁','尼古丁是兴奋剂，会让人睡得更浅、醒得更早'],
+  ['睡前不饮酒','酒精是镇静剂，会抑制 REM 并让后半夜变得破碎'],
+  ['睡前别吃太多','也避免大量饮水，减少夜间起夜'],
+  ['检查在服药物','部分药物会延迟或干扰睡眠，必要时与医生沟通'],
+  ['午后不午睡','下午 3 点后尽量不小睡；要睡也不超过 20 分钟'],
+  ['睡前放松','热水澡、阅读、听音乐——固定的一套仪式'],
+  ['卧室要暗、凉、静','书中给的温度参考是偏凉，约 18–19°C'],
+  ['白天多见光，睡前调暗','早晨的强光是校准生物钟最有效的信号'],
+  ['躺不着就起来','在床上清醒超过 20 分钟，就离开床，等困了再回来']
+];
+(function(){
+  var box=$('hygList'), state=HYG.map(function(){return false;});
+  HYG.forEach(function(h,i){
+    var b=document.createElement('button');
+    b.type='button'; b.className='chk'; b.setAttribute('aria-pressed','false');
+    b.innerHTML='<span class="box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>'+
+      '<span><b>'+h[0]+'</b><small>'+h[1]+'</small></span>';
+    b.addEventListener('click',function(){
+      state[i]=!state[i];
+      b.setAttribute('aria-pressed',state[i]?'true':'false');
+      upd();
+    });
+    box.appendChild(b);
+  });
+  function upd(){
+    var n=state.filter(Boolean).length;
+    var m='已做到 <b>'+n+' / 12</b> 条。';
+    if(n<=3) m+='建议先只挑一条开始：<b>固定起床时间</b>。它是所有其他建议的锚点——起床时刻固定了，困意自然会往合适的位置前移。';
+    else if(n<=7) m+='不错的开始。接下来最值得加的是光照与咖啡因这两项，它们分别作用在两个系统上，性价比最高。';
+    else if(n<=10) m+='已经做得比多数人好。剩下几条里如果只补一条，选"躺不着就起来"——它针对的是条件性失眠，比任何助眠产品都管用。';
+    else m+='几乎全中。到这一步，如果睡眠问题依然存在，那就不是习惯问题了，应该去做专业评估（比如睡眠呼吸暂停）。';
+    $('hygOut').innerHTML=m;
+  }
+  upd();
+})();
+
+/* ============ 08 争议 ============ */
+var CRIT=[
+  ['睡眠越短，寿命越短','多项研究显示睡眠时长与死亡率呈 U 型关系，最低点在 7 小时附近；睡 5 小时与睡 8 小时的死亡率大致相当。书中的线性表述未引用支持研究。','w','有争议'],
+  ['睡眠不足使患癌风险翻倍','一项纳入 155 万参与者、8.6 万癌症病例的系统综述发现，无论短睡还是长睡，都与癌症风险增加无关。','w','有争议'],
+  ['WHO 宣布了"睡眠损失流行病"','WHO 从未发布过这一声明。书中脚注引用的纪录片里也没有提及 WHO。','w','事实错误'],
+  ['发达国家三分之二的成年人睡不够','国家睡眠基金会的建议是 7–9 小时（区间），不是"平均 8 小时"。实际调查中约 40% 的人睡不足 7 小时。','w','数字夸大'],
+  ['没有任何生物功能不因一夜好眠而受益','睡眠剥夺疗法在部分抑郁症患者身上反而有效——作者本人在第七章也承认了这一点，与第一章自相矛盾。','w','自相矛盾'],
+  ['睡眠不足会损害认知与情绪','多条独立研究一致支持，也是全书证据最扎实的部分。','s','证据强'],
+  ['睡眠影响免疫应答与疫苗效果','方向上有独立证据支持；但常被引用的"NK 细胞下降 70%"来自单一小样本研究。','m','方向可信'],
+  ['固定作息、晨光、限制咖啡因、卧室暗凉','与临床睡眠卫生指南高度重合，也是批评者最少反对的部分。','s','证据强']
+];
+(function(){
+  var t=$('critTable');
+  var h='<div class="crit-row crit-head"><div>书中怎么说</div><div>核查结果</div><div>判定</div></div>';
+  t.innerHTML=h;
+  CRIT.forEach(function(r){
+    var d=document.createElement('div'); d.className='crit-row';
+    var lbl=r[3]==='证据强'?'ev-s':(r[3]==='有争议'||r[3]==='事实错误'||r[3]==='数字夸大'||r[3]==='自相矛盾'?'ev-w':'ev-m');
+    d.innerHTML='<div class="claim">'+r[0]+'</div><div>'+r[1]+'</div><div><span class="ev '+lbl+'">'+r[3]+'</span></div>';
+    t.appendChild(d);
+  });
+})();
+
+/* ============ 09 测验 ============ */
+var QUIZ=[
+  {q:'咖啡因为什么能让你保持清醒？',
+   o:['它给大脑补充了能量','它阻断了腺苷受体，让大脑收不到"困"的信号','它清除了大脑里累积的腺苷','它抑制了褪黑素的分泌'],
+   a:1,
+   e:'咖啡因是腺苷受体的拮抗剂。<b>腺苷本身还在累积</b>，只是你感觉不到它了——所以药效一过，困意会连同这段时间欠下的债一起扑上来。这也是为什么它不能替代睡眠。'},
+  {q:'一夜睡眠中，深睡（N3）主要集中在？',
+   o:['前半夜','后半夜','整夜均匀分布','入睡前的十分钟'],
+   a:0,
+   e:'深睡集中在前 2–3 个周期里，越往后越少；REM 则相反，越到后半夜越长。<b>所以熬夜主要损失深睡，早醒主要损失 REM</b>——两者代价不同。'},
+  {q:'关于酒精与睡眠，下面哪一项是正确的？',
+   o:['酒精能帮助人进入深睡','适量饮酒不会改变睡眠结构','酒精是一种有效的失眠疗法','酒精是镇静剂，会抑制 REM，并让后半夜睡得更碎'],
+   a:3,
+   e:'酒精让人"失去意识"，而不是"入睡"。它抑制 REM，并在代谢后造成反弹性觉醒，所以常见"上半夜睡得死、下半夜反复醒"。<b>镇静不等于睡眠</b>。'},
+  {q:'周末补觉能偿还睡眠债吗？',
+   o:['完全可以，只要睡够总时长','完全无效，补也白补','只能部分偿还，而且会打乱生物钟，制造"社会时差"','补觉的质量比平时更高'],
+   a:2,
+   e:'补觉能缓解一部分，但难以完全抵消连续剥夺。更麻烦的是周末暴睡会把生物钟往后推，等于每周给自己制造一次小型时差——<b>周一格外难受就是这么来的</b>。'},
+  {q:'关于这本书本身，下面哪一项更接近事实？',
+   o:['书中所有数据和结论都经过学界严格验证','核心方向可信，但部分具体数字被批评为夸大','因为有争议，说明睡眠其实没那么重要','作者与商业睡眠产品之间没有利益关联'],
+   a:1,
+   e:'2019 年起的核查指出，书中第一章就存在多处事实错误与数据夸大。但<b>"睡眠重要"这个方向仍是学界共识</b>——争议在于叙事的力度和个别数字，而不在于结论本身。'}
+];
+(function(){
+  var box=$('quizBox'), done=0, right=0;
+  QUIZ.forEach(function(q,qi){
+    var d=document.createElement('div'); d.className='q';
+    var h='<div class="q-h"><i>Q'+(qi+1)+'</i><span>'+q.q+'</span></div><div class="opts">';
+    q.o.forEach(function(o,oi){ h+='<button type="button" class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>'; });
+    h+='</div><div class="exp" id="exp'+qi+'"><b>解析：</b>'+q.e+'</div>';
+    d.innerHTML=h;
+    box.appendChild(d);
+  });
+  box.addEventListener('click',function(ev){
+    var b=ev.target.closest('.opt'); if(!b)return;
+    var qi=+b.dataset.q, oi=+b.dataset.o;
+    var grp=b.parentNode;
+    if(grp.dataset.done)return;
+    grp.dataset.done='1';
+    var btns=grp.querySelectorAll('.opt');
+    var ok=oi===QUIZ[qi].a;
+    btns.forEach(function(x){
+      x.disabled=true;
+      if(+x.dataset.o===QUIZ[qi].a)x.classList.add('right');
+      else if(+x.dataset.o===oi)x.classList.add('wrong');
+      else x.classList.add('dim');
+    });
+    $('exp'+qi).classList.add('show');
+    done++; if(ok)right++;
+    if(done===QUIZ.length){
+      var sc=$('quizScore');
+      sc.classList.add('show');
+      var msg = right===5?'满分。你抓住了这本书的骨架，也没有被它的数字带着走。'
+        : right>=3?'大部分拿到了。重点在于你已经能把"方向可信"和"数字存疑"分开看待。'
+        : '再看一遍上面的模块会好一些——尤其是双系统和睡眠结构这两块，它们是理解其余内容的基础。';
+      sc.innerHTML='你答对了 <b>'+right+' / '+QUIZ.length+'</b> 题。<br>'+msg;
+    }
+  });
+})();
+
+/* ============ 导航高亮 + 进度 ============ */
+/* 图表横向滚动提示：按容器实测宽度决定是否显示，避免断点猜错 */
+function hints(){
+  [].slice.call(document.querySelectorAll('.chart-scroll')).forEach(function(c){
+    var n=c.nextElementSibling;
+    if(!n||!n.classList||!n.classList.contains('scroll-hint'))return;
+    n.style.display = c.scrollWidth > c.clientWidth + 1 ? 'block' : 'none';
+  });
+}
+(function(){
+  var links=[].slice.call($('navLinks').querySelectorAll('a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var ticking=false;
+  function upd(){
+    var y=window.scrollY, h=document.documentElement.scrollHeight-window.innerHeight;
+    $('pbar').style.width=(h>0?clamp(y/h*100,0,100):0)+'%';
+    var line=window.innerHeight*0.3, pick=0;
+    for(var i=0;i<secs.length;i++){ if(secs[i]&&secs[i].getBoundingClientRect().top<=line) pick=i; }
+    links.forEach(function(a,i){a.classList.toggle('on',i===pick&&y>120);});
+  }
+  window.addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(function(){ticking=false;upd();});} },{passive:true});
+  window.addEventListener('resize',function(){upd();hints();});
+  upd(); hints();
+})();
+
+/* ============ init ============ */
+drawSys(); drawArch(); drawCaf(); drawDebt(); drawRem();
+
+window.__diag={
+  get sleepinessAt(){ var ss=parseFloat($('rSleep').value),se=parseFloat($('rWake').value); return function(h){return sleepiness(h,ss,se);}; },
+  get segments(){ return SEGS; },
+  get totals(){ return {R:TOT.R,N3:TOT.N3,total:TOTAL}; },
+  get quiz(){ return QUIZ.map(function(q){return {a:q.a,n:q.o.length};}); },
+  get hygieneCount(){ return document.querySelectorAll('#hygList .chk[aria-pressed=true]').length; }
+};
+})();
+</script>
+</body>
+</html>
