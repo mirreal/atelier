@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="JIsY2BtvI2KZ3zmLULyp5N">
+<head data-page-node-id="kqlLYSuX1Xw72LRHCR8148">
+<meta charset="utf-8" data-page-node-id="ox2aTMgd1MdWLgAwvazTXY">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" data-page-node-id="oCLJ9iIDD3RazLyiL1Wrv1">
+<title>决策板 · Decision Board</title>
+<style>
+  :root{
+    --ink:#2b2014;
+    --ink-2:#6d5b44;
+    --ink-3:#9c8a72;
+    --card:#fffdf8;
+    --line:#e6dbc7;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    color:var(--ink);
+    background:radial-gradient(1100px 620px at 50% -8%, #fffdf7 0%, #f7efe0 42%, #eee1ca 100%);
+    -webkit-font-smoothing:antialiased;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    overflow:hidden;
+  }
+  .app{
+    height:100dvh;max-width:760px;margin:0 auto;
+    padding:14px 18px 16px;
+    display:flex;flex-direction:column;gap:12px;
+  }
+
+  .top{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 4px}
+  .top h1{margin:0;font-size:16px;font-weight:650;letter-spacing:.14em;color:#3a2a17}
+  .topright{display:flex;align-items:center;gap:10px;min-width:0}
+  .top p{margin:0;font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .iconbtn{
+    flex:0 0 auto;appearance:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    width:30px;height:30px;padding:0;border-radius:9px;
+    border:1px solid rgba(230,219,199,.95);
+    background:rgba(255,255,255,.72);
+    color:var(--ink-3);
+    transition:color .18s,border-color .18s,background .18s;
+  }
+  .iconbtn:hover{color:var(--ink-2);border-color:rgba(200,182,152,.95)}
+  .iconbtn .slash{opacity:0;transition:opacity .18s}
+  .iconbtn.muted .slash{opacity:1}
+  .iconbtn.muted .wave{opacity:0}
+  .iconbtn .wave{transition:opacity .18s}
+  .iconbtn.muted{color:#b9a98f}
+
+  .stage{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  canvas{display:block;border-radius:18px}
+  /* 配置写错时的占位提示，别让用户对着一块空白猜 */
+  .cfg-err{
+    padding:28px 32px;border:1px dashed var(--line);border-radius:18px;
+    background:rgba(255,255,255,.6);text-align:center;line-height:1.7;
+    font-size:14px;font-weight:600;color:var(--ink-2);
+  }
+  .cfg-err-sub{margin-top:8px;font-size:12px;font-weight:400;color:var(--ink-3)}
+
+  .panel{
+    flex:0 0 auto;display:flex;align-items:center;gap:14px;
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:12px 14px;
+    box-shadow:0 18px 40px -20px rgba(96,70,36,.45);
+    transition:border-color .3s, box-shadow .3s;
+  }
+  /* 结果态的强调色跟着 CONFIG 走，由 syncPanel() 按槽位 color 注入，这里不写死 */
+
+  .badge{
+    flex:0 0 auto;width:46px;height:46px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:21px;line-height:1;font-weight:700;
+    background:#f3ece0;color:var(--ink-3);
+    transition:background .3s,color .3s;
+  }
+  .badge.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes pop{0%{transform:scale(.5)}55%{transform:scale(1.15)}100%{transform:scale(1)}}
+  .rtext{flex:1 1 auto;min-width:0}
+  .rtitle{font-size:15px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rsub{margin-top:3px;font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .btn{
+    flex:0 0 auto;appearance:none;border:0;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:600;letter-spacing:.06em;color:#fff;
+    background:linear-gradient(180deg,#4a3520,#2f2113);
+    padding:12px 22px;border-radius:13px;
+    box-shadow:0 8px 18px -8px rgba(47,33,19,.8), inset 0 1px 0 rgba(255,255,255,.18);
+    transition:transform .12s ease, box-shadow .2s, opacity .2s;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px) scale(.985)}
+  .btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+
+  .stats{flex:0 0 auto;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:0 4px;font-size:12px;color:var(--ink-3)}
+  .stat{
+    display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;
+    background:rgba(255,255,255,.7);border:1px solid rgba(230,219,199,.9);
+  }
+  .stat b{font-weight:700;font-variant-numeric:tabular-nums}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .stats .spacer{flex:1 1 auto}
+  .reset{
+    appearance:none;border:0;background:none;cursor:pointer;font-family:inherit;
+    font-size:12px;color:var(--ink-3);padding:4px 6px;border-radius:8px;
+    margin-left:auto;   /* 窄屏换行时也能靠右，而不是掉到左边 */
+  }
+  .reset:hover{color:var(--ink-2);background:rgba(230,219,199,.5)}
+
+  @media (max-width: 520px){
+    .app{padding:10px 12px 12px;gap:10px}
+    .top p{display:none}
+    .panel{padding:10px 12px;gap:10px;border-radius:16px}
+    .badge{width:42px;height:42px;border-radius:12px;font-size:19px}
+    .rtitle{font-size:14px}
+    .rsub{font-size:11px}
+    .btn{padding:11px 18px;font-size:13px}
+    .stats{gap:6px;font-size:11px}
+    .stat{padding:3px 8px}
+  }
+</style>
+</head>
+<body data-page-node-id="IlH26dPzEXhi25Y93gNCmE">
+<div class="app" data-page-node-id="yELopeoJtEEtoURenRGrjF">
+  <div class="top" data-page-node-id="F7F44OAlOTbJrEHZkJ991H">
+    <h1 data-page-node-id="OQDPL8GU5YZ27up3uDibkr">决 策 板</h1>
+    <div class="topright">
+      <p id="hint" data-page-node-id="i2D6fHar6apBXtzpiMTJYL">点击任意位置 / 空格键</p>
+      <button class="iconbtn" id="mute" aria-label="音效开关" title="音效开关">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.2 9.4h3.1L11.6 5.6v12.8L7.3 14.6H4.2z"/>
+          <path class="wave" d="M15.2 9.2a4.1 4.1 0 0 1 0 5.6"/>
+          <path class="wave" d="M17.8 6.7a7.6 7.6 0 0 1 0 10.6"/>
+          <path class="slash" d="M15.2 6.4 20.4 17.6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage" data-page-node-id="0VwOT0mjUPBsKv8vMzjd4N"><canvas id="board" data-page-node-id="vfpWtErKS3oo2temnDMezy"></canvas></div>
+
+  <div class="panel" id="panel" data-state="idle" data-page-node-id="aXHK7GKN912woibiuyA6Gu">
+    <div class="badge" id="badge" data-page-node-id="M0QHsrXZt2W94zgMlSfco6">?</div>
+    <div class="rtext" data-page-node-id="BYJHpXPDKABvxRfKbdG8nr">
+      <div class="rtitle" id="rtitle" data-page-node-id="UlffI1wF7sGuiyDGwXZ7Jj">准备好了吗</div>
+      <div class="rsub" id="rsub" data-page-node-id="iddti44QRSeMwcI4tulzKJ">点击任意位置或按下「开始」释放小球</div>
+    </div>
+    <button class="btn" id="go" data-page-node-id="Z5NgVAEzPyHcjtDYMAaRRf">开始</button>
+  </div>
+
+  <div class="stats" id="stats" data-page-node-id="iOen3ktGKxUS4Csu5AtPV1">
+    <!-- 每个槽位一个计数徽章，由 renderStats() 按 CONFIG 生成 -->
+    <span class="chips" id="stats-chips"></span>
+    <span class="stat">共 <b id="c-total" data-page-node-id="HKzsrP1Yr9Fu4B2kxiMBrB">0</b> 次</span>
+    <span class="spacer" data-page-node-id="Bt8JscZzmUlsud6QD9uDhT"></span>
+    <button class="reset" id="reset" data-page-node-id="8ZgfOXahkwm85RVWsaheN0">清空统计</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* =========================================================
+   0. 配置 —— 改这里就能变成你自己的决策板
+   ---------------------------------------------------------
+   slots    槽位列表，从左到右，数量随便改。2 ~ 7 个最舒展，
+             再往上（8、9 个）轨道会明显变密，属于正常代价。
+             mark  符号：内置 'x' / 'check' / 'redo' 画成矢量线条，
+                   其它任意字符 / emoji 直接当文字画
+             title 结果标题（面板大字）
+             sub   结果说明（面板小字）
+             color 该槽位的高亮色，面板边框、徽章、计数都用它
+   levels   决策层数，0 = 按槽位数量自动推算
+   showOdds 是否在每个槽位下方标出理论概率
+
+   例：改成 5 个槽位
+     slots: [
+       { mark: '☕', title: '喝咖啡', sub: '先歇一会儿', color: '#8b5cf6' },
+       { mark: 'x',  title: '不去',   sub: '算了',       color: '#c8452f' },
+       { mark: '?',  title: '看情况', sub: '再想想',     color: '#c9881c' },
+       { mark: 'check', title: '去',  sub: '就这么定',   color: '#2e9b62' },
+       { mark: '★',  title: '立刻去', sub: '别犹豫',     color: '#3a6ea5' }
+     ]
+
+   关于概率：分叉点是严格 50/50，但「撞到边界原地弹回」会让中轴列
+   被喂到更多次，所以各槽位概率天然不等（3 槽就是 25/50/25）。
+   这是数学结果，不是 bug；showOdds 会把真实概率标在槽位下方。
+   奇数个槽位时左右完全镜像；偶数个槽位时起始列没法落在正中，
+   左半边和右半边会各差几个百分点。
+   ========================================================= */
+const CONFIG = {
+  slots: [
+    { mark: 'x',     title: '不行',    sub: '换个方向再想想',       color: '#c8452f' },
+    { mark: 'redo',  title: '再抛一次', sub: '这一轮不作数，重新来', color: '#c9881c' },
+    { mark: 'check', title: '可以',    sub: '就按这个来',           color: '#2e9b62' }
+  ],
+  levels: 0,
+  showOdds: true
+};
+
+/* =========================================================
+   1. 几何推导
+   ---------------------------------------------------------
+   棋盘抽象成「N 列的反射式随机游走」：小球每走一步就移到
+   相邻列（左或右，50/50），撞到最左/最右列就原地弹回。
+   每个槽位对应一列，所以槽位数量天然可配置。
+
+   格点按「奇偶交替」排布：第 i 层只放满足
+       col ≡ START_COL + i  (mod 2)
+   的列。这样对角槽两两不相交，得到参考图里那种干净的扁平
+   菱形，而不是交叉成网。边界列的「原地弹回」画成跨两层的
+   竖向回槽 —— 这正是参考图左右两条竖直凹槽的由来。
+
+   注意：奇数个槽位时整个棋盘左右镜像对称（起始列正好落在中轴）；
+   偶数个槽位时起始列只能落在中轴左边一格，所以左右半边概率会差
+   几个百分点 —— 这是格点奇偶性决定的，改不了。
+   ========================================================= */
+/* 配置兜底：少写一个字段不该让页面静默变空白。
+   例如漏了 color 会让 tint() 拿到 'undefined'，borderColor 变成非法值被浏览器丢掉，
+   表现就是「落槽了但没有任何高亮」，很难查。 */
+if (!Array.isArray(CONFIG.slots) || CONFIG.slots.length < 1) {
+  // 配置写错了：把原因直接写到页面上，别让用户对着一块空白画布猜
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  stage.style.cursor = 'default';
+  const box = document.createElement('div');
+  box.className = 'cfg-err';
+  const l1 = document.createElement('div');
+  l1.textContent = '配置有误，棋盘无法绘制';
+  const l2 = document.createElement('div');
+  l2.className = 'cfg-err-sub';
+  l2.textContent = 'CONFIG.slots 至少要有一个槽位';
+  box.appendChild(l1); box.appendChild(l2);
+  stage.appendChild(box);
+
+  document.getElementById('rtitle').textContent = 'CONFIG.slots 至少要有一个槽位';
+  document.getElementById('rsub').textContent = '打开文件顶部的配置块，照着注释里的例子改';
+  document.getElementById('badge').textContent = '!';
+  document.getElementById('go').disabled = true;
+  return;
+}
+const SLOTS = CONFIG.slots.map((s, i) => ({
+  mark: s.mark !== undefined && s.mark !== '' ? s.mark : '?',
+  title: s.title !== undefined && s.title !== '' ? s.title : '槽位 ' + (i + 1),
+  sub: s.sub !== undefined ? s.sub : '',
+  color: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(s.color || '')) ? s.color : '#8a6a3a'
+}));
+const N = SLOTS.length;
+
+/* 结构照参考实物决策板逐像素实测还原：
+   木岛（下称「面」）是扁平的六边形，按砖墙式错位叠放；凹槽就是木岛之间剩下的缝。
+   所以「槽宽 = 缝宽」，不是描边的线宽；木岛两端是短竖边 + 圆角，不是尖角。
+
+   参考图（1000×989）实测（flood fill 提面 + 逐行宽度剖面）：
+     列距 210、面半宽 202、面高 69、面行距 56.4、槽宽 14（= 0.067 × 列距）
+     面的逐行剖面（相对面中心的 dy → 半宽）：
+        0→1.5   6→34   12→99   18→162   24→200.5   27~42→202（等宽竖边）
+       45→199.5  51→152  57→90.5  63→28  66→4.5
+   读出来就是「上下各一个三角帽 + 中间一段等宽竖边」，帽高 A=33、竖边半高 S=7.5。
+   全部常量都写成这些实测比例，不写死像素（换槽位数量时列距会变）。 */
+const W = 760;
+const BOARD_X = 16, BOARD_Y = 16, BOARD_W = W - 32;
+
+// 左右留白：参考图里木岛两端离板边约 8.7% 板宽
+const MARGIN_X = Math.round(W * 0.087);
+const X_LEFT = MARGIN_X, X_RIGHT = W - MARGIN_X;
+
+const M = N + 2;                              // 顶点列数：面占 1..N 列，两侧各留一列给面的外端
+const COL_GAP = M > 1 ? (X_RIGHT - X_LEFT) / (M - 1) : 0;
+
+/* 比例全部来自参考图实测（1000×989 实物照，flood fill 提面 + 逐行宽度剖面）：
+     列距 210、面半宽 202、面高 69、面行距 56.4、槽宽 14
+   面的逐行剖面（距尖端 d → 半宽/最大半宽）：
+     d=3→0.037  6→0.168  9→0.322  12→0.490  15→0.639  18→0.802  21→0.953  24→0.993  27→1.0
+   读出来是「上下各一个三角帽 + 中间一段等宽竖边」的六边形，且斜边基本是直线。
+
+   两个要同时满足的实测约束（都归一化到列距）：
+     · 相邻两行之间的缝宽 ≈ 行距 − S − A = 0.0686 列距   （缝太宽整块板就"糊"）
+     · 行交界处的"细腰"  (A − 行距/2) / (A − S) ≈ 0.18  （参考图面在交界处收得很尖）
+   行距/列距 = 0.2686 由剖面行距直接读出。两个方程解出：
+     A = 0.1535 列距、S = 0.303 A、行距 = 1.750 A
+   （早先用 A=列距/6、S=0.217A 时缝宽对得上，但细腰是 0.233 —— 交界处明显比实物胖。） */
+const A_OFF = COL_GAP * 0.1535;               // 上/下顶点相对面中心的偏移
+const ROW_GAP = A_OFF * 1.750;                // 面行距
+const S_OFF = A_OFF * 0.303;                  // 面两端等宽竖边的半高（也决定斜边坡度）
+
+const GROOVE_W = Math.max(3.5, Math.min(18, COL_GAP * 0.069));   // 可见槽宽（参考图实测 14/210 ≈ 0.067~0.071 列距）
+const HW = COL_GAP - GROOVE_W / 2;            // 面半宽：同行相邻两块之间正好留一条 GROOVE_W
+const BALL_R = Math.max(2.2, GROOVE_W * 0.40);
+const GRAV = 1000, VMAX = 950;
+
+// 面的行数。必须是奇数，最后一层才落在「少的那一半列」上（3 槽时就是中列一块）。
+// 行数按参考图实测的「晶格高 / 板宽 ≈ 0.677」反推，改槽位数量时整块板的宽高比才稳。
+let ROWS_F = CONFIG.levels > 0 ? Math.round(CONFIG.levels)
+                              : Math.max(5, 1 + Math.round(0.677 * BOARD_W / ROW_GAP));
+if (ROWS_F % 2 === 0) ROWS_F++;
+
+/* 顶部区域（起球钮 + 柄）。柄长和顶部留白都按 A 缩放，不能写死：
+   A = 列距/6，槽位少的时候列距很大，A 会到 50+，写死的话钮会被顶到板外
+   （N=1 时 KNOB_Y 会变成负数，画面上钮直接消失）。 */
+const KNOB_H = Math.max(10, COL_GAP * 0.10);
+const STEM = A_OFF * 1.7;                     // 柄长（参考图实测 ≈ 1.7A）
+const TOP_PAD = Math.max(14, A_OFF * 0.9);    // 钮顶到板顶
+// ROW_TOP = 第 0 行木岛的中心 y，同时决定整块板的顶部留白。
+// 给个下限，保证右上角 DECISION 字样不会和第 0 行木岛压在一起。
+const ROW_TOP = Math.max(
+  BOARD_Y + 96,
+  BOARD_Y + TOP_PAD + KNOB_H / 2 + GROOVE_W / 2 + STEM + A_OFF
+);
+const KNOB_Y = ROW_TOP - A_OFF - STEM;        // 起球钮中心
+
+// 槽位中心只比最后一行木岛的中心低一点点：参考图里槽是被「啃」进最后一行木岛下缘的
+const TROUGH_DROP = Math.max(2, A_OFF * 0.15);
+const TROUGH_Y = ROW_TOP + (ROWS_F - 1) * ROW_GAP + A_OFF + TROUGH_DROP;
+const TROUGH_H = Math.max(16, Math.min(48, COL_GAP * 0.214));
+const TROUGH_W = Math.max(28, Math.min(96, COL_GAP * 0.46));
+const BOTTOM_PAD = 108;
+const H = Math.round(TROUGH_Y + BOTTOM_PAD);
+const BOARD = { x: BOARD_X, y: BOARD_Y, w: BOARD_W, h: H - 44, r: 28 };
+
+const XC = (X_LEFT + X_RIGHT) / 2;
+
+const colX = c => X_LEFT + c * COL_GAP;
+const rowY = r => ROW_TOP + r * ROW_GAP;
+
+/* 槽位横向铺开：最外侧两个槽的外缘和木岛两端对齐（参考图就是这样，
+   外侧槽比它正上方的列更靠外），小球最后是一段「先竖直落下、再横着滚进槽」的 L 形路。 */
+const troughX = j => {
+  if (N === 1) return XC;
+  const pad = Math.min(TROUGH_W / 2, (X_RIGHT - X_LEFT) / (2 * (N - 1)));
+  const a = X_LEFT + pad, span = (X_RIGHT - X_LEFT) - 2 * pad;
+  return a + (j / (N - 1)) * span;
+};
+
+// 面 (c,r) 是否存在：列 1..N、行 0..ROWS_F-1，且行列同奇偶（砖墙错位）
+function faceAt(c, r) {
+  if (r < 0 || r >= ROWS_F) return false;
+  if (c < 1 || c > N) return false;
+  // 单槽位没有「相邻列」可以错开，隔一行放一块才不会上下叠在一起
+  if (N === 1) return r % 2 === 0;
+  return ((c + r) % 2 + 2) % 2 === 0;
+}
+
+/* 节点：一块木岛的四个「拐点」+ 两个只作折线经过的角点
+     T 上顶点   B 下顶点   L 左下拐点   R 右下拐点   U 左上角   V 右上角
+   小球的实际路线就是这些点之间的折线，也就是凹槽的中心线。
+   L/R/U/V 用 ±HW（面半宽）而不是 ±列距 —— 差的那半条槽宽就是「缝」。 */
+function nodeP(k, r, c) {
+  switch (k) {
+    case 'T': return { x: colX(c), y: rowY(r) - A_OFF };
+    case 'B': return { x: colX(c), y: rowY(r) + A_OFF };
+    case 'L': return { x: colX(c) - HW, y: rowY(r) + S_OFF };
+    case 'R': return { x: colX(c) + HW, y: rowY(r) + S_OFF };
+    case 'U': return { x: colX(c) - HW, y: rowY(r) - S_OFF };
+    default:  return { x: colX(c) + HW, y: rowY(r) - S_OFF };   // 'V'
+  }
+}
+const KEY = (k, r, c) => k + r + '_' + c;
+
+/* 每个节点的出路 —— 这就是「分叉点 50/50 选边」的规则
+     T：沿木岛的左上斜边 或 右上斜边 下去，走到木岛的左/右下拐点
+     L/R：绕过木岛端部（留在本列，跨两层） 或 掉到相邻列的下一行
+          相邻列没有木岛时只剩「绕过端部」一条路 —— 这就是边界的反弹
+     B：继续往下两层；没有下一层了就直接落槽 */
+function options(k, r, c) {
+  if (k === 'T') {
+    return [
+      { k: 'L', r, c, via: [['U', r, c]] },
+      { k: 'R', r, c, via: [['V', r, c]] }
+    ];
+  }
+  if (k === 'L' || k === 'R') {
+    const out = [{ k: 'B', r, c, via: [] }];
+    const nc = k === 'L' ? c - 1 : c + 1;
+    if (faceAt(nc, r + 1)) out.push({ k: 'T', r: r + 1, c: nc, via: [] });
+    return out;
+  }
+  if (k === 'B') {
+    // 槽位下标是 0 基：列 c 对应槽位 c-1
+    return faceAt(c, r + 2) ? [{ k: 'T', r: r + 2, c, via: [] }] : [{ trough: c - 1, via: [] }];
+  }
+  return [];
+}
+
+// 最上面一行的「面」。奇数槽位时只有 1 块，偶数槽位时有 N/2 块，
+// 那就用一个顶端分球器把它们平均分出去。
+const START_FACES = (() => {
+  const a = [];
+  for (let c = 1; c <= N; c++) if (faceAt(c, 0)) a.push(c);
+  return a;
+})();
+const START_COL = START_FACES[0];
+const START_HUB = START_FACES.length > 1;
+
+/* 精确概率：在图上做一次前向递推，得到每个槽位的理论概率。
+   行只升不降（T(r)→L/R(r)→B(r)→T(r+2)），所以按行升序扫一遍就够。
+   顺便也暴露了这块板子「不一定等概率」的事实。 */
+const ODDS = (() => {
+  const p = new Map();
+  const out = new Array(N).fill(0);
+  const add = (key, v) => p.set(key, (p.get(key) || 0) + v);
+
+  if (START_HUB) {
+    const share = 1 / START_FACES.length;
+    for (const c of START_FACES) add(KEY('T', 0, c), share);
+  } else {
+    add(KEY('T', 0, START_COL), 1);
+  }
+
+  for (let r = 0; r <= ROWS_F + 1; r++) {
+    for (let c = 0; c < M; c++) {
+      // 同一行内必须先 T、再 L/R、最后 B，否则 B 会在 L/R 之前被读走
+      for (const k of ['T', 'L', 'R', 'B']) {
+        const key = KEY(k, r, c);
+        const cur = p.get(key) || 0;
+        if (!cur) continue;
+        const opts = options(k, r, c);
+        if (!opts.length) continue;
+        p.delete(key);
+        const share = cur / opts.length;
+        for (const o of opts) {
+          if (o.trough !== undefined) out[o.trough] += share;
+          else add(KEY(o.k, o.r, o.c), share);
+        }
+      }
+    }
+  }
+  return out;
+})();
+
+/* =========================================================
+   2. 小工具
+   ========================================================= */
+function roundRect(c, x, y, w, h, r) {
+  c.beginPath();
+  rrectPath(c, x, y, w, h, r);
+}
+// Path2D 没有 beginPath，所以圆角矩形单独抽一个能同时喂给 ctx / Path2D 的版本
+function rrectPath(c, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+function hexA(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+// 给任意 CSS 颜色加透明度：hex 能算就加 alpha，其它写法（rgb/颜色名）原样返回，
+// 这样用户在 CONFIG 里写什么颜色都不会把页面搞崩
+function tint(color, a) {
+  const s = String(color).trim();
+  if (/^#[0-9a-f]{6}$/i.test(s)) return hexA(s, a);
+  if (/^#[0-9a-f]{3}$/i.test(s)) {
+    return hexA('#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3], a);
+  }
+  return s;
+}
+function mulberry(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* =========================================================
+   2.5 音效
+   纯 WebAudio 合成，不依赖任何音频文件。
+   小球每撞过一个节点响一声，落槽时是一记闷响。
+   浏览器要求音频上下文必须在用户手势中创建，所以在 start() 里 unlock。
+   ========================================================= */
+const Sound = (() => {
+  let ac = null;
+  let muted = false;
+
+  function ensure() {
+    if (muted) return null;
+    try {
+      if (!ac) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ac = new AC();
+      }
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    } catch (e) { return null; }
+  }
+
+  // 一次「木珠敲击」：正弦/三角波 + 指数衰减包络
+  function knock(freq, dur, peak, type, delay) {
+    const a = ensure();
+    if (!a) return;
+    try {
+      const t = a.currentTime + (delay || 0);
+      const osc = a.createOscillator();
+      const gain = a.createGain();
+      osc.type = type || 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.62, t + dur);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(peak, t + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(gain); gain.connect(a.destination);
+      osc.start(t); osc.stop(t + dur + 0.03);
+    } catch (e) { /* 音频失败不影响画面 */ }
+  }
+
+  return {
+    unlock() { ensure(); },
+    // 逐层下行时音高缓缓升高，听感上像球在往下走
+    tick(i) { knock(760 + i * 26, 0.05, 0.035, 'triangle', 0); },
+    land() {
+      knock(240, 0.30, 0.13, 'sine', 0);
+      knock(158, 0.34, 0.09, 'sine', 0.035);
+    },
+    get muted() { return muted; },
+    set muted(v) { muted = !!v; if (muted && ac) { try { ac.suspend(); } catch (e) {} } }
+  };
+})();
+
+/* =========================================================
+   3. 静态图层（木纹 / 凹槽 / 槽位 / 符号）
+   ========================================================= */
+const SS = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
+const staticCv = document.createElement('canvas');
+staticCv.width = Math.round(W * SS);
+staticCv.height = Math.round(H * SS);
+const sc = staticCv.getContext('2d');
+
+/* 木岛的六边形轮廓。所有岛合成一条 Path2D：
+   描边它 = 凹槽区域，填充它 = 木岛区域。 */
+const FACE_PATH = (() => {
+  const p = new Path2D();
+  for (let r = 0; r < ROWS_F; r++) {
+    for (let c = 1; c <= N; c++) {
+      if (!faceAt(c, r)) continue;
+      const T = nodeP('T', r, c), U = nodeP('U', r, c), L = nodeP('L', r, c),
+            B = nodeP('B', r, c), R = nodeP('R', r, c), V = nodeP('V', r, c);
+      p.moveTo(T.x, T.y);
+      p.lineTo(U.x, U.y);
+      p.lineTo(L.x, L.y);
+      p.lineTo(B.x, B.y);
+      p.lineTo(R.x, R.y);
+      p.lineTo(V.x, V.y);
+      p.closePath();
+    }
+  }
+  return p;
+})();
+
+// 同列上下两块木岛之间的竖沟（小球从上面那块的下顶点穿到下面那块的上顶点）
+const LINK_PATH = (() => {
+  const p = new Path2D();
+  for (let r = 0; r < ROWS_F; r++) {
+    for (let c = 1; c <= N; c++) {
+      if (!faceAt(c, r) || !faceAt(c, r + 2)) continue;
+      const a = nodeP('B', r, c), b = nodeP('T', r + 2, c);
+      p.moveTo(a.x, a.y);
+      p.lineTo(b.x, b.y);
+    }
+  }
+  return p;
+})();
+
+// 落槽沟：从每列最下面那块木岛一路下到槽位高度，再横着滚进槽里（参考图就是这个 L 形）
+const DROP_PATH = (() => {
+  const p = new Path2D();
+  for (let c = 1; c <= N; c++) {
+    let rBot = -1;
+    for (let r = ROWS_F - 1; r >= 0; r--) if (faceAt(c, r)) { rBot = r; break; }
+    if (rBot < 0) continue;
+    const a = nodeP('B', rBot, c);
+    p.moveTo(a.x, a.y);
+    p.lineTo(a.x, TROUGH_Y);
+    p.lineTo(troughX(c - 1), TROUGH_Y);
+  }
+  return p;
+})();
+
+// 起球钮 + 柄（柄接到最上面那块木岛的上顶点）
+const KNOB_PATH = (() => {
+  const p = new Path2D();
+  const x = XC;
+  // 尺寸按参考图：钮宽 ≈ 0.22 列距、高 ≈ 0.10 列距（描边还会各外扩半槽宽）
+  const kw = Math.max(16, COL_GAP * 0.22);
+  rrectPath(p, x - kw / 2, KNOB_Y - KNOB_H / 2, kw, KNOB_H, KNOB_H / 2);
+  const sw = GROOVE_W;
+  const t = nodeP('T', 0, START_COL);
+  p.moveTo(x - sw / 2, KNOB_Y + KNOB_H * 0.15);
+  p.lineTo(x - sw / 2, t.y + 2);
+  p.lineTo(x + sw / 2, t.y + 2);
+  p.lineTo(x + sw / 2, KNOB_Y + KNOB_H * 0.15);
+  p.closePath();
+  return p;
+})();
+
+// 顶端分球器：偶数槽位时最上面一行有多块木岛，从钮里分叉下去
+const HUB_PATH = !START_HUB ? null : (() => {
+  const p = new Path2D();
+  for (const c of START_FACES) {
+    const t = nodeP('T', 0, c);
+    p.moveTo(XC, KNOB_Y);
+    p.lineTo(t.x, t.y);
+  }
+  return p;
+})();
+
+/* 两套路径，描边宽度不同：
+   - FACE_PATH 是闭合的木岛轮廓，要「按 2 倍槽宽描边 + 填回岛内」才能得到一圈
+     GROOVE_W 宽的槽（描边内半圈会被 drawFaces 用木色盖掉）。
+   - CHANNEL_PATH 本来就是一条条中心线（连接沟 / 落槽沟 / 起球钮），
+     直接按 GROOVE_W 描边就是对的宽度，不能再翻倍。 */
+const CHANNEL_PATH = (() => {
+  const p = new Path2D();
+  p.addPath(LINK_PATH);
+  p.addPath(DROP_PATH);
+  p.addPath(KNOB_PATH);
+  if (HUB_PATH) p.addPath(HUB_PATH);
+  return p;
+})();
+
+/* 「板内减去所有木岛」= 凹槽 + 四周留白。
+   用 evenodd 填充规则把矩形和木岛叠成一条路径即可，clip 出来就是凹槽区。
+   侧壁的受光 / 落影必须裁到这块区域里：直接 fill 平移过的木岛轮廓，
+   在木岛收细的端部会横着甩出一大片半透明的暗色（实测能甩出 35px 宽），
+   看着像木岛底下拖了一条软阴影，而实物照片里明暗只发生在槽内。 */
+const GROOVE_REGION = (() => {
+  const p = new Path2D();
+  p.rect(BOARD.x, BOARD.y, BOARD.w, BOARD.h);
+  p.addPath(FACE_PATH);
+  return p;
+})();
+
+function drawWood(c) {
+  c.save();
+  c.shadowColor = 'rgba(96,70,36,.30)';
+  c.shadowBlur = 26; c.shadowOffsetY = 12;
+  c.fillStyle = '#e8d9bb';
+  roundRect(c, BOARD.x, BOARD.y, BOARD.w, BOARD.h, BOARD.r);
+  c.fill();
+  c.restore();
+
+  c.save();
+  roundRect(c, BOARD.x, BOARD.y, BOARD.w, BOARD.h, BOARD.r);
+  c.clip();
+
+  const g = c.createLinearGradient(0, BOARD.y, 0, BOARD.y + BOARD.h);
+  g.addColorStop(0, '#f3e8d1');
+  g.addColorStop(.45, '#ecdec0');
+  g.addColorStop(1, '#e0cda8');
+  c.fillStyle = g;
+  c.fillRect(BOARD.x, BOARD.y, BOARD.w, BOARD.h);
+
+  const rg = c.createRadialGradient(XC, 150, 20, XC, 150, 720);
+  rg.addColorStop(0, 'rgba(255,253,244,.92)');
+  rg.addColorStop(1, 'rgba(255,253,244,0)');
+  c.fillStyle = rg;
+  c.fillRect(BOARD.x, BOARD.y, BOARD.w, BOARD.h);
+
+  const R = mulberry(20260920);
+  c.lineWidth = 1;
+  for (let i = 0; i < 48; i++) {
+    const y0 = BOARD.y + (i / 47) * BOARD.h + (R() - .5) * 7;
+    const amp = 2 + R() * 8, ph = R() * Math.PI * 2, fq = .0055 + R() * .007;
+    c.beginPath();
+    for (let x = BOARD.x; x <= BOARD.x + BOARD.w; x += 9) {
+      const y = y0 + Math.sin(x * fq + ph) * amp + Math.sin(x * fq * 2.7 + ph * 1.7) * amp * .35;
+      x === BOARD.x ? c.moveTo(x, y) : c.lineTo(x, y);
+    }
+    c.strokeStyle = i % 3 === 0 ? 'rgba(150,116,74,.075)' : 'rgba(150,116,74,.042)';
+    c.stroke();
+  }
+
+  const vg = c.createRadialGradient(XC, H * .46, 240, XC, H * .46, 790);
+  vg.addColorStop(0, 'rgba(120,90,50,0)');
+  vg.addColorStop(1, 'rgba(112,82,44,.22)');
+  c.fillStyle = vg;
+  c.fillRect(BOARD.x, BOARD.y, BOARD.w, BOARD.h);
+  c.restore();
+
+  roundRect(c, BOARD.x + .5, BOARD.y + .5, BOARD.w - 1, BOARD.h - 1, BOARD.r);
+  c.strokeStyle = 'rgba(163,134,92,.5)'; c.lineWidth = 1.6; c.stroke();
+  roundRect(c, BOARD.x + 3.5, BOARD.y + 3.5, BOARD.w - 7, BOARD.h - 7, BOARD.r - 3);
+  c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = 1.6; c.stroke();
+}
+
+/* 凹槽 = 木岛轮廓外扩 GROOVE_W/2 的那一圈。
+   做法：先按 2×GROOVE_W 描边轮廓，再把轮廓内部填满 —— 合起来正好是「外扩 GROOVE_W」，
+   之后 drawFaces 会用木色把渗进岛里的那 GROOVE_W 盖回去，于是剩下一圈正好 GROOVE_W 宽的槽。
+   （只按 GROOVE_W 描边的话，可见槽宽会变成半槽宽，槽会显得比参考图细一半。）
+
+   侧壁的明暗不能用「轮廓整体平移再描边」来做：那样竖直的槽（同列上下两岛之间）
+   会被整条提亮，看着像没挖过。改成把「木岛」整体平移一点点去填色 ——
+   平移后多出来的那一条带只出现在岛的上沿 / 下沿，竖直槽不受影响。 */
+function drawGrooves(c) {
+  c.save();
+  c.lineJoin = 'round';
+  c.lineCap = 'round';
+
+  c.strokeStyle = '#4a3016';
+  c.lineWidth = GROOVE_W * 2;
+  c.stroke(FACE_PATH);
+  c.lineWidth = GROOVE_W;
+  c.stroke(CHANNEL_PATH);
+  c.fillStyle = '#4a3016';
+  c.fill(FACE_PATH);
+  // 只填钮（闭合子路径）。CHANNEL_PATH 里的连接沟 / 落槽沟是开放折线，
+  // fill 会自动首尾相连 —— 那条 L 形的落槽沟会被填成一个三角形色块。
+  c.fill(KNOB_PATH);
+
+  // 槽底更深的一道，做出「凹进去」的层次
+  c.strokeStyle = 'rgba(36,21,7,.5)';
+  c.lineWidth = GROOVE_W * 0.55;
+  c.stroke(FACE_PATH);
+  c.stroke(CHANNEL_PATH);
+
+  // 上侧壁落影 / 下侧壁受光：平移木岛轮廓去填色，多出来的那条带正好落在槽里。
+  // 必须裁进 GROOVE_REGION —— 否则在木岛收细的端部会甩出一大片横向暗色（见 GROOVE_REGION 注释）。
+  c.save();
+  c.clip(GROOVE_REGION, 'evenodd');
+
+  c.save();
+  c.translate(0, GROOVE_W * 0.34);
+  c.fillStyle = 'rgba(38,22,7,.34)';
+  c.fill(FACE_PATH);
+  c.restore();
+
+  c.save();
+  c.translate(0, -GROOVE_W * 0.30);
+  c.fillStyle = 'rgba(255,250,236,.44)';
+  c.fill(FACE_PATH);
+  c.restore();
+
+  c.restore();
+
+  c.restore();
+}
+
+// 木岛：盖掉凹槽描边渗进来的那一半，再叠木纹
+function drawFaces(c) {
+  const g = c.createLinearGradient(0, BOARD.y, 0, BOARD.y + BOARD.h);
+  g.addColorStop(0, '#f6ecd8');
+  g.addColorStop(.5, '#eee0c4');
+  g.addColorStop(1, '#e3d1ad');
+  c.fillStyle = g;
+  c.fill(FACE_PATH);
+
+  c.save();
+  c.clip(FACE_PATH);
+  const R = mulberry(20260920);
+  c.lineWidth = 1;
+  for (let i = 0; i < 56; i++) {
+    const y0 = BOARD.y + (i / 55) * BOARD.h + (R() - .5) * 9;
+    const amp = 1.5 + R() * 7, ph = R() * Math.PI * 2, fq = .006 + R() * .008;
+    c.beginPath();
+    for (let x = BOARD.x; x <= BOARD.x + BOARD.w; x += 10) {
+      const y = y0 + Math.sin(x * fq + ph) * amp + Math.sin(x * fq * 2.7 + ph * 1.7) * amp * .35;
+      x === BOARD.x ? c.moveTo(x, y) : c.lineTo(x, y);
+    }
+    c.strokeStyle = i % 3 === 0 ? 'rgba(150,116,74,.07)' : 'rgba(150,116,74,.038)';
+    c.stroke();
+  }
+  c.restore();
+
+  // 极淡的一道暗缝，让每块岛读得出来
+  c.save();
+  c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(96,68,34,.28)';
+  c.lineWidth = 1.1;
+  c.stroke(FACE_PATH);
+  c.restore();
+}
+
+function drawTroughs(c) {
+  for (let j = 0; j < N; j++) {
+    const x = troughX(j) - TROUGH_W / 2, y = TROUGH_Y - TROUGH_H / 2;
+    c.save();
+    c.shadowColor = 'rgba(88,60,28,.42)';
+    c.shadowBlur = 10; c.shadowOffsetY = 3;
+    const g = c.createLinearGradient(0, y, 0, y + TROUGH_H);
+    g.addColorStop(0, '#3a2610');
+    g.addColorStop(.55, '#2a1a0b');
+    g.addColorStop(1, '#1c1005');
+    c.fillStyle = g;
+    roundRect(c, x, y, TROUGH_W, TROUGH_H, TROUGH_H / 2);
+    c.fill();
+    c.restore();
+
+    roundRect(c, x + 1.4, y + 1.4, TROUGH_W - 2.8, TROUGH_H - 2.8, (TROUGH_H - 2.8) / 2);
+    c.strokeStyle = 'rgba(255,236,198,.14)';
+    c.lineWidth = 1.2;
+    c.stroke();
+  }
+}
+
+// 起球钮：跟凹槽同一套画法，看着像「挖出来的一个窝」
+function drawPeg(c) {
+  c.save();
+  c.lineJoin = 'round';
+  c.lineCap = 'round';
+  c.shadowColor = 'rgba(88,60,28,.4)';
+  c.shadowBlur = 9; c.shadowOffsetY = 3;
+  c.strokeStyle = '#4a3016';
+  c.lineWidth = GROOVE_W;
+  c.stroke(KNOB_PATH);
+  if (HUB_PATH) c.stroke(HUB_PATH);
+  c.fillStyle = '#4a3016';
+  c.fill(KNOB_PATH);
+  c.shadowColor = 'transparent';
+  c.strokeStyle = 'rgba(36,21,7,.5)';
+  c.lineWidth = GROOVE_W * 0.55;
+  c.stroke(KNOB_PATH);
+  if (HUB_PATH) c.stroke(HUB_PATH);
+  c.restore();
+}
+
+function drawMark(c, kind, cx, cy, size, lw, color) {
+  // 非内置符号：直接当文字画，方便用户塞自己的字符 / emoji
+  if (kind !== 'x' && kind !== 'check' && kind !== 'redo') {
+    c.save();
+    c.font = `600 ${size}px -apple-system, "PingFang SC", "Segoe UI", sans-serif`;
+    c.fillStyle = color;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(String(kind), cx, cy + size * 0.04);
+    c.restore();
+    return;
+  }
+
+  c.save();
+  c.strokeStyle = color; c.fillStyle = color;
+  c.lineWidth = lw; c.lineCap = 'round'; c.lineJoin = 'round';
+  const s = size / 2;
+
+  if (kind === 'x') {
+    c.beginPath();
+    c.moveTo(cx - s * .72, cy - s * .72); c.lineTo(cx + s * .72, cy + s * .72);
+    c.moveTo(cx + s * .72, cy - s * .72); c.lineTo(cx - s * .72, cy + s * .72);
+    c.stroke();
+  } else if (kind === 'check') {
+    c.beginPath();
+    c.moveTo(cx - s * .78, cy + s * .04);
+    c.lineTo(cx - s * .16, cy + s * .68);
+    c.lineTo(cx + s * .82, cy - s * .70);
+    c.stroke();
+  } else {
+    const r = s * .72;
+    const a0 = 250 * Math.PI / 180, a1 = 580 * Math.PI / 180;
+    c.beginPath(); c.arc(cx, cy, r, a0, a1); c.stroke();
+    const ax = cx + Math.cos(a0) * r, ay = cy + Math.sin(a0) * r;
+    const tx = -Math.sin(a0), ty = Math.cos(a0);
+    const px = -ty, py = tx, h = lw * 2.1;
+    const tipx = ax + tx * h, tipy = ay + ty * h;
+    const bx = ax - tx * h * .25, by = ay - ty * h * .25;
+    c.beginPath();
+    c.moveTo(tipx, tipy);
+    c.lineTo(bx + px * h * .92, by + py * h * .92);
+    c.lineTo(bx - px * h * .92, by - py * h * .92);
+    c.closePath();
+    c.fill();
+  }
+  c.restore();
+}
+
+function fmtPct(v) {
+  const n = v * 100;
+  const s = n >= 10 || Math.abs(n - Math.round(n)) < .05 ? n.toFixed(0) : n.toFixed(1);
+  return s + '%';
+}
+
+function drawLabels(c) {
+  const size = Math.max(14, Math.min(26, TROUGH_W * 0.46));
+  const lw = Math.max(2, size * .115);
+  // 这些 y 必须跟着 TROUGH_Y 走：槽位多的时候棋盘会被拉高
+  const markY = TROUGH_Y + TROUGH_H / 2 + 24;
+  const oddsY = markY + 22;
+
+  for (let j = 0; j < N; j++) {
+    drawMark(c, SLOTS[j].mark, troughX(j), markY, size, lw, 'rgba(44,28,13,.82)');
+  }
+
+  // 理论概率：这块板子并非一定等概率，把真实赔率标出来才诚实
+  if (CONFIG.showOdds) {
+    c.save();
+    c.font = `500 ${Math.max(10, Math.min(13, TROUGH_W * 0.19))}px -apple-system, "PingFang SC", sans-serif`;
+    c.fillStyle = 'rgba(72,54,34,.55)';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    for (let j = 0; j < N; j++) c.fillText(fmtPct(ODDS[j]), troughX(j), oddsY);
+    c.restore();
+  }
+}
+
+function drawBrand(c) {
+  const text = 'DECISION', size = 30, sp = 2.4;
+  c.save();
+  c.font = `600 ${size}px Georgia, "Times New Roman", serif`;
+  c.fillStyle = '#33220f';
+  c.textBaseline = 'middle';
+  const ws = [...text].map(ch => c.measureText(ch).width);
+  const total = ws.reduce((a, b) => a + b, 0) + sp * (text.length - 1);
+  let x = BOARD.x + BOARD.w - 44 - total;
+  [...text].forEach((ch, i) => { c.fillText(ch, x, 72); x += ws[i] + sp; });
+  c.restore();
+}
+
+function renderStatic() {
+  sc.setTransform(SS, 0, 0, SS, 0, 0);
+  sc.clearRect(0, 0, W, H);
+  drawWood(sc);      // 整块板（底色 + 木纹）
+  drawGrooves(sc);   // 凹槽（木岛轮廓外扩半槽宽）
+  drawFaces(sc);     // 木岛：盖回被描边吃掉的那一半，再叠一层木纹
+  drawTroughs(sc);   // 槽位
+  drawPeg(sc);       // 起球钮
+  drawLabels(sc);
+  drawBrand(sc);
+}
+
+/* =========================================================
+   4. 路径生成与采样
+   ========================================================= */
+function buildPath() {
+  const edges = [];
+
+  // 起球钮 → 最上面一行的木岛
+  if (START_HUB) {
+    const c0 = START_FACES[(Math.random() * START_FACES.length) | 0];
+    edges.push({ a: { x: XC, y: KNOB_Y }, b: nodeP('T', 0, c0), mid: [] });
+    return runFrom(edges, 'T', 0, c0);
+  }
+  edges.push({ a: { x: XC, y: KNOB_Y }, b: nodeP('T', 0, START_COL), mid: [] });
+  return runFrom(edges, 'T', 0, START_COL);
+}
+
+function runFrom(edges, k0, r0, c0) {
+  let k = k0, r = r0, c = c0;
+  for (let guard = 0; guard < 512; guard++) {
+    const opts = options(k, r, c);
+    // 收尾处只剩唯一出口，其余分叉点一律等概率（两个选项就是 50/50）
+    const pick = opts.length === 1 ? opts[0] : opts[(Math.random() * opts.length) | 0];
+    const from = nodeP(k, r, c);
+    // trough 是 0 基下标，0 也是合法槽位，只能用 !== undefined 判断
+    if (pick.trough !== undefined) {
+      // 先竖直落到槽位高度，再横着滚进槽里 —— 和 DROP_PATH 画的那条 L 形沟一致
+      edges.push({
+        a: from,
+        b: { x: troughX(pick.trough), y: TROUGH_Y },
+        mid: [{ x: from.x, y: TROUGH_Y }]
+      });
+      return finalize(edges, pick.trough);
+    }
+    edges.push({
+      a: from,
+      b: nodeP(pick.k, pick.r, pick.c),
+      mid: (pick.via || []).map(v => nodeP(v[0], v[1], v[2]))
+    });
+    k = pick.k; r = pick.r; c = pick.c;
+  }
+  return finalize(edges, Math.max(0, c - 1));
+}
+
+function finalize(edges, trough) {
+  // 采样成密集折线（每条边可能带中间折点）
+  let pts = [];
+  const nodeS = [];
+  let acc = 0;
+  edges.forEach(e => {
+    const chain = [e.a, ...(e.mid || []), e.b];
+    for (let i = 0; i < chain.length - 1; i++) {
+      const p0 = chain[i], p1 = chain[i + 1];
+      const len = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+      const n = Math.max(2, Math.ceil(len / 4));
+      for (let j = 0; j <= n; j++) {
+        if (pts.length && j === 0) continue;
+        const t = j / n;
+        pts.push({ x: p0.x + (p1.x - p0.x) * t, y: p0.y + (p1.y - p0.y) * t });
+      }
+      acc += len;
+    }
+    nodeS.push(acc);
+  });
+
+  // 平滑转角，让小球滚得更自然（也顺便把木岛端部的圆角对上了）
+  for (let k = 0; k < 2; k++) {
+    const q = pts.map(p => ({ x: p.x, y: p.y }));
+    for (let i = 1; i < pts.length - 1; i++) {
+      q[i].x = pts[i - 1].x * .25 + pts[i].x * .5 + pts[i + 1].x * .25;
+      q[i].y = pts[i - 1].y * .25 + pts[i].y * .5 + pts[i + 1].y * .25;
+    }
+    pts = q;
+  }
+
+  const cum = [0];
+  for (let i = 1; i < pts.length; i++) {
+    cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  }
+  return { pts, cum, total: cum[cum.length - 1], trough, nodeS, edges };
+}
+
+function pointAt(pts, cum, dist) {
+  const last = cum.length - 1;
+  if (dist <= 0) return { ...pts[0] };
+  if (dist >= cum[last]) return { ...pts[last] };
+  let lo = 0, hi = last;
+  while (lo < hi - 1) {
+    const mid = (lo + hi) >> 1;
+    if (cum[mid] <= dist) lo = mid; else hi = mid;
+  }
+  const span = cum[hi] - cum[lo] || 1;
+  const t = (dist - cum[lo]) / span;
+  return { x: pts[lo].x + (pts[hi].x - pts[lo].x) * t, y: pts[lo].y + (pts[hi].y - pts[lo].y) * t };
+}
+
+/* =========================================================
+   5. 渲染循环
+   ========================================================= */
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+
+const state = {
+  phase: 'idle', path: null, s: 0, v: 0,
+  ball: { x: XC, y: KNOB_Y },
+  trough: null, pulse: 0, bounceT: -1, passed: 0,
+  sparks: [], rot: 0
+};
+const counts = new Array(N).fill(0);   // 每个槽位一个计数，下标即槽位序号
+
+function layout() {
+  const rect = document.getElementById('stage').getBoundingClientRect();
+  const k = Math.min(Math.max(rect.width, 120) / W, Math.max(rect.height, 120) / H);
+  const cw = Math.max(1, Math.floor(W * k)), ch = Math.max(1, Math.floor(H * k));
+  canvas.style.width = cw + 'px';
+  canvas.style.height = ch + 'px';
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  canvas.width = Math.round(cw * dpr);
+  canvas.height = Math.round(ch * dpr);
+  ctx.setTransform(cw * dpr / W, 0, 0, ch * dpr / H, 0, 0);
+}
+
+function start() {
+  if (state.phase === 'running') return;
+  Sound.unlock();                 // 必须在用户手势里初始化音频
+  state.path = buildPath();
+  state.s = 0; state.v = 0; state.rot = 0;
+  state.ball = { x: XC, y: KNOB_Y };
+  state.trough = null; state.passed = 0; state.bounceT = -1;
+  state.sparks.length = 0;
+  state.phase = 'running';
+  syncPanel();
+  const btn = document.getElementById('go');
+  btn.disabled = true; btn.textContent = '滚动中';
+}
+
+function land() {
+  state.phase = 'done';
+  state.trough = state.path.trough;
+  state.bounceT = 0;
+  counts[state.trough]++;
+  Sound.land();
+  renderStats();
+  syncPanel();
+  const btn = document.getElementById('go');
+  btn.disabled = false; btn.textContent = '再试一次';
+}
+
+function update(dt) {
+  state.pulse += dt;
+
+  if (state.phase === 'running') {
+    state.v = Math.min(state.v + GRAV * dt, VMAX);
+    state.s += state.v * dt;
+    const p = state.path;
+    if (state.s >= p.total) {
+      state.s = p.total;
+      state.ball = { ...p.pts[p.pts.length - 1] };
+      land();
+    } else {
+      state.ball = pointAt(p.pts, p.cum, state.s);
+      state.rot = state.s / BALL_R;
+      while (state.passed < p.nodeS.length && state.s >= p.nodeS[state.passed]) {
+        const e = p.edges[state.passed];
+        state.sparks.push({ x: e.b.x, y: e.b.y, t: 0, r: 6 });
+        Sound.tick(state.passed);
+        state.passed++;
+      }
+    }
+  } else if (state.phase === 'done' && state.bounceT >= 0) {
+    state.bounceT += dt;
+  }
+
+  for (let i = state.sparks.length - 1; i >= 0; i--) {
+    const sp = state.sparks[i];
+    sp.t += dt; sp.r = 6 + sp.t * 74;
+    if (sp.t > .42) state.sparks.splice(i, 1);
+  }
+}
+
+function drawHighlight() {
+  // 注意：槽位 0 是合法值，判断「还没落槽」只能用 === null
+  if (state.phase !== 'done' || state.trough === null) return;
+  const slot = SLOTS[state.trough];
+  const p = .5 + .5 * Math.sin(state.pulse * 3.4);
+  const cx = troughX(state.trough), cy = TROUGH_Y;
+
+  ctx.save();
+  // 光晕半径跟着槽位尺寸走：写死的话槽位少时（槽位很宽）会糊到上面那排木岛上去
+  const gr = Math.max(46, TROUGH_W * 1.15);
+  const g = ctx.createRadialGradient(cx, cy, 6, cx, cy, gr);
+  g.addColorStop(0, hexA(slot.color, .30 + .18 * p));
+  g.addColorStop(1, hexA(slot.color, 0));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(cx, cy, gr, 0, Math.PI * 2); ctx.fill();
+
+  const tg = ctx.createLinearGradient(0, cy - TROUGH_H / 2, 0, cy + TROUGH_H / 2);
+  tg.addColorStop(0, hexA(slot.color, .95));
+  tg.addColorStop(1, hexA(slot.color, .62));
+  roundRect(ctx, cx - TROUGH_W / 2, cy - TROUGH_H / 2, TROUGH_W, TROUGH_H, TROUGH_H / 2);
+  ctx.fillStyle = tg; ctx.fill();
+
+  const ring = Math.max(5, TROUGH_H * 0.26);
+  roundRect(ctx, cx - TROUGH_W / 2 - ring, cy - TROUGH_H / 2 - ring,
+            TROUGH_W + ring * 2, TROUGH_H + ring * 2, (TROUGH_H + ring * 2) / 2);
+  ctx.strokeStyle = slot.color;
+  ctx.globalAlpha = .55 + .45 * p;
+  ctx.lineWidth = 3.4;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawSparks() {
+  for (const sp of state.sparks) {
+    const a = Math.max(0, 1 - sp.t / .42);
+    ctx.save();
+    ctx.globalAlpha = a * .5;
+    ctx.strokeStyle = '#8a6a3a';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawBall() {
+  let { x, y } = state.ball;
+  if (state.phase === 'done' && state.bounceT >= 0) {
+    y += -9 * Math.sin(state.bounceT * 24) * Math.exp(-state.bounceT * 7.5);
+  }
+
+  ctx.save();
+  const sg = ctx.createRadialGradient(x, y + 13, 1, x, y + 13, BALL_R * 1.6);
+  sg.addColorStop(0, 'rgba(58,38,14,.34)');
+  sg.addColorStop(1, 'rgba(58,38,14,0)');
+  ctx.fillStyle = sg;
+  ctx.beginPath(); ctx.ellipse(x, y + 13, BALL_R * 1.6, BALL_R * .8, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
+  const g = ctx.createRadialGradient(x - BALL_R * .38, y - BALL_R * .45, BALL_R * .12, x, y, BALL_R * 1.18);
+  g.addColorStop(0, '#fffaf0');
+  g.addColorStop(.30, '#f0d59b');
+  g.addColorStop(.72, '#c99a4c');
+  g.addColorStop(1, '#8a5a20');
+  ctx.beginPath(); ctx.arc(x, y, BALL_R, 0, Math.PI * 2);
+  ctx.fillStyle = g; ctx.fill();
+  ctx.lineWidth = 1.1; ctx.strokeStyle = 'rgba(72,44,12,.45)'; ctx.stroke();
+
+  const hx = x + Math.cos(state.rot - 2.2) * BALL_R * .42;
+  const hy = y + Math.sin(state.rot - 2.2) * BALL_R * .42;
+  ctx.beginPath(); ctx.arc(hx, hy, BALL_R * .24, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.drawImage(staticCv, 0, 0, W, H);
+  drawHighlight();
+  drawSparks();
+  drawBall();
+}
+
+let lastT = 0;
+function loop(t) {
+  if (!lastT) lastT = t;
+  const dt = Math.min((t - lastT) / 1000, 1 / 30);
+  lastT = t;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* =========================================================
+   6. 界面联动
+   ========================================================= */
+const panelEl = document.getElementById('panel');
+const badgeEl = document.getElementById('badge');
+const rtitleEl = document.getElementById('rtitle');
+const rsubEl = document.getElementById('rsub');
+const hintEl = document.getElementById('hint');
+const MARK_TEXT = { x: '✕', redo: '↻', check: '✓' };
+// 内置符号给个好看的字符版；用户自定义的符号直接原样显示
+const markText = m => (MARK_TEXT[m] !== undefined ? MARK_TEXT[m] : String(m));
+
+// 结果态的强调色是运行时算出来的，回到 idle / running 时要清掉
+function clearAccent() {
+  panelEl.style.borderColor = '';
+  panelEl.style.boxShadow = '';
+  badgeEl.style.background = '';
+  badgeEl.style.color = '';
+}
+
+function syncPanel() {
+  if (state.phase === 'idle') {
+    clearAccent();
+    panelEl.dataset.state = 'idle';
+    badgeEl.textContent = '?';
+    rtitleEl.textContent = '准备好了吗';
+    rsubEl.textContent = '点击任意位置释放小球';
+    hintEl.textContent = '点击任意位置 / 空格键';
+  } else if (state.phase === 'running') {
+    clearAccent();
+    panelEl.dataset.state = 'running';
+    badgeEl.textContent = '·';
+    rtitleEl.textContent = '小球正在滚动…';
+    rsubEl.textContent = '每层分叉点随机选边';
+    hintEl.textContent = '滚动中…';
+  } else {
+    const slot = SLOTS[state.trough];
+    panelEl.dataset.state = String(state.trough);
+    // 面板和徽章的强调色直接取槽位自己的 color，所以换配置时不需要改 CSS
+    panelEl.style.borderColor = tint(slot.color, .45);
+    panelEl.style.boxShadow = `0 18px 40px -20px ${tint(slot.color, .55)}`;
+    badgeEl.style.background = tint(slot.color, .13);
+    badgeEl.style.color = slot.color;
+    badgeEl.textContent = markText(slot.mark);
+    rtitleEl.textContent = slot.title;
+    rsubEl.textContent = slot.sub;
+    hintEl.textContent = '结果已揭晓';
+    badgeEl.classList.remove('pop');
+    void badgeEl.offsetWidth;
+    badgeEl.classList.add('pop');
+  }
+}
+
+function renderStats() {
+  const box = document.getElementById('stats-chips');
+  box.innerHTML = '';
+  for (let j = 0; j < N; j++) {
+    const el = document.createElement('span');
+    el.className = 'stat';
+    el.title = SLOTS[j].title;
+    const b = document.createElement('b');
+    b.textContent = String(counts[j]);
+    b.style.color = SLOTS[j].color;          // 计数颜色跟着槽位走
+    el.appendChild(document.createTextNode(markText(SLOTS[j].mark) + ' '));
+    el.appendChild(b);
+    box.appendChild(el);
+  }
+  document.getElementById('c-total').textContent =
+    String(counts.reduce((a, b) => a + b, 0));
+}
+
+/* =========================================================
+   7. 事件
+   ========================================================= */
+document.getElementById('go').addEventListener('click', e => { e.stopPropagation(); start(); });
+const muteBtn = document.getElementById('mute');
+muteBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  Sound.muted = !Sound.muted;
+  muteBtn.classList.toggle('muted', Sound.muted);
+  muteBtn.title = Sound.muted ? '音效已关闭' : '音效已开启';
+  if (!Sound.muted) Sound.unlock();
+});
+document.getElementById('reset').addEventListener('click', e => {
+  e.stopPropagation();
+  counts.fill(0);
+  renderStats();
+});
+document.addEventListener('click', e => {
+  if (e.target.closest('button')) return;
+  start();
+});
+document.addEventListener('keydown', e => {
+  if (e.code !== 'Space' && e.code !== 'Enter') return;
+  if (document.activeElement && document.activeElement.tagName === 'BUTTON') return;
+  e.preventDefault();
+  start();
+});
+window.addEventListener('resize', layout);
+
+/* =========================================================
+   8. 调试出口
+   ========================================================= */
+window.__diag = {
+  get phase() { return state.phase; },
+  get trough() { return state.trough; },
+  get planned() { return state.path ? state.path.trough : null; },
+  get progress() { return state.path ? state.s / state.path.total : 0; },
+  get ball() { return [Math.round(state.ball.x), Math.round(state.ball.y)]; },
+  get counts() { return counts.slice(); },
+  get size() { return [canvas.width, canvas.height]; },
+  get nodes() { return countFaces(); },
+  get slots() { return N; },
+  get rows() { return ROWS_F; },
+  get odds() { return ODDS.slice(); },
+  // 推导出来的几何量：改 CONFIG 后先看这里，NaN / 负数一眼就能发现
+  get geom() {
+    return {
+      W, H, ROWS_F, ROW_GAP, A_OFF, S_OFF, GROOVE_W, HW, BALL_R,
+      TROUGH_Y, TROUGH_H, TROUGH_W, KNOB_H,
+      M, COL_GAP, X_LEFT, X_RIGHT, XC, KNOB_Y, MARGIN_X,
+      BOARD_W: BOARD.w, BOARD_H: BOARD.h,
+      startCol: START_COL, startHub: START_HUB, startFaces: START_FACES.slice()
+    };
+  },
+  // 每个槽位的中心 x（检查槽位是否被挤出板外时很有用）
+  get troughXs() { return Array.from({ length: N }, (_, j) => troughX(j)); },
+  get muted() { return Sound.muted; },
+  get audioCtx() { return !!window.AudioContext || !!window.webkitAudioContext; },
+  roll() { return buildPath().trough; },   // 只推算结果，不动画面
+  start
+};
+
+function countFaces() {
+  let n = 0;
+  for (let r = 0; r < ROWS_F; r++) for (let c = 1; c <= N; c++) if (faceAt(c, r)) n++;
+  return n;
+}
+
+/* =========================================================
+   9. 启动
+   ========================================================= */
+renderStatic();
+layout();
+renderStats();
+syncPanel();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
