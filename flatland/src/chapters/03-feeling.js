@@ -25,13 +25,16 @@
     '六边形 · 贵族的第一级',
     '八边形及以上 · 接近圆形的僧侣阶层',
   ];
-  const ROUND_INTRO = {
-    3: '第一位来客。他薄得像一张纸，边缘是一圈折线。按住空格，用指尖去数他的角。',
+  /* 第一位来客那一句要教人「怎么触摸」。桌面是空格，手机是屏幕上那个键 ——
+     对手机用户说「按住空格」等于什么都没说。 */
+  const holdHint = touch => (touch ? '按住屏幕右下角的「触摸」键' : '按住空格');
+  const ROUND_INTRO = touch => ({
+    3: '第一位来客。他薄得像一张纸，边缘是一圈折线。' + holdHint(touch) + '，用指尖去数他的角。',
     4: '下一位来客。他一动不动地站着——这是规矩，也是他给你的善意。',
     5: '这一位站得很正。边数越多，棱角越钝，指尖上的感觉也越含糊。',
     6: '到了这一档，你已经该称他一声「老爷」了。',
     8: '最后一位。他几乎摸不出棱角——但别急着把他当成圆形。',
-  };
+  });
   const FEEDBACK = {
     3: { ok: '三边——等边三角形，中产阶级。平面国里最不稳的一档，再降半级就是等腰三角形。',
          no: '不对。三个角：等边三角形，中产阶级。别小看这一档，所有上升与下降都从它开始。' },
@@ -72,7 +75,7 @@
     brief: [
       '下午茶之后，五位来客依次登门。按平面国的规矩，你要靠触觉辨认他们的阶级。',
       '上流社会认为触摸粗鲁——大学里触摸他人是严重过失，初犯停学，再犯开除。可你没有别的办法：视觉辨认是一门要练一辈子的技艺。',
-      '按住空格触摸对方。指尖的扇形里每扫过一个角，你都会感觉到一次。数清它有几个角。',
+      '触摸对方。指尖的扇形里每扫过一个角，你都会感觉到一次。数清它有几个角——具体按哪里，右侧「操作」里写着。',
       '还要记住那条最要紧的安全规则：被触摸的人必须完全静止。所以你每多摸一秒，都是在赌对方不会颤抖。',
     ],
     goal: '在不过分失礼的前提下，认对 5 位来客的阶级',
@@ -81,6 +84,13 @@
       ['1–5', '选择阶级'],
       ['R', '重新开始本章'],
     ],
+
+    /* 空格要「按住不放」才数得清边，所以屏幕键标成 hold，视觉上多一条下划线。
+       选择阶级的选项本来就是画布下方的按钮，手机上直接点。 */
+    touch: {
+      actions: [{ code: 'Space', label: '按住触摸', desc: '按住不放，摸清来客的边数', hold: true }],
+      note: '按住上面那个键，或者直接按住画面；阶级选项在画布下方。',
+    },
 
     create(api) {
       const S = {
@@ -130,20 +140,26 @@
 
       // 「按住不放」的按钮：自己挂指针事件（api.button 只在 click 时触发）
       function buildHud() {
-        const hold = api.el('button', 'btn sm', '触摸（按住空格）');
-        hold.type = 'button';
-        hold.style.touchAction = 'none';
-        hold.style.userSelect = 'none';
-        const grab = ev => { ev.preventDefault(); if (S.phase !== 'ask') return; S.hudHold = true; syncHud(); };
-        const rel = () => { S.hudHold = false; syncHud(); };
-        hold.addEventListener('pointerdown', grab);
-        hold.addEventListener('pointerup', rel);
-        hold.addEventListener('pointerleave', rel);
-        hold.addEventListener('pointercancel', rel);
-        H.hold = hold;
-        api.hud.appendChild(hold);
+        /* 触屏设备上不建这个按钮：引擎的触控层已经在画布右下角放了一个更大的
+           「按住触摸」键，位置更顺手。这里再放一个，除了重复，还会挤占选项按钮的
+           横向空间 —— 390px 宽的屏上五个选项本来就要折成三行。
+           H.hold 保持 null 是安全的：syncHud 里对它判了空。 */
+        if (!api.touch) {
+          const hold = api.el('button', 'btn sm', '触摸（按住空格）');
+          hold.type = 'button';
+          hold.style.touchAction = 'none';
+          hold.style.userSelect = 'none';
+          const grab = ev => { ev.preventDefault(); if (S.phase !== 'ask') return; S.hudHold = true; syncHud(); };
+          const rel = () => { S.hudHold = false; syncHud(); };
+          hold.addEventListener('pointerdown', grab);
+          hold.addEventListener('pointerup', rel);
+          hold.addEventListener('pointerleave', rel);
+          hold.addEventListener('pointercancel', rel);
+          H.hold = hold;
+          api.hud.appendChild(hold);
 
-        api.hud.appendChild(api.el('div', 'grow'));
+          api.hud.appendChild(api.el('div', 'grow'));
+        }
 
         OPTIONS.forEach((label, i) => {
           const b = api.el('button', 'btn sm', (i + 1) + ' ' + label);
@@ -172,7 +188,7 @@
         // 起始刻度：先偏开半个夹角，免得一开始就压在指尖或顶点上
         S.tickLocal = -S.rot + Math.PI / SIDES[S.round];
         syncHud();
-        if (!quiet) api.say(ROUND_INTRO[SIDES[S.round]]);
+        if (!quiet) api.say(ROUND_INTRO(api.touch)[SIDES[S.round]]);
       }
 
       function beginTouch() {
@@ -305,7 +321,7 @@
       /* ---------- 开场 ---------- */
       buildHud();
       api.say('五位来客依次登门。按平面国的规矩，你要靠触觉辨认他们的阶级。');
-      api.say('按住空格触摸对方，指尖的扇形里每扫过一个角，你都会感觉到一次——数清它有几个角。');
+      api.say(holdHint(api.touch) + '触摸对方，指尖的扇形里每扫过一个角，你都会感觉到一次——数清它有几个角。');
       api.say('记住：被触摸的人必须完全静止。你每多摸一秒，都是在赌对方不会颤抖。', 'hi');
       setupRound(false);
 
@@ -549,7 +565,7 @@
             ctx.textBaseline = 'bottom';
             ctx.font = WB.font(Math.max(12, fs), 500);
             ctx.fillStyle = S.touched ? INK2 : INK3;
-            ctx.fillText('按住空格触摸它，数清它有几个角', W / 2, Hh - pad);
+            ctx.fillText(api.touch ? '按住「触摸」键，数清它有几个角' : '按住空格触摸它，数清它有几个角', W / 2, Hh - pad);
           }
         },
       };

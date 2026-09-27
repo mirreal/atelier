@@ -27,6 +27,13 @@
       ['点击', '指认目标'],
     ],
 
+    /* 手机没有滚轮，「远近」改由双指捏合给出（引擎把捏合翻译成 scene.wheel）。 */
+    touch: {
+      pad: 'all',
+      padLabels: { up: '抬高视角', down: '压低视角', left: '左绕', right: '右绕' },
+      note: '双指捏合可以拉远拉近；直接拖动画面也能绕行。',
+    },
+
     create(api) {
       const S = {
         az: -1.02, ang: 0.075, dist: 92,
@@ -93,6 +100,9 @@
         state() {
           return {
             az: Number(S.az.toFixed(3)), ang: Number(S.ang.toFixed(3)),
+            /* dist 是相机距离，也就是滚轮/双指捏合控制的那个「远近」。
+               暴露出来才能断言「捏合真的拉近了」—— 否则只能间接看画面，很容易假绿。 */
+            dist: Number(S.dist.toFixed(2)),
             vis: Number(vis().toFixed(3)), thick: Number(S.thick.toFixed(3)),
             phase: S.phase, chest: S.found.chest, irregular: S.found.irregular,
             targets: S.hits.map(h => h.key),

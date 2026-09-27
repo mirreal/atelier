@@ -76,6 +76,10 @@
     goal: '读完这最后五页',
     keys: [['空格 / 点击', '翻页']],
 
+    touch: {
+      note: '点「翻页」按钮即可。',
+    },
+
     create(api) {
       const S = { page: 0, t: 0, shown: 0, beats: {} };
 

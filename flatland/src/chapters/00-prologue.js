@@ -40,6 +40,14 @@
       ['拖动画面', '转动'],
     ],
 
+    /* 触屏设备上的操作方式。pad 决定屏幕上出现哪些方向键，
+       padLabels 既当方向键的 aria-label，也当侧栏「操作」卡片的说明。 */
+    touch: {
+      pad: 'lr',
+      padLabels: { left: '逆时针', right: '顺时针' },
+      note: '也可以直接用手指拖动画面转动。',
+    },
+
     create(api) {
       // 先采样一整圈，拿到真实的极值，再据此定判据（免得写死一个拍脑袋的阈值）
       let tMin = Infinity, tMax = -Infinity;

@@ -276,6 +276,79 @@ canvas{ display:block; width:100%; height:100%; border-radius:7px; background:#f
 }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
+/* ---------------- 触控层（移动端） ----------------
+   桌面端是键盘加鼠标，手机上两样都没有，所以把按键搬到屏幕上。
+   这一层盖在画布上（.canvasWrap 是 position:relative），但自身 pointer-events:none，
+   只有按钮本身可点 —— 否则会挡住场景自己的拖动。
+   显示与否由引擎写在 #touch 的 hidden 属性上（[hidden] 全局规则负责真的藏起来）。 */
+.touch{
+  position:absolute; inset:0; z-index:5; pointer-events:none;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:10px;
+  /* 刘海屏/圆角屏：按钮要躲开系统手势区，否则贴着屏幕边缘会被系统抢走 */
+  padding:8px;
+  padding-bottom:calc(8px + env(safe-area-inset-bottom, 0px));
+  padding-left:calc(8px + env(safe-area-inset-left, 0px));
+  padding-right:calc(8px + env(safe-area-inset-right, 0px));
+}
+.tbtn{
+  --t:clamp(50px, 13.5vw, 64px);
+  width:var(--t); height:var(--t); min-width:44px; min-height:44px;
+  display:flex; align-items:center; justify-content:center;
+  /* 半透明是有意的：虚拟键盖在画布上，而画布边角常常有场景自己画的信息
+     （第一章右下角的罗盘、左下角的明暗刻度）。底色太实就会把它们糊掉。
+     实测 .74 时罗盘基本看不见，降到 .58 后能透出来，同时按钮本身仍然清楚。 */
+  border:1.5px solid rgba(28,25,21,.2); border-radius:15px;
+  background:rgba(255,253,247,.58); backdrop-filter:blur(7px);
+  color:var(--ink); font-size:20px; line-height:1; padding:0;
+  box-shadow:0 3px 12px -6px rgba(28,25,21,.28);
+  pointer-events:auto; cursor:pointer;
+  touch-action:none; -webkit-user-select:none; user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .1s ease, transform .08s ease, border-color .1s ease, color .1s ease;
+}
+.tbtn.down{ background:var(--ink); border-color:var(--ink); color:#fbf7ec; transform:scale(.94); }
+.tbtn:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+.touchPad{ display:grid; gap:7px; }
+/* 四向盘：3×3 里只填四边，中间留空，看着就是个十字键 */
+.pad-all{ grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
+.pad-all .d-up{ grid-area:1 / 2; }
+.pad-all .d-left{ grid-area:2 / 1; }
+.pad-all .d-right{ grid-area:2 / 3; }
+.pad-all .d-down{ grid-area:3 / 2; }
+.pad-lr{ grid-template-columns:repeat(2,1fr); }
+.pad-ud{ grid-template-columns:1fr; }
+
+.touchActs{ display:flex; gap:8px; align-items:flex-end; margin-left:auto; }
+.tbtn.act{ width:auto; padding:0 15px; font-size:13.5px; letter-spacing:.02em; white-space:nowrap; }
+/* 需要「按住」的键（第三章的触摸）标一条下划线，跟点一下的动作区分开 */
+.tbtn.act.hold{ border-bottom-width:3px; border-bottom-color:rgba(28,25,21,.34); }
+.tbtn.act.hold.down{ border-bottom-color:#fbf7ec; }
+
+/* 「操作」卡片里的触控行 */
+.keys .row.act .chip{
+  font-size:11.5px; padding:2px 8px; border-radius:6px; white-space:nowrap;
+  background:var(--ink); color:#fbf7ec;
+}
+.keys .row.note span{ font-size:11.5px; color:var(--ink-3); line-height:1.6; }
+
+/* 触屏设备的通用加大：手指的落点比鼠标粗得多，44px 是下限 */
+@media (pointer:coarse){
+  .btn{ min-height:44px; padding:10px 16px; font-size:14.5px; }
+  .btn.sm{ min-height:40px; padding:9px 14px; font-size:13.5px; }
+  .seg button{ min-height:44px; padding:10px 14px; }
+  .swatch{ width:44px; height:44px; }
+  .dots{ gap:8px; }
+  .dots i{ width:16px; height:16px; border-width:1.8px; }
+  input[type=range]{ height:36px; }
+  .pickItem{ min-height:56px; }
+  /* 手指按住时浏览器会选中文字/弹出菜单，画面上很干扰 */
+  .hud,.dots,.touch{ -webkit-user-select:none; user-select:none; }
+  .hud,.touch{ -webkit-tap-highlight-color:transparent; }
+}
+body{ overscroll-behavior-y:none; -webkit-text-size-adjust:100%; }
+
 /* ---------------- 响应式 ---------------- */
 @media (max-width:1180px){
   .side{ flex:0 0 288px; }
@@ -304,6 +377,27 @@ canvas{ display:block; width:100%; height:100%; border-radius:7px; background:#f
 @media (min-width:981px) and (max-width:1120px){
   .side{ flex:0 0 262px; }
   .card{ padding:11px 12px; }
+}
+
+/* 横屏手机：宽而矮（典型 844×390）。
+   两个问题必须一起解决：
+   1) 竖排布局（画布在上、说明在下）会把画布压到 300px 上下，说明栏还得往下滚很远
+      才看得到 —— 横屏本来就是「宽」，改回左右并排，画布拿满高度、说明栏收到右侧自己滚。
+   2) 虚拟键默认最大 64px（按视口宽度算的），在 300px 高的画布里三行就是 206px，
+      占掉近七成，玩法被压没了。这里改成按矮视口给固定小尺寸。
+   放在 980/620 那两条之后，靠「同特异性、后者胜」覆盖它们。 */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+  .grid{ flex-direction:row; overflow:hidden; padding:7px 9px 9px; gap:9px; }
+  .stage{ flex:1 1 auto; padding:8px; gap:7px; }
+  .canvasWrap{ flex:1 1 auto; height:auto; min-height:0; }
+  .side{ flex:0 0 248px; overflow-y:auto; }
+  .hud{ max-height:108px; overflow-y:auto; }
+  .tbtn{ --t:46px; font-size:16px; border-radius:12px; }
+  .tbtn.act{ font-size:12px; padding:0 11px; }
+  .touch{ padding:6px; padding-bottom:calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .touchPad{ gap:5px; }
+  .card{ padding:10px 11px; }
+  .ticker{ max-height:120px; }
 }
 
 @media (prefers-reduced-motion: reduce){

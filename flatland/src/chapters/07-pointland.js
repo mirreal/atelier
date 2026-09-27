@@ -60,6 +60,10 @@
       ['空格', '继续'],
     ],
 
+    touch: {
+      note: '点选项说话即可；开场的等待会自动跳过。',
+    },
+
     create(api) {
       const S = {
         round: 0, phase: 'open', t: 0, glow: 0.45, ripples: [],

@@ -76,6 +76,12 @@
       ['点击选项', '作答'],
     ],
 
+    touch: {
+      pad: 'ud',
+      padLabels: { up: '升高', down: '降低' },
+      note: '也可以拖动画布下方的滑块，或直接在画面上上下拖动。',
+    },
+
     create(api) {
       const S = {
         phase: 'demo', t: 0, phaseT: 0,

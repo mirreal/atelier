@@ -24,14 +24,18 @@
     --shadow:0 1px 2px rgba(60,45,30,.05), 0 8px 24px rgba(60,45,30,.06);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0}
+  html,body{margin:0;padding:0;overscroll-behavior:none}
   body{
     background:var(--bg);
     color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
     font-size:15px;line-height:1.6;
     -webkit-font-smoothing:antialiased;
+    -webkit-user-select:none;user-select:none;   /* 移动端避免长按选中文字 */
+    -webkit-text-size-adjust:100%;
   }
+  textarea,input{-webkit-user-select:text;user-select:text}
+  .boardWrap,.pad,.bar{-webkit-user-select:none;user-select:none}
   .wrap{max-width:760px;margin:0 auto;padding:22px 16px 40px}
   .top{margin-bottom:18px}
   .top h1{font-size:23px;margin:0 0 4px;letter-spacing:.5px;font-weight:650}
@@ -172,11 +176,51 @@
   .chip.good{border-color:#C9DCCD;background:var(--ok-soft)}
   .empty{color:var(--muted);font-size:13px}
   .foot{margin-top:22px;color:var(--muted);font-size:12px;text-align:center}
+  /* ---------- 移动端 ---------- */
   @media (max-width:560px){
-    .wrap{padding:16px 10px 30px}
+    .wrap{padding:14px 10px 26px}
     .panel{padding:14px 12px}
+    .prompt{padding:10px 12px;margin-bottom:10px}
     .prompt .zh{font-size:19px}
-    .stat{flex:1 1 72px;min-width:72px}
+    .stats{gap:6px;margin-bottom:10px}
+    .stat{flex:1 1 56px;min-width:56px;padding:4px 7px}
+    .stat .v{font-size:14.5px}
+    .stat .k{font-size:10px}
+    .speedbar{margin-top:4px}
+    .hearts{margin-top:4px}
+    #sSpeedTxt{display:none}          /* 小屏省一行 */
+    .prompt{padding:9px 11px;margin-bottom:9px}
+    .prompt .zh{font-size:18px}
+    .btn.small{padding:10px 16px}
+    .bar{margin-top:10px;gap:8px}
+    .grid4{gap:8px}
+  }
+  /* 游戏中：收起页头，把高度全留给棋盘 */
+  body.playing .top{display:none}
+  /* 触控键：保证 44px 以上命中区 */
+  .pad{width:174px;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:6px;padding-bottom:env(safe-area-inset-bottom)}
+  .pad button{touch-action:none;font-size:19px}
+  @media (max-height:720px){
+    .pad{width:156px;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px);gap:5px;margin-top:8px}
+    .pad button{font-size:17px}
+  }
+  /* 横屏：高度最紧张，方向键改为右下角悬浮，不挤占棋盘高度 */
+  @media (orientation:landscape) and (max-height:560px){
+    .wrap{padding:10px}
+    .panel{padding:10px 12px}
+    .stats{gap:6px;margin-bottom:8px}
+    .stat{flex:1 1 60px;min-width:60px;padding:3px 7px}
+    .stat .v{font-size:14px}
+    .stat .k{font-size:10px}
+    #sSpeedTxt{display:none}
+    .prompt{padding:7px 10px;margin-bottom:8px}
+    .prompt .zh{font-size:17px}
+    .pad{
+      position:fixed;right:14px;bottom:14px;margin:0;z-index:5;
+      width:150px;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(3,46px);gap:4px;
+    }
+    .pad button{font-size:16px;background:rgba(255,255,255,.94)}
+    .bar{margin-top:8px}
   }
 </style>
 </head>
@@ -265,7 +309,7 @@
       <button class="right" data-dir="right">▶</button>
     </div>
 
-    <div class="row bar">
+    <div class="row bar" id="bar">
       <button id="pauseBtn" class="btn small">暂停</button>
       <button id="quitBtn" class="btn small ghost">返回菜单</button>
     </div>
@@ -392,13 +436,13 @@ var BOOKS = [
 ];
 
 var DIFFS = [
-  { id:'easy',   name:'轻松', desc:'慢速 · 2 个干扰 · 5 命', interval:210, distract:2, penalty:0.06, lives:5, levels:10, showFirst:true  },
-  { id:'normal', name:'普通', desc:'常速 · 3 个干扰 · 3 命', interval:165, distract:3, penalty:0.10, lives:3, levels:15, showFirst:false },
-  { id:'hard',   name:'挑战', desc:'快速 · 4 个干扰 · 2 命', interval:128, distract:4, penalty:0.14, lives:2, levels:20, showFirst:false },
-  { id:'crazy',  name:'疯狂', desc:'极速 · 5 个干扰 · 1 命', interval:102, distract:5, penalty:0.18, lives:1, levels:20, showFirst:false }
+  { id:'easy',   name:'轻松', desc:'慢速 · 2 个干扰 · 5 命', interval:300, distract:2, penalty:0.05, lives:5, levels:10, showFirst:true  },
+  { id:'normal', name:'普通', desc:'常速 · 3 个干扰 · 3 命', interval:240, distract:3, penalty:0.08, lives:3, levels:15, showFirst:false },
+  { id:'hard',   name:'挑战', desc:'较快 · 4 个干扰 · 2 命', interval:195, distract:4, penalty:0.11, lives:2, levels:20, showFirst:false },
+  { id:'crazy',  name:'疯狂', desc:'快 · 5 个干扰 · 1 命',   interval:160, distract:5, penalty:0.14, lives:1, levels:20, showFirst:false }
 ];
 
-var MIN_INTERVAL = 58;
+var MIN_INTERVAL = 105;   // 加速下限，保证再快也还能操作
 
 /* =========================================================
    工具
@@ -530,24 +574,59 @@ function getBook(id){
    画布
    ========================================================= */
 var cv = $('board'), ctx = cv.getContext('2d');
-function resizeCanvas(){
-  // 先把画布宽度归零再测量，避免旧画布把父容器撑开导致读数偏小
-  cv.style.width = '0px';
-  var wrapW = cv.parentNode.clientWidth || 0;
-  var maxW = Math.min(wrapW > 120 ? wrapW : window.innerWidth - 60, 760);
-  cell = Math.max(15, Math.floor(maxW / cols));
-  var w = cell*cols, h = cell*rows;
-  var dpr = Math.min(window.devicePixelRatio||1, 2);
-  cv.style.width = w+'px'; cv.style.height = h+'px';
-  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
 function gridSizeForWidth(){
   var w = window.innerWidth;
   // 屏幕窄时用更小的网格，保证每个字母格子足够大、看得清
   if(w < 400){ cols = 13; rows = 11; }
   else if(w < 560){ cols = 15; rows = 11; }
   else { cols = 20; rows = 14; }
+}
+// 棋盘下方被方向键 / 按钮栏占用的高度
+function reserveBelow(){
+  var pad = $('pad'), bar = $('bar'), h = 24;
+  if(pad && pad.classList.contains('show')){
+    var pos = window.getComputedStyle(pad).position;
+    if(pos !== 'fixed' && pos !== 'absolute') h += pad.offsetHeight + 14;  // 悬浮的方向键不占高度
+  }
+  if(bar) h += bar.offsetHeight + 8;
+  return h;
+}
+function resizeCanvas(){
+  // 先把画布宽度归零再测量，避免旧画布把父容器撑开导致读数偏小
+  cv.style.width = '0px';
+  cv.style.height = '0px';
+  var wrapW = cv.parentNode.clientWidth || 0;
+  var maxW = Math.min(wrapW > 120 ? wrapW : window.innerWidth - 60, 760);
+  var cw = Math.floor(maxW / cols);
+  // 高度约束：棋盘要能塞进一屏，否则手机上得滚动着玩
+  var rect = cv.getBoundingClientRect();
+  var availH = window.innerHeight - Math.max(0, rect.top) - reserveBelow();
+  if(availH < 150) availH = 150;   // 高度实在不够时压格子，不撑破一屏
+  var ch = Math.floor(availH / rows);
+  // 高度不够就减少行数，而不是把格子压得看不清
+  while(rows > 8 && Math.min(cw, ch) < 22 && Math.floor(availH / (rows-1)) > ch){
+    rows--; ch = Math.floor(availH / rows);
+  }
+  cell = Math.max(14, Math.min(cw, ch));
+  var w = cell*cols, h = cell*rows;
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  cv.style.width = w+'px'; cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  clampToGrid();
+}
+// 网格尺寸变化后，把蛇和词块拉回合法范围
+function clampToGrid(){
+  for(var i=0;i<S.snake.length;i++){
+    S.snake[i].x = clamp(S.snake[i].x, 0, cols-1);
+    S.snake[i].y = clamp(S.snake[i].y, 0, rows-1);
+  }
+  var keep = [];
+  for(var j=0;j<S.blocks.length;j++){
+    var b = S.blocks[j];
+    if(b.y < rows && b.x + b.len <= cols) keep.push(b);
+  }
+  if(keep.length !== S.blocks.length) S.blocks = keep;
 }
 function updatePad(){
   var coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
@@ -669,6 +748,8 @@ function startGame(){
   layoutRound(false);
   show('game');
   hideOverlay();
+  document.body.classList.add('playing');
+  updatePad();
   resizeCanvas();
   updateStats();
   ensureAudio();
@@ -1017,7 +1098,7 @@ cv.addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive:fa
 cv.addEventListener('touchend', function(e){
   var t = e.changedTouches[0];
   var dx = t.clientX - tsx, dy = t.clientY - tsy;
-  if(Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+  if(Math.abs(dx) < 16 && Math.abs(dy) < 16) return;   // 阈值小一点，手机上更跟手
   if(Math.abs(dx) > Math.abs(dy)) turn(dx > 0 ? 'right' : 'left');
   else turn(dy > 0 ? 'down' : 'up');
 }, {passive:true});
@@ -1033,7 +1114,11 @@ Array.prototype.forEach.call(document.querySelectorAll('#pad button'), function(
    ========================================================= */
 $('startBtn').onclick = function(){ ensureAudio(); startGame(); };
 $('pauseBtn').onclick = togglePause;
-$('quitBtn').onclick = function(){ S.running = false; S.paused = false; show('menu'); };
+$('quitBtn').onclick = function(){
+  S.running = false; S.paused = false;
+  document.body.classList.remove('playing');
+  show('menu');
+};
 $('againBtn').onclick = function(){ startGame(); };
 $('backBtn').onclick = function(){ show('menu'); };
 $('soundChk').onchange = function(){ soundOn = this.checked; if(soundOn) beep(660,0.08,'sine',0.05); };
