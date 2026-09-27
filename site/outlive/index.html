@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>超越百岁 · Outlive — 一份互动解读</title>
+<meta name="description" content="彼得·阿提亚《超越百岁》互动解读：四骑士、医学 3.0、百岁老人十项全能、运动处方、营养与睡眠。含可用的计算器与自测。">
+<style>
+:root{
+  --bg:#FAF7F1;
+  --bg-2:#F3ECE1;
+  --bg-3:#EDE4D6;
+  --card:#FFFFFF;
+  --ink:#221E19;
+  --ink-2:#5A5248;
+  --ink-3:#8C8274;
+  --line:#E4DACA;
+  --line-2:#D3C6B2;
+  --rust:#C1440E;
+  --rust-d:#8E2F08;
+  --rust-l:#F6E4DA;
+  --gold:#A9721A;
+  --gold-d:#7A5110;
+  --gold-l:#F7EBD6;
+  --green:#2F6B3C;
+  --green-d:#1F4A29;
+  --green-l:#E3EFE5;
+  --blue:#2B5C88;
+  --blue-d:#1D4062;
+  --blue-l:#E2ECF5;
+  --plum:#7A3B5C;
+  --plum-l:#F4E6EE;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  --serif:"Songti SC","STSong","Noto Serif SC",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --shadow:0 1px 2px rgba(60,45,25,.05),0 8px 24px -12px rgba(60,45,25,.18);
+  --r:14px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img,svg{max-width:100%}
+button{font-family:inherit;font-size:inherit;color:inherit}
+a{color:var(--rust-d)}
+
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--rust),var(--gold));z-index:60;transition:width .12s linear}
+
+.topnav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,247,241,.88);backdrop-filter:saturate(160%) blur(12px);
+  -webkit-backdrop-filter:saturate(160%) blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.topnav .navin{
+  max-width:1120px;margin:0 auto;
+  padding-left:24px;padding-right:24px;
+  display:flex;align-items:center;gap:18px;height:52px;
+}
+.brand{
+  font-family:var(--serif);font-size:15px;font-weight:700;letter-spacing:.06em;
+  color:var(--ink);white-space:nowrap;flex:0 0 auto;
+}
+.brand span{color:var(--rust)}
+.navlinks{
+  display:flex;gap:2px;overflow-x:auto;flex:1 1 auto;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.navlinks::-webkit-scrollbar{display:none}
+.navlinks a{
+  flex:0 0 auto;padding:5px 10px;border-radius:8px;
+  font-size:13px;color:var(--ink-2);text-decoration:none;white-space:nowrap;
+  transition:background .2s,color .2s;
+}
+.navlinks a:hover{background:var(--bg-3);color:var(--ink)}
+.navlinks a.on{background:var(--rust-l);color:var(--rust-d);font-weight:600}
+
+.wrap{max-width:1120px;margin:0 auto;padding-left:24px;padding-right:24px}
+.narrow{max-width:760px}
+section{padding-top:84px;padding-bottom:84px}
+section + section{border-top:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 14px;
+}
+h2{
+  font-family:var(--serif);font-size:clamp(26px,3.6vw,38px);line-height:1.28;
+  margin:0 0 18px;font-weight:700;letter-spacing:.01em;
+}
+h3{font-size:17.5px;margin:0 0 10px;font-weight:650;letter-spacing:.01em}
+.lede{font-size:17.5px;line-height:1.8;color:var(--ink-2);margin:0 0 28px;max-width:70ch}
+p{margin:0 0 16px}
+.muted{color:var(--ink-2)}
+.small{font-size:13.5px;line-height:1.7;color:var(--ink-3)}
+strong{font-weight:650}
+.hl{background:linear-gradient(180deg,transparent 62%,var(--gold-l) 62%);padding:0 .12em}
+
+.hero{position:relative;overflow:hidden;padding-top:66px;padding-bottom:56px;border-top:none}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:44px;align-items:center}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(46px,8.2vw,86px);line-height:1.02;
+  margin:6px 0 4px;font-weight:700;letter-spacing:.01em;
+}
+.hero .en{
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--rust);margin:0 0 20px;
+}
+.hero .byline{font-size:14px;color:var(--ink-2);margin:0 0 26px}
+.hero .byline b{font-weight:650;color:var(--ink)}
+.hero .claim{
+  font-size:clamp(17px,2.1vw,20px);line-height:1.72;color:var(--ink);
+  border-left:3px solid var(--rust);padding-left:18px;margin:0 0 28px;max-width:46ch;
+}
+.hero .claim em{font-style:normal;color:var(--rust-d);font-weight:650}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--card);color:var(--ink);text-decoration:none;font-size:14.5px;font-weight:600;
+  cursor:pointer;transition:transform .16s,box-shadow .2s,background .2s,border-color .2s;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);border-color:var(--ink-3)}
+.btn.primary{background:var(--rust);border-color:var(--rust);color:#fff}
+.btn.primary:hover{background:var(--rust-d);border-color:var(--rust-d)}
+.hero-fig{margin:0}
+.hero-fig figcaption{font-size:12.5px;color:var(--ink-3);margin-top:10px;line-height:1.6}
+
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:22px;box-shadow:0 1px 2px rgba(60,45,25,.03);
+}
+.card h3{margin-top:0}
+.card p:last-child{margin-bottom:0}
+
+.panel{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px;box-shadow:var(--shadow);
+}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.panel-head h3{margin:0}
+
+.chartbox{position:relative}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.lg{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 13px;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--card);font-size:13px;cursor:pointer;
+  transition:background .2s,border-color .2s,opacity .2s,transform .16s;
+}
+.lg:hover{transform:translateY(-1px)}
+.lg i{width:16px;height:3px;border-radius:2px;display:inline-block;background:currentColor}
+.lg.dim{opacity:.42}
+.lg.k0{color:var(--rust-d)}
+.lg.k1{color:var(--gold-d)}
+.lg.k2{color:var(--green-d)}
+.readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.ro{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg)}
+.ro .n{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1.2}
+.ro .t{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.ro.k0 .n{color:var(--rust-d)}
+.ro.k1 .n{color:var(--gold-d)}
+.ro.k2 .n{color:var(--green-d)}
+
+.rider{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .18s;
+  position:relative;overflow:hidden;
+}
+.rider::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc);opacity:.85}
+.rider:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--line-2)}
+.rider.open{border-color:var(--acc);box-shadow:var(--shadow)}
+.rider .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rider .ic{width:38px;height:38px;flex:0 0 auto}
+.rider .num{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.14em}
+.rider h3{margin:0;font-size:16.5px}
+.rider .en-name{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin-top:2px}
+.rider .sum{font-size:14px;color:var(--ink-2);margin:0;line-height:1.7}
+.rider .more{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.3,.8,.3,1),opacity .3s;opacity:0}
+.rider.open .more{max-height:620px;opacity:1}
+.rider .more-in{padding-top:14px;margin-top:14px;border-top:1px dashed var(--line-2)}
+.rider .more dl{margin:0;font-size:13.5px}
+.rider .more dt{font-weight:650;font-size:12px;letter-spacing:.06em;color:var(--acc-d);margin-top:10px;text-transform:uppercase}
+.rider .more dt:first-child{margin-top:0}
+.rider .more dd{margin:2px 0 0;color:var(--ink-2);line-height:1.7}
+.rider .tap{font-size:12px;color:var(--ink-3);margin-top:12px;display:flex;align-items:center;gap:6px}
+.rider .tap svg{transition:transform .3s}
+.rider.open .tap svg{transform:rotate(180deg)}
+
+.pyr{display:flex;flex-direction:column;gap:8px;margin:0}
+.pl{
+  border-radius:10px;padding:14px 18px;border:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;cursor:pointer;background:var(--card);
+  transition:transform .18s,box-shadow .2s,border-color .2s;
+}
+.pl:hover{transform:translateX(3px);box-shadow:var(--shadow)}
+.pl.on{border-color:var(--acc);box-shadow:var(--shadow)}
+.pl .pnum{font-family:var(--mono);font-size:12px;color:var(--ink-3);flex:0 0 auto;width:22px}
+.pl .pt{font-weight:650;font-size:15.5px}
+.pl .pd{font-size:13px;color:var(--ink-2);margin-left:auto;text-align:right}
+
+.calc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:7px}
+.field .row{display:flex;align-items:center;gap:12px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg-3);outline:none;margin:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--rust);border:3px solid #fff;box-shadow:0 1px 4px rgba(60,45,25,.35);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--rust);border:3px solid #fff;cursor:pointer}
+.val{font-family:var(--mono);font-size:19px;font-weight:700;min-width:76px;text-align:right;color:var(--rust-d)}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:var(--card);flex-wrap:wrap}
+.seg button{padding:8px 14px;border:0;background:transparent;cursor:pointer;font-size:13.5px;color:var(--ink-2);border-right:1px solid var(--line-2);transition:background .2s,color .2s}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--rust);color:#fff;font-weight:600}
+.seg button:hover:not(.on){background:var(--bg-3)}
+.out{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:20px}
+.out .big{font-family:var(--mono);font-size:38px;font-weight:700;line-height:1.1;color:var(--rust-d);letter-spacing:-.01em}
+.out .big span{font-size:16px;font-weight:600;color:var(--ink-2);margin-left:4px}
+.out .cap{font-size:13.5px;color:var(--ink-2);margin:8px 0 0;line-height:1.65}
+.out .hint{font-size:12.5px;color:var(--ink-3);margin:12px 0 0;padding-top:12px;border-top:1px dashed var(--line-2);line-height:1.6}
+
+.deca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.di{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 15px;
+  border:1px solid var(--line);border-radius:11px;background:var(--card);
+  cursor:pointer;transition:background .2s,border-color .2s,transform .16s;text-align:left;
+}
+.di:hover{transform:translateY(-1px);border-color:var(--line-2)}
+.di .box{width:20px;height:20px;flex:0 0 auto;border-radius:6px;border:1.6px solid var(--line-2);margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+.di .box svg{opacity:0;transition:opacity .2s;width:12px;height:12px}
+.di .txt{font-size:14px;line-height:1.55}
+.di .txt b{font-weight:650}
+.di .txt em{font-style:normal;color:var(--ink-3);font-size:12.5px;display:block;margin-top:2px}
+.di.on{background:var(--green-l);border-color:var(--green)}
+.di.on .box{background:var(--green);border-color:var(--green)}
+.di.on .box svg{opacity:1}
+.di.on .txt em{color:var(--green-d)}
+.scorebar{display:flex;align-items:center;gap:18px;margin-top:20px;padding:18px 20px;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;flex-wrap:wrap}
+.scorebar .sc{font-family:var(--mono);font-size:34px;font-weight:700;color:var(--green-d);line-height:1}
+.scorebar .sc small{font-size:15px;color:var(--ink-3);font-weight:600}
+.scorebar .msg{font-size:14.5px;color:var(--ink-2);flex:1 1 260px;line-height:1.65;margin:0}
+.meter{height:8px;border-radius:4px;background:var(--bg-3);overflow:hidden;width:100%;margin-top:4px}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--green));width:0;transition:width .4s cubic-bezier(.3,.8,.3,1)}
+
+.bars{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.bar-row{display:grid;grid-template-columns:104px 1fr 54px;align-items:center;gap:12px}
+.bar-row .lbl{font-size:13px;color:var(--ink-2);text-align:right;line-height:1.35}
+.bar-row .track{height:22px;background:var(--bg-3);border-radius:6px;overflow:hidden}
+.bar-row .fill{display:block;height:100%;border-radius:6px;width:0;transition:width .8s cubic-bezier(.25,.8,.3,1)}
+.bar-row .v{font-family:var(--mono);font-size:13.5px;font-weight:700;color:var(--ink-2)}
+.bar-row.top .fill{background:linear-gradient(90deg,var(--green),var(--green-d))}
+.bar-row.top .v{color:var(--green-d)}
+.bar-row.low .fill{background:linear-gradient(90deg,#D9825A,var(--rust))}
+.bar-row.low .v{color:var(--rust-d)}
+.bar-row.mid .fill{background:linear-gradient(90deg,#D9B36A,var(--gold))}
+.bar-row.mid .v{color:var(--gold-d)}
+
+blockquote{margin:0;padding:22px 24px;background:var(--plum-l);border-left:3px solid var(--plum);border-radius:0 12px 12px 0;font-family:var(--serif);font-size:17px;line-height:1.75;color:var(--ink)}
+blockquote cite{display:block;font-family:var(--sans);font-style:normal;font-size:13px;color:var(--ink-3);margin-top:12px}
+
+.q{border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--card);margin-bottom:14px}
+.q .qh{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.q .qn{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:var(--ink);width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;margin-top:3px}
+.q .qt{font-size:15.5px;font-weight:600;line-height:1.6}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:11px;padding:11px 14px;border:1px solid var(--line);border-radius:9px;background:var(--bg);cursor:pointer;text-align:left;font-size:14.5px;transition:background .2s,border-color .2s,transform .16s}
+.opt:hover{background:var(--bg-2);border-color:var(--line-2)}
+.opt .key{font-family:var(--mono);font-size:12px;font-weight:700;width:20px;height:20px;flex:0 0 auto;border-radius:5px;background:var(--bg-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center}
+.opt.right{background:var(--green-l);border-color:var(--green)}
+.opt.right .key{background:var(--green);color:#fff}
+.opt.wrong{background:var(--rust-l);border-color:var(--rust)}
+.opt.wrong .key{background:var(--rust);color:#fff}
+.opt.locked{cursor:default}
+.opt.locked:hover{transform:none}
+.expl{font-size:13.5px;color:var(--ink-2);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-2);display:none;line-height:1.7}
+.expl.show{display:block}
+.expl b{color:var(--green-d)}
+
+.acts{display:grid;gap:9px}
+.act{display:flex;align-items:flex-start;gap:13px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:11px;cursor:pointer;text-align:left;transition:background .2s,border-color .2s,transform .16s}
+.act:hover{transform:translateX(3px);border-color:var(--line-2)}
+.act .box{width:20px;height:20px;flex:0 0 auto;border-radius:6px;border:1.6px solid var(--line-2);margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+.act .box svg{opacity:0;transition:opacity .2s;width:12px;height:12px}
+.act.on{background:var(--green-l);border-color:var(--green)}
+.act.on .box{background:var(--green);border-color:var(--green)}
+.act.on .box svg{opacity:1}
+.act .at{display:block;font-size:14.5px;font-weight:600;line-height:1.5}
+.act .ad{display:block;font-size:13px;color:var(--ink-2);margin-top:2px;line-height:1.6}
+
+footer{border-top:1px solid var(--line);background:var(--bg-2);padding-top:52px;padding-bottom:60px}
+footer h3{font-size:14px;letter-spacing:.04em}
+.srcs{font-size:13px;line-height:1.85;color:var(--ink-2);margin:0;padding-left:20px}
+.srcs li{margin-bottom:5px}
+.disc{font-size:12.5px;color:var(--ink-3);line-height:1.75;margin-top:26px;padding-top:20px;border-top:1px solid var(--line-2)}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+@media (max-width:1000px){
+  .hero-grid{grid-template-columns:1fr;gap:32px}
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .calc{grid-template-columns:1fr;gap:20px}
+}
+@media (max-width:760px){
+  body{font-size:15.5px}
+  section{padding-top:60px;padding-bottom:60px}
+  .wrap{padding-left:18px;padding-right:18px}
+  .topnav .navin{padding-left:18px;padding-right:18px;gap:12px}
+  .g3,.g2{grid-template-columns:1fr}
+  .deca{grid-template-columns:1fr}
+  .readout{grid-template-columns:1fr}
+  .bar-row{grid-template-columns:84px 1fr 48px;gap:9px}
+  .bar-row .lbl{font-size:12px}
+  .hero{padding-top:44px;padding-bottom:40px}
+  .hero .claim{padding-left:14px}
+  .pl{flex-wrap:wrap}
+  .pl .pd{margin-left:36px;text-align:left;width:100%}
+}
+@media (max-width:420px){
+  .g4{grid-template-columns:1fr}
+  .scorebar{gap:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<nav class="topnav" aria-label="章节导航">
+  <div class="navin">
+    <div class="brand">超越<span>百岁</span></div>
+    <div class="navlinks" id="navlinks">
+      <a href="#s1">起点</a>
+      <a href="#s2">医学 3.0</a>
+      <a href="#s3">四骑士</a>
+      <a href="#s4">运动</a>
+      <a href="#s5">十项全能</a>
+      <a href="#s6">营养</a>
+      <a href="#s7">睡眠</a>
+      <a href="#s8">情绪</a>
+      <a href="#s9">自测</a>
+      <a href="#s10">行动</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">一份互动解读 · 非原书内容</p>
+        <h1>超越百岁</h1>
+        <p class="en">Outlive · The Science and Art of Longevity</p>
+        <p class="byline"><b>彼得·阿提亚</b>（Peter Attia, MD）著 · 比尔·吉福德 合著 · 中译出版社 2024</p>
+        <p class="claim">我们大多数人不是被「衰老」杀死的，而是被<em>四类疾病</em>杀死的——而它们在你感觉完全良好的时候，已经悄悄开始了布局。</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#s1">从头开始读</a>
+          <a class="btn" href="#s9">直接去自测</a>
+        </div>
+      </div>
+      <figure class="hero-fig">
+        <svg viewBox="0 0 380 300" role="img" aria-label="示意：寿命在延长，但健康寿命的延长更缓慢，中间形成一段边缘十年">
+          <defs>
+            <linearGradient id="gGap" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#C1440E" stop-opacity=".06"/>
+              <stop offset="1" stop-color="#C1440E" stop-opacity=".30"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="380" height="300" fill="#F3ECE1" rx="16"/>
+          <text x="26" y="38" font-family="ui-monospace,monospace" font-size="10" letter-spacing="1.6" fill="#8C8274">HEALTHSPAN vs LIFESPAN</text>
+          <text x="26" y="60" font-family="-apple-system,PingFang SC,sans-serif" font-size="13" font-weight="650" fill="#221E19">多出来的那些年，你在做什么？</text>
+
+          <path d="M 34 236 L 352 236" stroke="#D3C6B2" stroke-width="1"/>
+          <path d="M 34 236 L 34 92" stroke="#D3C6B2" stroke-width="1"/>
+          <text x="34" y="256" font-family="ui-monospace,monospace" font-size="9.5" fill="#8C8274">出生</text>
+          <text x="322" y="256" font-family="ui-monospace,monospace" font-size="9.5" fill="#8C8274">晚年</text>
+
+          <path d="M 34 236 C 120 226 200 186 250 146 C 290 114 322 100 348 96 L 348 236 Z" fill="url(#gGap)"/>
+          <path d="M 34 236 C 120 226 200 186 250 146 C 290 114 322 100 348 96" fill="none" stroke="#C1440E" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M 34 236 C 120 230 210 214 262 196 C 300 182 326 172 348 168" fill="none" stroke="#A9721A" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="6 4"/>
+
+          <circle cx="348" cy="96" r="4" fill="#C1440E"/>
+          <circle cx="348" cy="168" r="4" fill="#A9721A"/>
+          <text x="288" y="88" font-family="-apple-system,PingFang SC,sans-serif" font-size="11.5" font-weight="650" fill="#8E2F08">寿命</text>
+          <text x="286" y="199" font-family="-apple-system,PingFang SC,sans-serif" font-size="11.5" font-weight="650" fill="#7A5110">健康寿命</text>
+
+          <path d="M 318 102 L 318 162" stroke="#C1440E" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="182" y="136" font-family="-apple-system,PingFang SC,sans-serif" font-size="11.5" font-weight="700" fill="#8E2F08">边缘十年</text>
+        </svg>
+        <figcaption>「边缘十年」（Marginal Decade）——生命最后那十年。问题不在于它能有多长，而在于那十年里你还能做什么。</figcaption>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ============ S1 ============ -->
+<section id="s1">
+  <div class="wrap">
+    <p class="eyebrow reveal">01 · 一个被忽略的事实</p>
+    <h2 class="reveal">活得久，和活得好，是两件事</h2>
+    <div class="narrow">
+      <p class="lede reveal">二十世纪最伟大的医学成就，是把人从「急性死亡」里救了出来：感染、外伤、饥荒。代价是，我们换来了另一种死法——缓慢的、由慢性病主导的退场。</p>
+      <p class="reveal">阿提亚在开篇就把这个问题摆在桌上：一个 40 岁的人，体检报告全部「正常」，血压、血糖、血脂都在参考范围内，他因此感到安心。但参考范围来自<strong>人群的平均值</strong>，而平均值里包含了大量正在走向疾病的人。你的目标不该是「不比别人差」，而是<strong>尽可能远离风险的那一端</strong>。</p>
+      <p class="reveal">于是问题从「我能活多久」变成了另一个更锋利的问题：<span class="hl">在生命的最后十年，我还能自己站起来、自己走路、自己思考吗？</span></p>
+    </div>
+
+    <div class="panel reveal" style="margin-top:32px">
+      <div class="panel-head">
+        <h3>三种人生轨迹：能力储备随时间的变化</h3>
+        <span class="small">点击下方图例切换强调</span>
+      </div>
+      <div class="chartbox">
+        <svg id="chartHS" viewBox="0 0 680 340" role="img" aria-label="三条曲线对比：不投入、平均、主动管理三种生活方式下，身体功能储备随年龄的下降速度与跌破独立生活门槛的时间点"></svg>
+      </div>
+      <div class="legend" id="legendHS">
+        <button class="lg k0" data-k="0" type="button"><i></i>不投入 / 被动</button>
+        <button class="lg k1" data-k="1" type="button"><i></i>平均水平</button>
+        <button class="lg k2" data-k="2" type="button"><i></i>主动管理</button>
+      </div>
+      <div class="readout">
+        <div class="ro k0"><div class="n" id="ro0">—</div><div class="t">跌破独立生活门槛的年龄</div></div>
+        <div class="ro k1"><div class="n" id="ro1">—</div><div class="t">平均水平</div></div>
+        <div class="ro k2"><div class="n" id="ro2">—</div><div class="t">主动管理</div></div>
+      </div>
+      <p class="small" style="margin-top:16px;margin-bottom:0">曲线为<strong>示意模型</strong>，用于表达书中「功能储备随年龄下降、训练可改变下降斜率」的核心论点，非实测数据。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S2 ============ -->
+<section id="s2">
+  <div class="wrap">
+    <p class="eyebrow reveal">02 · 框架</p>
+    <h2 class="reveal">医学 3.0：把干预的时间点提前</h2>
+    <div class="narrow">
+      <p class="lede reveal">阿提亚把医学史切成三段。前两段已经完成了它们的使命，第三段还没真正开始。</p>
+    </div>
+
+    <div class="grid g3 reveal" style="margin-top:30px">
+      <div class="card" style="border-top:3px solid var(--ink-3)">
+        <p class="eyebrow" style="margin-bottom:6px">Medicine 1.0</p>
+        <h3>观察与经验</h3>
+        <p class="muted small">19 世纪中叶之前。医学建立在观察、经验和少量解剖知识之上，对病因几乎一无所知。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--gold)">
+        <p class="eyebrow" style="margin-bottom:6px">Medicine 2.0</p>
+        <h3>循证与对症</h3>
+        <p class="muted small">始于细菌学说。随机对照试验、抗生素、疫苗、外科手术——我们今天熟悉的医学。它的逻辑是：<strong>等你病了，我再治</strong>。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--rust)">
+        <p class="eyebrow" style="margin-bottom:6px">Medicine 3.0</p>
+        <h3>预防与个体化</h3>
+        <p class="muted small">阿提亚主张的下一阶段。在疾病出现之前几十年就开始干预，把每个人的风险单独算清楚。</p>
+      </div>
+    </div>
+
+    <div class="grid g4 reveal" style="margin-top:18px">
+      <div class="card">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--rust);margin-bottom:8px">原则 01</div>
+        <h3 style="font-size:15.5px">预防先于治疗</h3>
+        <p class="muted small">等到症状出现，动脉里的斑块已经积累了三十年。</p>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--rust);margin-bottom:8px">原则 02</div>
+        <h3 style="font-size:15.5px">风险个体化</h3>
+        <p class="muted small">「正常范围」是人群平均值。你的风险要单独算。</p>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--rust);margin-bottom:8px">原则 03</div>
+        <h3 style="font-size:15.5px">目标是健康寿命</h3>
+        <p class="muted small">不只是活得更久，而是让能独立生活的时间更长。</p>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--rust);margin-bottom:8px">原则 04</div>
+        <h3 style="font-size:15.5px">患者是伙伴</h3>
+        <p class="muted small">你是自己健康的决策者，医生是提供信息和工具的人。</p>
+      </div>
+    </div>
+
+    <div class="narrow reveal" style="margin-top:30px">
+      <blockquote>
+        「正常」不等于「最优」。你的化验单上没有箭头，只说明你还没有跨过疾病的诊断线——不说明你正走在最好的那条路上。
+        <cite>— 本页对书中论述的概括</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S3 ============ -->
+<section id="s3">
+  <div class="wrap">
+    <p class="eyebrow reveal">03 · 主要风险</p>
+    <h2 class="reveal">四骑士：绝大多数人真正的死因</h2>
+    <div class="narrow">
+      <p class="lede reveal">阿提亚把 85 岁之前的绝大多数死亡归入四类疾病。它们看起来互不相干，但有一条共同的主线——<strong>你的血管和代谢状态</strong>。</p>
+      <p class="reveal small">点击任意一张卡片展开细节。</p>
+    </div>
+
+    <div class="grid g2 reveal" id="riders" style="margin-top:26px;align-items:start">
+
+      <article class="rider" data-k="0" style="--acc:#C1440E;--acc-d:#8E2F08" tabindex="0" role="button" aria-expanded="false">
+        <div class="top">
+          <svg class="ic" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M20 33C10 26 5 21 5 15.5 5 10.7 8.8 7 13.4 7c2.6 0 4.9 1.2 6.6 3.3C21.7 8.2 24 7 26.6 7 31.2 7 35 10.7 35 15.5 35 21 30 26 20 33Z" fill="none" stroke="#C1440E" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M8 19.5h6l2.5-4.5 3 9 2.5-4.5h10" fill="none" stroke="#C1440E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <div class="num">01 / FOUR HORSEMEN</div>
+            <h3>动脉粥样硬化性心血管疾病</h3>
+            <div class="en-name">ASCVD · 心梗与中风</div>
+          </div>
+        </div>
+        <p class="sum">全球头号死因。斑块在血管壁里悄悄积累了二三十年，第一次「发作」往往就是终点。</p>
+        <div class="more"><div class="more-in">
+          <dl>
+            <dt>为什么危险</dt>
+            <dd>动脉粥样硬化是一个几乎无声的、持续数十年的过程。多数人的第一次临床表现就是心肌梗死或猝死——没有预演。</dd>
+            <dt>阿提亚强调的指标</dt>
+            <dd>ApoB（载脂蛋白 B）、LDL-C、脂蛋白(a)［Lp(a)，主要由基因决定，一生测一次］、hsCRP（高敏 C 反应蛋白，反映炎症）。他主张关注 ApoB 的<strong>颗粒数量</strong>，而不只是 LDL 的胆固醇含量。</dd>
+            <dt>干预方向</dt>
+            <dd>越早越好。生活方式是基础；对高风险者，他明确主张在医生指导下使用降脂药物，把 ApoB 压到远低于常规目标。</dd>
+          </dl>
+        </div></div>
+        <div class="tap">展开细节 <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </article>
+
+      <article class="rider" data-k="1" style="--acc:#7A3B5C;--acc-d:#5A2942" tabindex="0" role="button" aria-expanded="false">
+        <div class="top">
+          <svg class="ic" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="9" fill="none" stroke="#7A3B5C" stroke-width="2.2"/>
+            <circle cx="16" cy="18" r="3.4" fill="none" stroke="#7A3B5C" stroke-width="1.6"/>
+            <circle cx="25" cy="23" r="2.6" fill="none" stroke="#7A3B5C" stroke-width="1.6"/>
+            <path d="M20 5v5M20 30v5M5 20h5M30 20h5M9.4 9.4l3.5 3.5M27.1 27.1l3.5 3.5M30.6 9.4l-3.5 3.5M12.9 27.1l-3.5 3.5" stroke="#7A3B5C" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="num">02 / FOUR HORSEMEN</div>
+            <h3>癌症</h3>
+            <div class="en-name">Cancer · 失控的细胞</div>
+          </div>
+        </div>
+        <p class="sum">突变随年龄累积，所以它本质上是一种「时间相关」的疾病。但发现得早晚，结局差别巨大。</p>
+        <div class="more"><div class="more-in">
+          <dl>
+            <dt>阿提亚的立场</dt>
+            <dd>对癌症最有效的杠杆是<strong>更早、更主动的筛查</strong>，而不是等身体发出信号。他在书中提到，私人执业中建议把结肠镜筛查提前到 40 岁，早于公共指南的 45 岁。</dd>
+            <dt>筛查思路</dt>
+            <dd>按个人风险（家族史、基因、生活方式）决定筛查项目和起始年龄；高风险者考虑更密集的影像学检查。</dd>
+            <dt>降低风险的抓手</dt>
+            <dd>不吸烟、控制代谢健康与体脂、规律运动、限制酒精。代谢紊乱本身与多种癌症风险上升相关。</dd>
+          </dl>
+        </div></div>
+        <div class="tap">展开细节 <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </article>
+
+      <article class="rider" data-k="2" style="--acc:#2B5C88;--acc-d:#1D4062" tabindex="0" role="button" aria-expanded="false">
+        <div class="top">
+          <svg class="ic" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M18 7c-5 0-9 3.4-9 8 0 2 .7 3.6.7 5.2 0 1.6-1.7 2.6-1.7 4.6 0 3 2.6 5.2 6 5.2 1.6 0 2.6-.7 4-.7s2.4.7 4 .7c3.4 0 6-2.2 6-5.2 0-2-1.7-3-1.7-4.6 0-1.6.7-3.2.7-5.2 0-4.6-4-8-9-8Z" fill="none" stroke="#2B5C88" stroke-width="2.1" stroke-linejoin="round"/>
+            <path d="M18 7c-2 2-2.6 4-2.6 6M18 7c2 2 2.6 4 2.6 6" fill="none" stroke="#2B5C88" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 21.5c1.4-1.2 2.6-1.2 4 0s2.6 1.2 4 0" fill="none" stroke="#2B5C88" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="num">03 / FOUR HORSEMEN</div>
+            <h3>神经退行性疾病</h3>
+            <div class="en-name">Neurodegeneration · 阿尔茨海默、帕金森</div>
+          </div>
+        </div>
+        <p class="sum">大脑的退化通常在被诊断之前十几年就已经开始。阿提亚认为它并非完全不可干预。</p>
+        <div class="more"><div class="more-in">
+          <dl>
+            <dt>可干预的杠杆</dt>
+            <dd>血管健康（大脑高度依赖稳定的血供）、规律运动、优质睡眠、持续的脑力刺激与社交连接。阿提亚把阿尔茨海默病部分地视为一种<strong>代谢与血管问题</strong>。</dd>
+            <dt>为什么它和四骑士是一组</dt>
+            <dd>代谢功能障碍、高血压、缺乏运动都显著提高痴呆风险。预防心血管疾病，某种意义上也在预防认知衰退。</dd>
+          </dl>
+        </div></div>
+        <div class="tap">展开细节 <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </article>
+
+      <article class="rider" data-k="3" style="--acc:#A9721A;--acc-d:#7A5110" tabindex="0" role="button" aria-expanded="false">
+        <div class="top">
+          <svg class="ic" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M5 27h30" stroke="#A9721A" stroke-width="1.4" stroke-dasharray="3 3"/>
+            <path d="M5 24c3.5 0 4-2 6-2s2.5 3 5 3 3-8 5.5-8 3 11 5.5 11 3-4 5-4 2 1 3 1" fill="none" stroke="#A9721A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="30" cy="13" r="2.4" fill="none" stroke="#A9721A" stroke-width="1.6"/>
+          </svg>
+          <div>
+            <div class="num">04 / FOUR HORSEMEN</div>
+            <h3>代谢功能障碍</h3>
+            <div class="en-name">Metabolic Dysfunction · 2 型糖尿病、脂肪肝</div>
+          </div>
+        </div>
+        <p class="sum">它本身就是一种疾病，同时又是另外三位骑士的「加速器」。而它的最早信号，往往出现在化验单变红之前很多年。</p>
+        <div class="more"><div class="more-in">
+          <dl>
+            <dt>核心是什么</dt>
+            <dd>胰岛素敏感性下降、内脏脂肪堆积、血糖调节能力变差。阿提亚强调要关注<strong>胰岛素抵抗的早期迹象</strong>，而不是等空腹血糖跨过糖尿病诊断线。</dd>
+            <dt>为什么它排第四但最重要</dt>
+            <dd>它影响心血管、癌症与神经退行的共同通路。改善代谢健康，等于同时降低另外三位骑士的威胁。</dd>
+            <dt>可用的工具</dt>
+            <dd>规律运动（尤其力量训练与餐后活动）、足够的蛋白质、控制精制碳水与酒精、改善睡眠、必要时使用连续血糖监测（CGM）来观察个体反应。</dd>
+          </dl>
+        </div></div>
+        <div class="tap">展开细节 <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ S4 ============ -->
+<section id="s4">
+  <div class="wrap">
+    <p class="eyebrow reveal">04 · 战术之一</p>
+    <h2 class="reveal">运动：阿提亚眼中最强效的「长寿药」</h2>
+    <div class="narrow">
+      <p class="lede reveal">书里反复出现一个判断：如果只能保留一种干预手段，那就是运动。它不是用来「减肥」的，而是用来维持你在晚年依然能做事的能力。</p>
+      <p class="reveal">阿提亚把训练拆成四个层级，从底到顶。下层是上层的基础——没有稳定性，力量会变成伤病；没有力量，心肺能力也无从发挥。</p>
+    </div>
+
+    <div class="grid g2 reveal" style="margin-top:28px;align-items:start">
+      <div class="pyr" id="pyr">
+        <div class="pl" data-k="3" style="--acc:#2F6B3C" tabindex="0" role="button">
+          <span class="pnum">04</span>
+          <span class="pt">最大摄氧量训练</span>
+          <span class="pd">每周 1 次 4×4 间歇</span>
+        </div>
+        <div class="pl" data-k="2" style="--acc:#2B5C88" tabindex="0" role="button">
+          <span class="pnum">03</span>
+          <span class="pt">有氧效率（Zone 2）</span>
+          <span class="pd">每周 3–4 小时</span>
+        </div>
+        <div class="pl" data-k="1" style="--acc:#A9721A" tabindex="0" role="button">
+          <span class="pnum">02</span>
+          <span class="pt">力量</span>
+          <span class="pd">每周 2–3 次</span>
+        </div>
+        <div class="pl" data-k="0" style="--acc:#C1440E" tabindex="0" role="button">
+          <span class="pnum">01</span>
+          <span class="pt">稳定性</span>
+          <span class="pd">贯穿日常，先于一切</span>
+        </div>
+      </div>
+      <div class="card" id="pyrInfo" style="min-height:220px">
+        <h3 id="pyrTitle">点击左侧任意一层</h3>
+        <p class="muted small" id="pyrDesc" style="margin-bottom:0">四层训练构成一个整体。点开看每一层具体在解决什么问题，以及阿提亚给出的剂量。</p>
+        <div id="pyrBody" class="small" style="margin-top:14px;color:var(--ink-2)"></div>
+      </div>
+    </div>
+
+    <div class="grid g2 reveal" style="margin-top:34px">
+      <div class="panel">
+        <div class="panel-head"><h3>Zone 2 心率估算</h3><span class="small">通用公式，非书中原文</span></div>
+        <div class="field">
+          <label for="rngAge">你的年龄</label>
+          <div class="row"><input type="range" id="rngAge" min="18" max="80" value="38" step="1" aria-describedby="z2out"><span class="val" id="ageVal">38 岁</span></div>
+        </div>
+        <div class="out">
+          <div class="big" id="z2out">—</div>
+          <p class="cap" id="z2cap">—</p>
+          <p class="hint">书中强调的是<strong>主观感受</strong>而非精确心率：Zone 2 是「能完整说出一句话，但没法唱歌」的强度。心率只作为参考起点，实际以呼吸与说话测试为准。</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>体能水平与全因死亡风险</h3><span class="small">Mandsager 等，2018</span></div>
+        <p class="small" style="margin-top:-6px">一项纳入约 12.2 万人的研究，按心肺适能（VO₂ max）分层追踪。下图展示相对风险，以最低体能组为基准 1.00。</p>
+        <div class="bars" id="vo2bars">
+          <div class="bar-row low"><span class="lbl">最低</span><span class="track"><i class="fill" data-w="100"></i></span><span class="v">1.00</span></div>
+          <div class="bar-row mid"><span class="lbl">低于平均</span><span class="track"><i class="fill" data-w="66"></i></span><span class="v">0.66</span></div>
+          <div class="bar-row mid"><span class="lbl">平均</span><span class="track"><i class="fill" data-w="47"></i></span><span class="v">0.47</span></div>
+          <div class="bar-row top"><span class="lbl">高于平均</span><span class="track"><i class="fill" data-w="35"></i></span><span class="v">0.35</span></div>
+          <div class="bar-row top"><span class="lbl">精英</span><span class="track"><i class="fill" data-w="20"></i></span><span class="v">0.20</span></div>
+        </div>
+        <p class="small" style="margin-top:16px;margin-bottom:0">与体能最低组相比，精英组的全因死亡风险<strong>低约 80%</strong>。阿提亚据此主张把 VO₂ max 当作最重要的生理指标之一来训练。数值为量级示意。</p>
+      </div>
+    </div>
+
+    <div class="grid g3 reveal" style="margin-top:26px">
+      <div class="card">
+        <h3>VO₂ max 会随年龄下降</h3>
+        <p class="muted small">大约每十年下降 10%，50–60 岁之后下降更快。但下降的<strong>斜率可以被训练改变</strong>——训练者可以在更高水平上变老。</p>
+      </div>
+      <div class="card">
+        <h3>阿提亚的个人处方</h3>
+        <p class="muted small">每周 3–4 小时 Zone 2（单次 ≥45 分钟）、1 次 4×4 VO₂ max 间歇（4 分钟高强度 + 3 分钟恢复，重复 4 轮）、2–3 次力量训练，稳定性贯穿始终。</p>
+      </div>
+      <div class="card">
+        <h3>为什么力量不能省</h3>
+        <p class="muted small">肌肉与骨密度是晚年独立生活的硬件。没有力量，一次跌倒就可能终结你所有的其他努力。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S5 ============ -->
+<section id="s5">
+  <div class="wrap">
+    <p class="eyebrow reveal">05 · 战术之二</p>
+    <h2 class="reveal">百岁老人十项全能</h2>
+    <div class="narrow">
+      <p class="lede reveal">这是全书最有想象力的一步：与其笼统地说「多锻炼」，不如先问——<strong>我希望 90 岁时还能做到哪些事？</strong>然后从那个终点倒推今天的训练。</p>
+      <p class="reveal">阿提亚在书中列出了十项功能性的动作，全部来自真实生活，而不是竞技场。他称这一组目标为「百岁老人十项全能」（Centenarian Decathlon）。</p>
+      <p class="reveal small">下面这份清单对应书中第 12 章的十项内容。勾选你<strong>现在</strong>就能做到的——结果会告诉你，哪些能力需要提前储备。</p>
+    </div>
+
+    <div class="deca reveal" id="deca" style="margin-top:26px">
+      <button class="di" data-k="0" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>在山丘小径徒步约 2.4 公里</b><em>连续行走，且有坡度</em></span></button>
+      <button class="di" data-k="1" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>不用手从地面起身</b><em>单臂辅助即可，最好完全不用手</em></span></button>
+      <button class="di" data-k="2" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>从地面抱起一个幼儿</b><em>约 14 公斤的负重</em></span></button>
+      <button class="di" data-k="3" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>提两袋杂货走五个街区</b><em>每袋约 2.3 公斤</em></span></button>
+      <button class="di" data-k="4" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>把约 9 公斤的行李箱举过头顶</b><em>放进飞机行李舱的动作</em></span></button>
+      <button class="di" data-k="5" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>睁眼单腿站立 30 秒</b><em>平衡能力，与跌倒风险直接相关</em></span></button>
+      <button class="di" data-k="6" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>3 分钟内爬完 4 层楼梯</b><em>心肺与腿部力量的综合测试</em></span></button>
+      <button class="di" data-k="7" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>能拧开一个紧的罐子</b><em>握力——被反复引用的健康预测指标</em></span></button>
+      <button class="di" data-k="8" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>连续跳绳 30 次</b><em>协调性、小腿弹性与心肺</em></span></button>
+      <button class="di" data-k="9" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>保持活跃的性生活</b><em>阿提亚把它列为功能健康的指标之一</em></span></button>
+    </div>
+
+    <div class="scorebar reveal">
+      <div class="sc" id="decaScore">0<small> / 10</small></div>
+      <div style="flex:1 1 260px">
+        <p class="msg" id="decaMsg" style="margin-bottom:8px">勾选你目前能做到的项目。</p>
+        <div class="meter"><i id="decaMeter"></i></div>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top:14px">注意：能完成多少项不是重点，<strong>哪些项做不到才是信息</strong>。做不到的那几项，正是你未来十年要专门训练的方向。阿提亚在书中给出的回推逻辑是：以「边际十年」的目标为基准，50 岁需要约 2 倍的能力储备，60 岁约 1.5 倍，70 岁约 1.2 倍。</p>
+  </div>
+</section>
+
+<!-- ============ S6 ============ -->
+<section id="s6">
+  <div class="wrap">
+    <p class="eyebrow reveal">06 · 战术之三</p>
+    <h2 class="reveal">营养 3.0：不是「吃什么」，而是「为什么」</h2>
+    <div class="narrow">
+      <p class="lede reveal">书里没有给出一份食谱。阿提亚把这一章命名为「你说土豆，我说营养生物化学」——他反对把饮食简化成流行口号，主张回到机制层面。</p>
+    </div>
+
+    <div class="grid g3 reveal" style="margin-top:28px">
+      <div class="card" style="border-top:3px solid var(--gold)">
+        <h3>蛋白质：被长期低估</h3>
+        <p class="muted small">官方每日推荐量 0.8 g/kg 是<strong>防止缺乏</strong>的下限，不是最优值。对中老年人而言，摄入不足会加速肌肉流失，进而抬高死亡率、降低生活质量。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--gold)">
+        <h3>精制程度决定升糖反应</h3>
+        <p class="muted small">碳水化合物越精制，血糖上升越快越高。阿提亚提醒一个反直觉的现象：大米和燕麦片的升糖作用比很多人以为的更强，糙米的升糖指数也只比长粒白米略低。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--gold)">
+        <h3>酒精：纯享乐</h3>
+        <p class="muted small">书中的判断很直接——酒精没有营养或健康作用，是纯粹的享乐。它提供「无效」热量，还会抑制脂肪氧化，并且常常导致无意识进食。</p>
+      </div>
+    </div>
+
+    <div class="grid g2 reveal" style="margin-top:34px;align-items:start">
+      <div class="panel">
+        <div class="panel-head"><h3>每日蛋白质需求估算</h3><span class="small">基于阿提亚的公开立场</span></div>
+        <div class="field">
+          <label for="rngW">体重</label>
+          <div class="row"><input type="range" id="rngW" min="40" max="130" value="70" step="1" aria-describedby="pOut"><span class="val" id="wVal">70 kg</span></div>
+        </div>
+        <div class="field">
+          <label id="segActLabel">活动水平</label>
+          <div class="seg" id="segAct" role="group" aria-labelledby="segActLabel">
+            <button type="button" data-a="0" class="on">久坐</button>
+            <button type="button" data-a="1">规律训练</button>
+            <button type="button" data-a="2">增肌 / 高强度</button>
+          </div>
+        </div>
+        <div class="out">
+          <div class="big" id="pOut">—</div>
+          <p class="cap" id="pCap">—</p>
+          <p class="hint">对照：中国居民膳食推荐量约 0.8–1.0 g/kg，是防缺乏标准；阿提亚主张的区间明显更高。若有肾脏疾病等特殊情况，请先咨询医生。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>书里真正强调的三件事</h3>
+        <p class="muted small"><strong>一、能量平衡与体脂。</strong>不是「节食」，而是把体脂维持在代谢健康的范围内，尤其是内脏脂肪。</p>
+        <p class="muted small"><strong>二、代谢健康。</strong>用血糖、胰岛素敏感性、肝脏脂肪等指标来观察，而不是只看体重秤。</p>
+        <p class="muted small"><strong>三、个体差异。</strong>同一碗米饭，不同人的血糖反应可能差出数倍。阿提亚鼓励用数据和自我观察找到属于自己的模式，而不是照搬别人的清单。</p>
+        <p class="small" style="margin-bottom:0;padding-top:14px;border-top:1px dashed var(--line-2)">他反对的，是「一种食物解决所有问题」和「一种禁忌适合所有人」这两种简化。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S7 ============ -->
+<section id="s7">
+  <div class="wrap">
+    <p class="eyebrow reveal">07 · 战术之四</p>
+    <h2 class="reveal">睡眠：大脑最好的良药</h2>
+    <div class="narrow">
+      <p class="lede reveal">书中第 16 章的标题是「觉醒：如何学会热爱睡眠」。阿提亚承认自己曾是那个把睡眠当作可牺牲项的人，直到数据说服了他。</p>
+    </div>
+
+    <div class="grid g2 reveal" style="margin-top:28px;align-items:center">
+      <div>
+        <div class="card" style="background:var(--blue-l);border-color:#C3D6E6">
+          <p class="eyebrow" style="color:var(--blue-d);margin-bottom:8px">书中的一个具体数字</p>
+          <p style="font-size:19px;line-height:1.6;margin:0;font-weight:600;color:var(--blue-d)">睡眠 5–6 小时（而非 8 小时），峰值血糖反应可上升约 10–20 mg/dL，整体水平上升约 5–10 mg/dL。</p>
+          <p class="small" style="margin:14px 0 0;color:var(--ink-2)">这是一个相当大的差距——仅仅因为少睡了两三个小时。</p>
+        </div>
+        <p class="reveal small" style="margin-top:20px">睡眠不只影响血糖。它同时作用于：认知与记忆巩固、情绪调节、免疫功能、食欲激素与食物选择、以及心血管系统的恢复。阿提亚把睡眠放在和运动、营养同等的地位上，而不是「有空再补」的附属品。</p>
+      </div>
+      <div class="card reveal">
+        <h3>可操作的起点</h3>
+        <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.9;color:var(--ink-2)">
+          <li>固定起床时间，比固定入睡时间更有效</li>
+          <li>早晨接触自然光，晚上减少强光</li>
+          <li>咖啡因在下午早些时候截止</li>
+          <li>卧室保持凉爽、安静、黑暗</li>
+          <li>把睡眠时长当作一项需要达成的指标，而不是剩下的时间</li>
+        </ul>
+        <p class="small" style="margin-top:16px;margin-bottom:0">这些是通用建议，书中更强调的是：先把睡眠当作<strong>不可协商的优先级</strong>，再谈优化细节。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S8 ============ -->
+<section id="s8">
+  <div class="wrap">
+    <p class="eyebrow reveal">08 · 战术之五</p>
+    <h2 class="reveal">情绪健康：最容易被跳过的一章</h2>
+    <div class="narrow">
+      <p class="lede reveal">如果只读这本书的运动和营养部分，你会错过它真正的转折点。全书最后一章讲的不是训练，而是痛苦。</p>
+    </div>
+
+    <div class="narrow reveal" style="margin-top:28px">
+      <blockquote>
+        「你的整个职业生涯都在试图让人们活得更长久，但你却没有花精力去帮助人们减少痛苦，减少情感上的痛苦，这不是很讽刺吗？」<br>「如果你这么不快乐，为什么还想活得更久呢？」
+        <cite>— 阿提亚在书中回忆，这段话来自他的女儿。他写道，这个逻辑无可辩驳，它改变了他对长寿的全部认知。</cite>
+      </blockquote>
+    </div>
+
+    <div class="grid g3 reveal" style="margin-top:30px">
+      <div class="card">
+        <h3>情绪影响生理</h3>
+        <p class="muted small">长期压力、睡眠不足、关系破裂与心理创伤，会通过行为和生理两条通路影响健康——它们改变你的饮食、运动、睡眠，也直接作用于激素与炎症。</p>
+      </div>
+      <div class="card">
+        <h3>它需要练习</h3>
+        <p class="muted small">第 17 章的标题是「持续的自我修炼」。阿提亚把它当作一项需要长期训练的能力，而不是「想开点」就能解决的事。</p>
+      </div>
+      <div class="card">
+        <h3>长寿不是指标合集</h3>
+        <p class="muted small">把身体指标做到最优，却依然活在痛苦里，是一种失败。作者把亲密关系、情绪修复与生活意义写进了长寿的框架。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S9 ============ -->
+<section id="s9">
+  <div class="wrap">
+    <p class="eyebrow reveal">09 · 检验理解</p>
+    <h2 class="reveal">五道题，看看记住了什么</h2>
+    <div class="narrow">
+      <p class="lede reveal">点击你认为正确的选项，会立即给出判断和解释。</p>
+    </div>
+
+    <div class="reveal" id="quiz" style="margin-top:26px;max-width:820px"></div>
+
+    <div class="panel reveal" style="margin-top:22px;max-width:820px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div>
+        <div class="small" style="letter-spacing:.1em">当前得分</div>
+        <div style="font-family:var(--mono);font-size:32px;font-weight:700;color:var(--rust-d);line-height:1.1"><span id="qScore">0</span> <span style="font-size:15px;color:var(--ink-3)">/ 5</span></div>
+      </div>
+      <button class="btn" id="qReset" type="button" style="margin-left:auto">重做一遍</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S10 ============ -->
+<section id="s10">
+  <div class="wrap">
+    <p class="eyebrow reveal">10 · 从今天开始</p>
+    <h2 class="reveal">八件事，可以现在就排进日程</h2>
+    <div class="narrow">
+      <p class="lede reveal">把书里的框架压缩成一份可执行的清单。勾选你打算在下个月开始的项。</p>
+    </div>
+
+    <div class="acts reveal" id="acts" style="margin-top:26px;max-width:820px">
+      <button class="act" data-k="0" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">做一次「四骑士」相关的基础检查</span><span class="ad">血脂全套（含 ApoB）、Lp(a) 一生测一次、血糖与糖化血红蛋白、血压、hsCRP。带着数据去和医生讨论风险，而不是等箭头出现。</span></span></button>
+      <button class="act" data-k="1" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">把每周有氧量提到 3 小时以上</span><span class="ad">以 Zone 2 为主，单次尽量不少于 45 分钟。判断标准是「能说完整句子，但不能唱歌」。</span></span></button>
+      <button class="act" data-k="2" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">每周安排一次高强度间歇</span><span class="ad">4 分钟高强度 + 3 分钟恢复，重复 4 轮。这一项专门训练最大摄氧量。</span></span></button>
+      <button class="act" data-k="3" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">每周 2–3 次力量训练</span><span class="ad">覆盖推、拉、蹲、髋铰链、负重行走等基本模式。肌肉和骨密度是晚年独立生活的硬件。</span></span></button>
+      <button class="act" data-k="4" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">每天加一点稳定性练习</span><span class="ad">单腿站立、踝关节与髋部活动度、核心控制。它排在金字塔最底层，决定了上面所有训练能不能安全进行。</span></span></button>
+      <button class="act" data-k="5" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">把蛋白质吃到 1.6 g/kg 左右</span><span class="ad">用上面的计算器估算你的目标克数，然后平均分配到三餐，而不是集中在晚餐。</span></span></button>
+      <button class="act" data-k="6" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">把睡眠当成不可协商的项目</span><span class="ad">先固定起床时间，保证 7–8 小时。睡眠不足会直接影响血糖控制与训练恢复。</span></span></button>
+      <button class="act" data-k="7" type="button" aria-pressed="false"><span class="box"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.7 9 10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="at">每年做一次「十项全能」自测</span><span class="ad">把上面那十项当作年度体检的一部分。做不到的项目，就是下一年的训练重点。</span></span></button>
+    </div>
+
+    <div class="narrow reveal" style="margin-top:34px">
+      <div class="card" style="background:var(--bg-2)">
+        <p style="margin:0;font-size:15.5px;line-height:1.8;color:var(--ink-2)">这本书最核心的态度，也许是这一句：<strong style="color:var(--ink)">你的命运不是一成不变的。</strong>寿命与健康的可塑性比我们以为的大得多。真正起作用的不是某一次体检、某一次训练或某一次饮食调整，而是<strong style="color:var(--ink)">多年累积的行为模式</strong>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3 style="margin-bottom:14px">关于本页</h3>
+    <p class="small" style="max-width:78ch;margin-bottom:22px">这是一份对《超越百岁》（Outlive: The Science and Art of Longevity）的整理与可视化解读，用于帮助理解该书的核心框架。<strong>它不是原书内容，也不能替代原书</strong>。书中论述涉及大量临床细节与个人化判断，具体决策请以原书、医生意见和你的实际检查结果为准。</p>
+    <h3 style="margin-bottom:10px">主要参考</h3>
+    <ul class="srcs">
+      <li>彼得·阿提亚（Peter Attia, MD）、比尔·吉福德：《超越百岁：长寿的科学与艺术》，程纪莲 译，中译出版社，2024 年 1 月（原作名：Outlive）。</li>
+      <li>Mandsager K, et al. Association of Cardiorespiratory Fitness With Long-term Mortality Among Adults Undergoing Exercise Treadmill Testing. <em>JAMA Network Open</em>, 2018.</li>
+      <li>Helgerud J, et al. Aerobic high-intensity intervals improve VO₂max more than moderate training. <em>Med Sci Sports Exerc</em>, 2007.（4×4 间歇方案的来源）</li>
+      <li>关于蛋白质摄入的讨论，参考阿提亚在 peterattiamd.com 公开发表的观点及其播客 The Drive。</li>
+    </ul>
+    <p class="disc">本页为纯前端单文件页面：无外部依赖、无网络请求、可离线打开。所有图表为示意性可视化，用于表达书中论点，不构成医学建议。图中标注「示意」「量级」的数值不代表精确统计结果。</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  /* ---------- 1. 顶部进度条 ---------- */
+  var progress = $("#progress");
+  function updateProgress() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? (window.scrollY / h) * 100 : 0;
+    if (progress) progress.style.width = clamp(p, 0, 100) + "%";
+  }
+
+  /* ---------- 2. 导航高亮（确定性计算，不用 IO） ---------- */
+  var navItems = $$("#navlinks a").map(function (a) {
+    var id = a.getAttribute("href").slice(1);
+    return { a: a, id: id, el: document.getElementById(id) };
+  }).filter(function (x) { return !!x.el; });
+  var navCurrent = null;
+  function updateNav() {
+    if (!navItems.length) return;
+    var line = window.innerHeight * 0.32, pick = navItems[0], i;
+    for (i = 0; i < navItems.length; i++) {
+      if (navItems[i].el.getBoundingClientRect().top <= line) pick = navItems[i];
+    }
+    if (pick === navCurrent) return;
+    navCurrent = pick;
+    navItems.forEach(function (x) { x.a.classList.toggle("on", x === pick); });
+    var box = $("#navlinks");
+    if (box && box.scrollWidth > box.clientWidth) {
+      var target = pick.a.offsetLeft - box.clientWidth / 2 + pick.a.offsetWidth / 2;
+      try { box.scrollTo({ left: clamp(target, 0, box.scrollWidth - box.clientWidth), behavior: reduced ? "auto" : "smooth" }); } catch (e) {}
+    }
+  }
+
+  /* ---------- 3. 滚动驱动 + reveal 兜底扫描 ---------- */
+  var ticking = false, REVEAL = { els: [] };
+  function revealSweep() {
+    var els = REVEAL.els;
+    if (!els.length) return;
+    var lim = window.innerHeight - 30, left = 0, hit = [], i, e, r;
+    for (i = 0; i < els.length; i++) {
+      e = els[i];
+      if (e.classList.contains("in")) continue;
+      r = e.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      if (r.top < lim) hit.push(e); else left++;
+    }
+    for (i = 0; i < hit.length; i++) hit[i].classList.add("in");
+    if (left === 0) REVEAL.els = [];
+  }
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      updateProgress(); updateNav(); revealSweep();
+    });
+  }
+  function initReveal() {
+    REVEAL.els = $$(".reveal");
+    if (reduced || !("IntersectionObserver" in window)) {
+      REVEAL.els.forEach(function (e) { e.classList.add("in"); });
+      REVEAL.els = [];
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.01 });
+    REVEAL.els.forEach(function (e) { io.observe(e); });
+    setTimeout(revealSweep, 2400);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+
+  /* ---------- 4. 健康寿命曲线 ---------- */
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(tag, attrs, parent) {
+    var el = document.createElementNS(NS, tag);
+    if (attrs) for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(el);
+    return el;
+  }
+  var CURVES = [
+    { key: 0, color: "#C1440E", pts: [[0,100],[15,100],[25,97],[35,90],[45,79],[55,64],[65,47],[75,29],[85,14],[90,7]] },
+    { key: 1, color: "#A9721A", pts: [[0,100],[15,100],[25,99],[35,95],[45,88],[55,78],[65,64],[75,47],[85,28],[90,18]] },
+    { key: 2, color: "#2F6B3C", pts: [[0,100],[15,100],[25,100],[35,99],[45,96],[55,92],[65,86],[75,78],[85,68],[90,61]] }
+  ];
+  var THRESHOLD = 35;
+  var CH = { x0: 62, x1: 642, y0: 42, y1: 292, ageMax: 90 };
+  function px(age) { return CH.x0 + (age / CH.ageMax) * (CH.x1 - CH.x0); }
+  function py(v) { return CH.y1 - (v / 100) * (CH.y1 - CH.y0); }
+  function smoothPath(pts) {
+    var p = pts.map(function (d) { return [px(d[0]), py(d[1])]; });
+    if (p.length < 2) return "";
+    var d = "M " + p[0][0].toFixed(1) + " " + p[0][1].toFixed(1);
+    for (var i = 0; i < p.length - 1; i++) {
+      var p0 = p[i - 1] || p[i], p1 = p[i], p2 = p[i + 1], p3 = p[i + 2] || p[i + 1];
+      var c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+      var c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += " C " + c1x.toFixed(1) + " " + c1y.toFixed(1) + ", " + c2x.toFixed(1) + " " + c2y.toFixed(1) + ", " + p2[0].toFixed(1) + " " + p2[1].toFixed(1);
+    }
+    return d;
+  }
+  function crossAge(pts) {
+    for (var i = 0; i < pts.length - 1; i++) {
+      var a = pts[i], b = pts[i + 1];
+      if (a[1] >= THRESHOLD && b[1] < THRESHOLD) {
+        var t = (a[1] - THRESHOLD) / (a[1] - b[1]);
+        return Math.round(a[0] + t * (b[0] - a[0]));
+      }
+    }
+    return null;
+  }
+  var hsPaths = [];
+  function buildHSChart() {
+    var svg = $("#chartHS");
+    if (!svg) return;
+    var g = mk("g", {}, svg);
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      mk("line", { x1: CH.x0, y1: py(v), x2: CH.x1, y2: py(v), stroke: "#E4DACA", "stroke-width": 1 }, g);
+      mk("text", { x: CH.x0 - 10, y: py(v) + 4, "text-anchor": "end", "font-family": "ui-monospace,monospace", "font-size": 10, fill: "#8C8274" }, g).textContent = v;
+    });
+    [0, 20, 40, 60, 80, 90].forEach(function (a) {
+      mk("text", { x: px(a), y: CH.y1 + 20, "text-anchor": "middle", "font-family": "ui-monospace,monospace", "font-size": 10, fill: "#8C8274" }, g).textContent = a;
+    });
+    mk("text", { x: CH.x0 - 10, y: CH.y0 - 14, "text-anchor": "end", "font-family": "ui-monospace,monospace", "font-size": 9.5, fill: "#8C8274" }, g).textContent = "储备";
+    mk("text", { x: CH.x1, y: CH.y1 + 38, "text-anchor": "end", "font-family": "ui-monospace,monospace", "font-size": 9.5, fill: "#8C8274" }, g).textContent = "年龄";
+    mk("line", { x1: CH.x0, y1: py(THRESHOLD), x2: CH.x1, y2: py(THRESHOLD), stroke: "#8E2F08", "stroke-width": 1.4, "stroke-dasharray": "5 4", opacity: .55 }, g);
+    mk("text", { x: CH.x0 + 6, y: py(THRESHOLD) - 8, "font-family": "-apple-system,PingFang SC,sans-serif", "font-size": 11, "font-weight": 650, fill: "#8E2F08", opacity: .9 }, g).textContent = "独立生活门槛";
+    CURVES.forEach(function (c) {
+      var path = mk("path", { d: smoothPath(c.pts), fill: "none", stroke: c.color, "stroke-width": 2.8, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+      hsPaths.push({ el: path, c: c });
+    });
+    CURVES.forEach(function (c) {
+      var ca = crossAge(c.pts);
+      if (ca === null) return;
+      mk("circle", { cx: px(ca), cy: py(THRESHOLD), r: 4.5, fill: "#FAF7F1", stroke: c.color, "stroke-width": 2.2 }, g);
+    });
+    CURVES.forEach(function (c, i) {
+      var el = document.getElementById("ro" + i);
+      if (!el) return;
+      var ca = crossAge(c.pts);
+      el.textContent = ca === null ? "90 岁后" : ca + " 岁";
+    });
+  }
+  function initHSLines() {
+    if (reduced) return;
+    hsPaths.forEach(function (p, i) {
+      var len = 0;
+      try { len = p.el.getTotalLength(); } catch (e) { len = 0; }
+      if (!len) return;
+      p.el.style.strokeDasharray = len + " " + len;
+      p.el.style.strokeDashoffset = len;
+      setTimeout(function () {
+        p.el.style.transition = "stroke-dashoffset 1.5s cubic-bezier(.25,.7,.3,1)";
+        p.el.style.strokeDashoffset = "0";
+      }, 120 + i * 140);
+    });
+  }
+  var legendBtns = $$("#legendHS .lg");
+  legendBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var k = parseInt(btn.getAttribute("data-k"), 10);
+      var isOnly = btn.classList.contains("only");
+      legendBtns.forEach(function (b) { b.classList.remove("only"); });
+      if (isOnly) {
+        hsPaths.forEach(function (p) { p.el.style.opacity = "1"; p.el.style.strokeWidth = "2.8"; });
+        legendBtns.forEach(function (b) { b.classList.remove("dim"); });
+        return;
+      }
+      btn.classList.add("only");
+      hsPaths.forEach(function (p, i) {
+        p.el.style.opacity = (i === k) ? "1" : "0.16";
+        p.el.style.strokeWidth = (i === k) ? "3.6" : "2.2";
+      });
+      legendBtns.forEach(function (b) { b.classList.toggle("dim", parseInt(b.getAttribute("data-k"), 10) !== k); });
+    });
+  });
+
+  /* ---------- 5. 四骑士卡片 ---------- */
+  $$("#riders .rider").forEach(function (card) {
+    function toggle() {
+      var open = card.classList.toggle("open");
+      card.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    card.addEventListener("click", toggle);
+    card.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---------- 6. 运动金字塔 ---------- */
+  var PYR = [
+    { t: "稳定性", d: "训练身体在正确的位置上承受负荷的能力：脚踝、髋部、脊柱的灵活性与控制。阿提亚把它放在最底层——因为一次损伤可以抹掉你所有的其他训练成果。", n: "贯穿日常，先于一切" },
+    { t: "力量", d: "对抗肌肉流失与骨密度下降。肌肉是晚年独立生活的硬件：能不能从椅子上站起来、能不能提得动东西、摔倒时能不能撑住。", n: "每周 2–3 次" },
+    { t: "有氧效率（Zone 2）", d: "在较低强度下长时间运动的能力，训练线粒体功能与脂肪氧化效率。主观标准：能完整说出一句话，但不能唱歌。", n: "每周 3–4 小时，单次 ≥45 分钟" },
+    { t: "最大摄氧量（VO₂ max）", d: "心肺适能的峰值指标，也是全因死亡率最强的预测指标之一。用高强度间歇来提升它。", n: "每周 1 次 4×4 间歇" }
+  ];
+  var pyrItems = $$("#pyr .pl");
+  function selectPyr(k) {
+    pyrItems.forEach(function (it) { it.classList.toggle("on", parseInt(it.getAttribute("data-k"), 10) === k); });
+    var ti = $("#pyrTitle"), de = $("#pyrDesc"), bo = $("#pyrBody");
+    if (ti) ti.textContent = PYR[k].t;
+    if (de) de.textContent = PYR[k].d;
+    if (bo) bo.innerHTML = '<div style="padding-top:12px;border-top:1px dashed var(--line-2)"><strong>剂量：</strong>' + PYR[k].n + "</div>";
+  }
+  pyrItems.forEach(function (it) {
+    var k = parseInt(it.getAttribute("data-k"), 10);
+    it.addEventListener("click", function () { selectPyr(k); });
+    it.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectPyr(k); } });
+  });
+
+  /* ---------- 7. Zone 2 计算器 ---------- */
+  var rngAge = $("#rngAge");
+  function calcZone2() {
+    var age = parseInt(rngAge.value, 10);
+    var ageVal = $("#ageVal"), z2out = $("#z2out"), z2cap = $("#z2cap");
+    if (ageVal) ageVal.textContent = age + " 岁";
+    var hrmax = 208 - 0.7 * age;
+    var lo = Math.round(hrmax * 0.60), hi = Math.round(hrmax * 0.70);
+    if (z2out) z2out.innerHTML = lo + "–" + hi + '<span>次 / 分钟</span>';
+    if (z2cap) z2cap.textContent = "估算最大心率约 " + Math.round(hrmax) + " 次/分，Zone 2 取其中的 60%–70%。";
+  }
+  if (rngAge) { rngAge.addEventListener("input", calcZone2); calcZone2(); }
+
+  /* ---------- 8. VO2 条形图 ---------- */
+  $$("#vo2bars .fill").forEach(function (f, i) {
+    var w = f.getAttribute("data-w");
+    if (reduced) { f.style.width = w + "%"; return; }
+    setTimeout(function () { f.style.width = w + "%"; }, 180 + i * 110);
+  });
+
+  /* ---------- 9. 蛋白质计算器 ---------- */
+  var rngW = $("#rngW");
+  var ACT = [
+    { g: 1.2, label: "久坐", note: "久坐人群的维持量，仍高于官方防缺乏标准 0.8 g/kg。" },
+    { g: 1.6, label: "规律训练", note: "阿提亚对活跃人群的常见建议值：肌肉合成大约在 1.6 g/kg 附近趋于平台。" },
+    { g: 2.2, label: "增肌 / 高强度", note: "高强度训练或热量缺口下的上限区间，用于尽量保住肌肉。" }
+  ];
+  var actIdx = 0;
+  function calcProtein() {
+    var w = parseInt(rngW.value, 10);
+    var wVal = $("#wVal"), pOut = $("#pOut"), pCap = $("#pCap");
+    if (wVal) wVal.textContent = w + " kg";
+    var a = ACT[actIdx];
+    var g = Math.round(w * a.g);
+    if (pOut) pOut.innerHTML = g + '<span>克 / 天</span>';
+    if (pCap) pCap.textContent = "按体重 " + w + " kg × " + a.g + " g/kg（" + a.label + "）。" + a.note;
+  }
+  if (rngW) { rngW.addEventListener("input", calcProtein); }
+  $$("#segAct button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      $$("#segAct button").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+      actIdx = parseInt(b.getAttribute("data-a"), 10);
+      calcProtein();
+    });
+  });
+  if (rngW) calcProtein();
+
+  /* ---------- 10. 十项全能自测 ---------- */
+  var decaItems = $$("#deca .di");
+  function updateDeca() {
+    var n = decaItems.filter(function (it) { return it.classList.contains("on"); }).length;
+    var sc = $("#decaScore"), msg = $("#decaMsg"), me = $("#decaMeter");
+    if (sc) sc.innerHTML = n + "<small> / 10</small>";
+    if (me) me.style.width = (n * 10) + "%";
+    var t;
+    if (n === 0) t = "勾选你目前能做到的项目。做不到的那几项，就是未来十年要专门训练的方向。";
+    else if (n <= 4) t = "有相当一部分能力需要提前储备。好消息是：这些全部可以通过训练改善，而且越早开始成本越低。";
+    else if (n <= 7) t = "基础不错。接下来要盯住的是「哪些项目会在未来十年先掉队」——通常是有氧能力与下肢力量。";
+    else if (n <= 9) t = "功能储备相当好。剩下的短板值得单独安排训练，别让它成为晚年第一个失守的环节。";
+    else t = "十项全过。接下来要做的不是维持，而是提高储备——因为年龄会让门槛不断上移。";
+    if (msg) msg.textContent = t;
+  }
+  decaItems.forEach(function (it) {
+    it.addEventListener("click", function () {
+      var on = it.classList.toggle("on");
+      it.setAttribute("aria-pressed", on ? "true" : "false");
+      updateDeca();
+    });
+  });
+  updateDeca();
+
+  /* ---------- 11. 测验 ---------- */
+  var QUIZ = [
+    { q: "书中所说的「四骑士」不包括以下哪一项？",
+      o: ["动脉粥样硬化性心血管疾病", "癌症", "代谢功能障碍", "骨质疏松"], a: 3,
+      e: "四骑士是：动脉粥样硬化性心血管疾病、癌症、神经退行性疾病、代谢功能障碍。骨质疏松是重要的健康问题，但不属于书中的「四骑士」框架。" },
+    { q: "医学 3.0 与医学 2.0 最关键的区别是什么？",
+      o: ["使用更昂贵的检查手段", "在症状出现之前几十年就开始干预", "完全放弃药物治疗", "只关心寿命的长度"], a: 1,
+      e: "医学 2.0 的逻辑是「等你病了再治」；医学 3.0 主张预防先于治疗，在疾病出现之前很久就开始评估和干预风险。" },
+    { q: "阿提亚主张的每日蛋白质摄入量大约是？",
+      o: ["0.8 g/kg 体重", "1.0 g/kg 体重", "1.6 g/kg 体重", "3.5 g/kg 体重"], a: 2,
+      e: "0.8 g/kg 是官方推荐量，属于防止缺乏的下限。阿提亚主张活跃人群应达到约 1.6 g/kg，因为肌肉合成大致在这个水平才趋于平台。" },
+    { q: "「边缘十年」（Marginal Decade）指的是什么？",
+      o: ["生命最后十年里，你还能独立生活的质量", "退休后的第一个十年", "40 到 50 岁这十年", "确诊慢性病之后的十年"], a: 0,
+      e: "它指的是生命最后那十年。关键不在于它能有多长，而在于那十年里你还能自己站起来、自己走路、自己思考。" },
+    { q: "阿提亚认为最强效的「长寿药」是什么？",
+      o: ["特定的补剂组合", "严格的热量限制", "运动", "基因层面的干预"], a: 2,
+      e: "书中反复强调：如果只能保留一种干预手段，那就是运动。它不是用来减肥的，而是用来维持晚年依然能做事的能力。" }
+  ];
+  var quizBox = $("#quiz"), qScoreEl = $("#qScore"), qState = [];
+  function renderQuiz() {
+    if (!quizBox) return;
+    quizBox.innerHTML = "";
+    qState = [];
+    QUIZ.forEach(function (item, qi) {
+      qState.push({ answered: false, picked: -1, correct: false });
+      var keys = ["A", "B", "C", "D"];
+      var html = '<div class="qh"><span class="qn">' + (qi + 1) + '</span><span class="qt">' + item.q + "</span></div><div class=\"opts\">";
+      item.o.forEach(function (txt, oi) {
+        html += '<button class="opt" type="button" data-q="' + qi + '" data-o="' + oi + '"><span class="key">' + keys[oi] + "</span><span>" + txt + "</span></button>";
+      });
+      html += '</div><div class="expl" id="expl' + qi + '"><b>正确答案：' + keys[item.a] + "</b> — " + item.e + "</div>";
+      var card = document.createElement("div");
+      card.className = "q";
+      card.innerHTML = html;
+      quizBox.appendChild(card);
+    });
+    updateQScore();
+  }
+  function updateQScore() {
+    var n = qState.filter(function (s) { return s.correct; }).length;
+    if (qScoreEl) qScoreEl.textContent = n;
+  }
+  if (quizBox) {
+    quizBox.addEventListener("click", function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest(".opt") : null;
+      if (!btn) return;
+      var qi = parseInt(btn.getAttribute("data-q"), 10), oi = parseInt(btn.getAttribute("data-o"), 10);
+      if (qState[qi].answered) return;
+      qState[qi].answered = true;
+      qState[qi].picked = oi;
+      var correct = QUIZ[qi].a;
+      qState[qi].correct = (oi === correct);
+      var card = btn.closest(".q");
+      $$(".opt", card).forEach(function (b) {
+        b.classList.add("locked");
+        var bOi = parseInt(b.getAttribute("data-o"), 10);
+        if (bOi === correct) b.classList.add("right");
+        else if (bOi === oi) b.classList.add("wrong");
+      });
+      var expl = document.getElementById("expl" + qi);
+      if (expl) expl.classList.add("show");
+      updateQScore();
+    });
+  }
+  var qReset = $("#qReset");
+  if (qReset) qReset.addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  /* ---------- 12. 行动清单 ---------- */
+  $$("#acts .act").forEach(function (it) {
+    it.addEventListener("click", function () {
+      var on = it.classList.toggle("on");
+      it.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  });
+
+  /* ---------- 13. 启动 ---------- */
+  function boot() {
+    initReveal(); buildHSChart(); initHSLines();
+    updateProgress(); updateNav(); revealSweep();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { onScroll(); }).catch(function () {});
+  }
+
+  /* ---------- 调试出口（只读，供自动化验收） ---------- */
+  window.__diag = {
+    get sections() { return $$("main section").map(function (s) { return s.id; }); },
+    get navOn() { return navCurrent ? navCurrent.id : null; },
+    get revealHidden() { return $$(".reveal").filter(function (e) { return parseFloat(getComputedStyle(e).opacity) < 0.99; }).length; },
+    get revealTotal() { return $$(".reveal").length; },
+    get overflow() { return document.documentElement.scrollWidth - document.documentElement.clientWidth; },
+    get scrollW() { return document.documentElement.scrollWidth; },
+    get clientW() { return document.documentElement.clientWidth; },
+    get zone2() { return $("#z2out") ? $("#z2out").textContent : ""; },
+    get protein() { return $("#pOut") ? $("#pOut").textContent : ""; },
+    get deca() { return decaItems.filter(function (i) { return i.classList.contains("on"); }).length; },
+    get decaMsg() { return $("#decaMsg") ? $("#decaMsg").textContent : ""; },
+    get quizScore() { return qState.filter(function (s) { return s.correct; }).length; },
+    get quizAnswered() { return qState.filter(function (s) { return s.answered; }).length; },
+    get quizAnswers() { return QUIZ.map(function (q) { return q.a; }); },
+    get crossAges() { return CURVES.map(function (c) { return crossAge(c.pts); }); },
+    get riderOpen() { return $$("#riders .rider.open").length; },
+    get svgTextOverflow() {
+      var bad = [];
+      $$("#chartHS, .hero-fig svg").forEach(function (svg) {
+        var vb = svg.viewBox && svg.viewBox.baseVal;
+        if (!vb) return;
+        $$("text", svg).forEach(function (t) {
+          var b;
+          try { b = t.getBBox(); } catch (e) { return; }
+          if (b.x + b.width > vb.width + 1 || b.x < -1) bad.push(t.textContent.slice(0, 20));
+        });
+      });
+      return bad;
+    }
+  };
+})();
+</script>
+</body>
+</html>
