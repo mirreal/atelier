@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>资产配置与再平衡</title>
+<style>
+/* ============ design tokens ============ */
+:root{
+  --bg:#FAF7F2;
+  --bg-2:#F3EEE6;
+  --card:#FFFFFF;
+  --card-2:#FBF9F6;
+  --ink:#2A2521;
+  --ink-2:#6E655C;
+  --ink-3:#A29889;
+  --line:#EAE3D9;
+  --line-2:#D9CFC1;
+  --accent:#A65A3A;
+  --accent-2:#8C4A2C;
+  --accent-soft:#F7EAE2;
+  --up:#BF5439;
+  --up-soft:#FBEDE8;
+  --down:#37755F;
+  --down-soft:#E8F2EE;
+  --r:14px;
+  --r-s:9px;
+  --sh:0 1px 2px rgba(42,37,33,.04), 0 10px 28px -16px rgba(42,37,33,.22);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --tabs-h:52px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--tabs-h) + 28px + env(safe-area-inset-bottom));
+}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px}
+
+/* ============ header ============ */
+.hdr{
+  position:sticky;top:0;z-index:40;
+  background:rgba(250,247,242,.9);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.hdr-in{display:flex;align-items:center;gap:16px;height:60px}
+.brand{display:flex;align-items:center;gap:9px;min-width:0}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
+.brand h1{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-total{margin-left:auto;text-align:right;line-height:1.25}
+.hdr-total .lbl{display:block;font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+.hdr-total strong{font-size:17px;font-variant-numeric:tabular-nums}
+.hdr-actions{display:flex;gap:6px;flex:none}
+
+/* ============ tabs ============ */
+.tabs{
+  position:sticky;top:60px;z-index:39;
+  background:rgba(250,247,242,.9);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.tabs-in{display:flex;gap:2px;height:var(--tabs-h);align-items:stretch;overflow-x:auto;scrollbar-width:none}
+.tabs-in::-webkit-scrollbar{display:none}
+.tab{
+  border:0;background:none;padding:0 16px;font-size:14px;color:var(--ink-2);
+  position:relative;white-space:nowrap;flex:none;
+}
+.tab::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;
+  background:var(--accent);border-radius:2px 2px 0 0;transform:scaleX(0);transition:transform .18s ease;
+}
+.tab.on{color:var(--ink);font-weight:600}
+.tab.on::after{transform:scaleX(1)}
+
+/* ============ generic ============ */
+main{padding:22px 0 8px}
+.view{display:none}
+.view.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);padding:18px;
+}
+.card + .card{margin-top:14px}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-h h3{font-size:14px;letter-spacing:.02em}
+.card-h .sp{margin-left:auto;display:flex;gap:6px;align-items:center}
+.hint{font-size:12.5px;color:var(--ink-3);line-height:1.6}
+.muted{color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+
+/* buttons */
+.btn{
+  border:1px solid var(--line-2);background:var(--card);border-radius:var(--r-s);
+  padding:7px 13px;font-size:13.5px;color:var(--ink-2);transition:.15s;
+  white-space:nowrap;
+}
+.btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--bg-2);color:var(--ink)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn.danger:hover{border-color:var(--up);color:var(--up)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%;justify-content:center;text-align:center}
+
+/* inputs */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:var(--ink-3);letter-spacing:.02em}
+.inp{
+  width:100%;border:1px solid var(--line-2);background:var(--card);border-radius:var(--r-s);
+  padding:8px 11px;font-size:14px;transition:.15s;font-variant-numeric:tabular-nums;
+}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
+.inp-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+
+/* ============ overview ============ */
+.ov-top{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:center}
+.donut-wrap{position:relative;width:300px;height:300px;flex:none;max-width:100%}
+.donut-wrap svg{display:block;width:100%;height:100%}
+.donut-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;text-align:center;padding:0 62px;
+}
+.donut-center .k{font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+.donut-center .v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.3}
+.donut-center .s{font-size:11px;color:var(--ink-3)}
+.legend{display:flex;flex-direction:column;gap:1px;min-width:0}
+.lg-row{
+  display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:10px;align-items:center;
+  padding:8px 10px;border-radius:var(--r-s);
+}
+.lg-row:nth-child(odd){background:var(--card-2)}
+.lg-row .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.lg-row .nm{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg-row .nm em{font-style:normal;color:var(--ink-3);font-size:11.5px;margin-left:6px}
+.lg-row .amt{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums;text-align:right}
+.lg-row .pcts{font-size:12.5px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;min-width:104px}
+.lg-row .pcts b{font-weight:600}
+.dev{font-size:11.5px;padding:1px 6px;border-radius:20px;font-variant-numeric:tabular-nums;margin-left:6px}
+.dev.up{color:var(--up);background:var(--up-soft)}
+.dev.down{color:var(--down);background:var(--down-soft)}
+.dev.flat{color:var(--ink-3);background:var(--bg-2)}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+.stat{background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-s);padding:11px 13px}
+.stat .k{font-size:11.5px;color:var(--ink-3);margin-bottom:3px}
+.stat .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:12px;font-weight:400;color:var(--ink-3);margin-left:3px}
+
+/* bars */
+.bars{display:flex;flex-direction:column;gap:14px}
+.bar-item .bi-h{display:flex;align-items:baseline;gap:8px;font-size:13px;margin-bottom:5px}
+.bar-item .bi-h .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-item .bi-h .sp{margin-left:auto;color:var(--ink-3);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.track{position:relative;height:22px;background:var(--bg-2);border-radius:6px;overflow:visible}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .35s cubic-bezier(.3,.8,.4,1)}
+.mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);border-radius:2px;transform:translateX(-1px)}
+.mark::after{
+  content:"";position:absolute;top:-3px;left:-3px;width:8px;height:8px;background:var(--ink);
+  border-radius:2px;transform:rotate(45deg);
+}
+
+/* ============ holdings ============ */
+.seg{display:inline-flex;background:var(--bg-2);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:0;background:none;padding:5px 13px;border-radius:7px;font-size:13px;color:var(--ink-2)}
+.seg button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(42,37,33,.08)}
+.pf{border:1px solid var(--line);border-radius:var(--r);background:var(--card);overflow:hidden}
+.pf + .pf{margin-top:12px}
+.pf-h{
+  display:flex;align-items:center;gap:10px;padding:12px 15px;background:var(--card-2);
+  border-bottom:1px solid var(--line);
+}
+.pf-h .nm{font-size:14px;font-weight:600}
+.pf-h .meta{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pf-h .sp{margin-left:auto;display:flex;gap:6px;align-items:center}
+.hrow{
+  display:grid;grid-template-columns:minmax(0,1fr) 130px 118px 84px 62px;gap:12px;align-items:center;
+  padding:11px 15px;border-top:1px solid var(--line);font-size:13.5px;
+}
+.hrow:first-child{border-top:0}
+.hrow:hover{background:var(--card-2)}
+.hrow .nm{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hrow .nm b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrow .nm span{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-2);background:var(--bg-2);border-radius:20px;padding:1px 8px;white-space:nowrap}
+.tag .sw{width:7px;height:7px;border-radius:50%;flex:none}
+.hrow .amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.hrow .sh{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:13px}
+.hrow .sh small{display:block;font-size:11px;color:var(--ink-3)}
+.hrow .ops{display:flex;gap:2px;justify-content:flex-end}
+.icon-btn{
+  border:0;background:none;padding:5px;border-radius:6px;color:var(--ink-3);line-height:0;
+}
+.icon-btn:hover{background:var(--bg-2);color:var(--ink)}
+.icon-btn.del:hover{background:var(--up-soft);color:var(--up)}
+.pf-foot{
+  padding:10px 15px;border-top:1px solid var(--line);background:var(--card-2);
+  display:flex;gap:12px;font-size:12.5px;color:var(--ink-2);
+}
+.pf-foot b{font-variant-numeric:tabular-nums;color:var(--ink)}
+
+/* ============ targets ============ */
+.tg-row{
+  display:grid;grid-template-columns:14px minmax(0,1fr) 108px 132px 62px;gap:12px;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line);
+}
+.tg-row:last-of-type{border-bottom:0}
+.sw-btn{width:14px;height:14px;border-radius:4px;border:0;padding:0;flex:none}
+.tg-name{font-size:14px;font-weight:500}
+.tg-name small{display:block;font-weight:400;font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pct-inp{position:relative}
+.pct-inp .inp{padding-right:26px;text-align:right}
+.pct-inp .sfx{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink-3);pointer-events:none}
+.tg-total{
+  display:flex;align-items:center;gap:10px;padding:13px 0 3px;border-top:2px solid var(--line-2);margin-top:6px;
+  font-size:14px;font-weight:600;
+}
+.tg-total .sp{margin-left:auto;font-variant-numeric:tabular-nums}
+.badge{font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:20px}
+.badge.ok{color:var(--down);background:var(--down-soft)}
+.badge.bad{color:var(--up);background:var(--up-soft)}
+
+/* ============ rebalance ============ */
+.cfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.radio-row{display:flex;flex-direction:column;gap:7px}
+.radio{
+  display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line-2);
+  border-radius:var(--r-s);cursor:pointer;transition:.15s;background:var(--card);
+}
+.radio:hover{border-color:var(--ink-3)}
+.radio.on{border-color:var(--accent);background:var(--accent-soft)}
+.radio input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+.radio .t{display:block;font-size:13.5px;font-weight:500}
+.radio .d{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:1px}
+
+.verdict{
+  display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:var(--r);
+  border:1px solid var(--line);background:var(--card-2);
+}
+.verdict.act{background:var(--accent-soft);border-color:#E7CDBF}
+.verdict .mark-icon{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--down-soft);color:var(--down)}
+.verdict.act .mark-icon{background:var(--accent);color:#fff}
+.verdict h4{font-size:15px;margin-bottom:3px}
+.verdict p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.65}
+.verdict p b{color:var(--ink)}
+
+.trade-group + .trade-group{margin-top:16px}
+.trade-h{display:flex;align-items:baseline;gap:8px;font-size:13px;margin-bottom:8px}
+.trade-h .tt{font-weight:600}
+.trade-h .sp{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.trow{
+  display:grid;grid-template-columns:minmax(0,1fr) 116px 108px;gap:12px;align-items:center;
+  padding:10px 13px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--card);font-size:13.5px;
+}
+.trow + .trow{margin-top:7px}
+.trow.sell{border-left:3px solid var(--up)}
+.trow.buy{border-left:3px solid var(--down)}
+.trow .nm{display:flex;flex-direction:column;gap:2px;min-width:0}
+.trow .nm b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trow .nm span{font-size:11.5px;color:var(--ink-3);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.trow .amt{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.trow.sell .amt{color:var(--up)}
+.trow.buy .amt{color:var(--down)}
+.trow .note{text-align:right;font-size:11.5px;color:var(--ink-3)}
+.trow.tiny{opacity:.72}
+.mini-flag{color:var(--up);font-size:11px}
+
+.sum-table{width:100%;border-collapse:collapse;font-size:13px}
+.sum-table th{
+  text-align:right;font-weight:500;font-size:11.5px;color:var(--ink-3);padding:0 0 8px;border-bottom:1px solid var(--line);
+}
+.sum-table th:first-child{text-align:left}
+.sum-table td{padding:9px 0;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.sum-table td:first-child{text-align:left;font-variant-numeric:normal}
+.sum-table tr:last-child td{border-bottom:0}
+.sum-table .gname{display:flex;align-items:center;gap:7px}
+.sum-table .sw{width:8px;height:8px;border-radius:50%;flex:none}
+.arrow{color:var(--ink-3);padding:0 5px}
+.old-v{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--line-2)}
+
+/* ============ empty state ============ */
+.empty{
+  text-align:center;padding:52px 20px;border:1px dashed var(--line-2);border-radius:var(--r);
+  background:var(--card-2);
+}
+.empty .ico{font-size:26px;color:var(--ink-3);margin-bottom:10px;line-height:1}
+.empty h3{font-size:15px;margin-bottom:6px}
+.empty p{margin:0 auto 18px;font-size:13px;color:var(--ink-3);max-width:400px;line-height:1.7}
+.empty .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ============ modal ============ */
+.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}
+.modal[hidden]{display:none}
+.modal-bg{position:absolute;inset:0;background:rgba(42,37,33,.34);backdrop-filter:blur(2px)}
+.modal-card{
+  position:relative;background:var(--card);border-radius:16px;box-shadow:0 24px 60px -18px rgba(42,37,33,.4);
+  width:100%;max-width:440px;max-height:88vh;display:flex;flex-direction:column;
+  animation:pop .2s cubic-bezier(.2,.9,.3,1.1);
+}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+.modal-card h3{font-size:15.5px;padding:18px 20px 0}
+.modal-body{padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:13px}
+.modal-foot{display:flex;gap:9px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--line)}
+.modal-foot .btn{padding:8px 18px}
+.err{font-size:12px;color:var(--up);min-height:0}
+.err:empty{display:none}
+.swatches{display:flex;gap:7px;flex-wrap:wrap}
+.swatch{width:26px;height:26px;border-radius:8px;border:2px solid transparent;padding:0}
+.swatch.on{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--card)}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:calc(var(--tabs-h) + 26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);
+  background:var(--ink);color:#fff;font-size:13px;padding:9px 18px;border-radius:22px;z-index:200;
+  opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* ============ responsive ============ */
+@media (max-width:820px){
+  .ov-top{grid-template-columns:1fr;gap:18px;justify-items:center}
+  .donut-wrap{width:260px;height:260px}
+  .legend{width:100%}
+  .lg-row{grid-template-columns:12px minmax(0,1fr) auto;gap:8px}
+  .lg-row .amt{display:none}
+  .lg-row .pcts{min-width:0}
+  .grid2{grid-template-columns:1fr}
+}
+@media (max-width:700px){
+  :root{--tabs-h:56px}
+  .wrap{padding:0 13px}
+  .hdr-in{height:54px;gap:10px}
+  .brand h1{font-size:14px}
+  .hdr-total .lbl{display:none}
+  .hdr-total strong{font-size:15px}
+  .hdr-actions .btn.hide-sm{display:none}
+  .tabs{position:fixed;top:auto;bottom:0;left:0;right:0;border-top:1px solid var(--line);border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}
+  .tabs-in{height:var(--tabs-h);justify-content:space-around;gap:0}
+  .tab{padding:0 8px;font-size:12.5px;flex:1;text-align:center}
+  .tab::after{left:22%;right:22%;bottom:auto;top:0;border-radius:0 0 2px 2px}
+  body{padding-bottom:calc(var(--tabs-h) + 24px + env(safe-area-inset-bottom))}
+  main{padding:16px 0 4px}
+  .card{padding:15px;border-radius:12px}
+  .hrow{grid-template-columns:minmax(0,1fr) auto 62px;grid-template-areas:"n a o" "s s s";gap:6px 10px;padding:12px 14px}
+  .hrow .nm{grid-area:n}
+  .hrow .amt{grid-area:a}
+  .hrow .sh{grid-area:s;text-align:left;display:flex;gap:10px;align-items:center;padding-top:2px}
+  .hrow .sh small{display:inline}
+  .hrow .ops{grid-area:o}
+  .trow{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n a" "t t";gap:4px 10px}
+  .trow .nm{grid-area:n}
+  .trow .amt{grid-area:a}
+  .trow .note{grid-area:t;text-align:left}
+  .tg-row{grid-template-columns:14px minmax(0,1fr) 86px 56px;gap:9px;grid-template-areas:"c n p o"}
+  .tg-row .sw-btn{grid-area:c}
+  .tg-row .tg-name{grid-area:n}
+  .tg-row .pct-inp{grid-area:p}
+  .tg-row .cur-col{display:none}
+  .tg-row .ops{grid-area:o;justify-content:flex-end}
+  .donut-center{padding:0 52px}
+  .verdict{padding:14px;gap:11px}
+  .verdict .mark-icon{width:30px;height:30px}
+  .toast{bottom:calc(var(--tabs-h) + 16px + env(safe-area-inset-bottom))}
+}
+@media (max-width:400px){
+  .hrow{grid-template-columns:minmax(0,1fr) auto 34px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <div class="brand"><span class="dot"></span><h1>资产配置与再平衡</h1></div>
+    <div class="hdr-total">
+      <span class="lbl">总资产</span>
+      <strong id="hdrTotal">—</strong>
+    </div>
+    <div class="hdr-actions">
+      <button class="btn ghost sm" id="btnExport" title="导出为 JSON 备份">导出</button>
+      <button class="btn ghost sm" id="btnImport" title="从 JSON 恢复">导入</button>
+      <button class="btn ghost sm hide-sm danger" id="btnReset" title="清空全部数据">清空</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap tabs-in" id="tabs">
+    <button class="tab on" data-tab="overview">总览</button>
+    <button class="tab" data-tab="holdings">持仓</button>
+    <button class="tab" data-tab="targets">目标配比</button>
+    <button class="tab" data-tab="rebalance">再平衡</button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="view on" id="view-overview"></section>
+  <section class="view" id="view-holdings"></section>
+  <section class="view" id="view-targets"></section>
+  <section class="view" id="view-rebalance"></section>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <h3 id="modalTitle">标题</h3>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn" data-close>取消</button>
+      <button class="btn primary" id="modalOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json,application/json" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* =========================================================================
+   资产配置与再平衡 —— 单文件离线工具
+   数据模型：
+     平台 platform  —— 支付宝 / 天天基金 / 券商账户 …
+     组合 group     —— 沪深300 / 中证500 / 债券 …（目标配比设定在这一层）
+     持仓 holding   —— 某平台上的一只具体基金，归属某个组合
+   ========================================================================= */
+
+const LS_KEY = "asset-alloc-v1";
+const PALETTE = ["#A65A3A","#37755F","#8A6FA8","#C08A2E","#5B7BA6","#B05F76","#7A8B5A","#9C6B4A","#5F8B96","#A8845C","#8E6B8E","#6B7A8F"];
+
+let state = blankState();
+let ui = { tab:"overview", holdView:"platform", lastPlan:null };
+
+function blankState(){
+  return {
+    v: 1,
+    groups: [],      // {id, name, targetPct, color}
+    platforms: [],   // {id, name}
+    holdings: [],    // {id, platformId, groupId, name, amount, note}
+    cfg: {
+      mode: "full",        // full | cash
+      scope: "triggered",  // triggered（只动超阈值类别）| all（全部调至目标）
+      absTh: 5,            // 绝对偏离阈值（百分点）
+      relTh: 20,           // 相对偏离阈值（%）
+      period: "quarter",   // month | quarter | half | year | none
+      lastRebalance: "",
+      minTrade: 100,       // 最小交易金额
+      cash: 0              // 增量再平衡的新增资金
+    }
+  };
+}
+
+/* ============================ utils ============================ */
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
+
+function fmtMoney(n, dp){
+  dp = dp == null ? 2 : dp;
+  const neg = n < 0;
+  const s = Math.abs(n).toLocaleString("zh-CN", { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  return (neg ? "-¥" : "¥") + s;
+}
+function fmtPct(n, dp){ return (n >= 0 ? "" : "-") + Math.abs(n).toFixed(dp == null ? 2 : dp) + "%"; }
+function fmtSigned(n, dp){ return (n >= 0 ? "+" : "−") + Math.abs(n).toLocaleString("zh-CN",{minimumFractionDigits:dp==null?2:dp,maximumFractionDigits:dp==null?2:dp}); }
+function todayStr(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function fmtDate(s){
+  if(!s) return "—";
+  const p = String(s).split("-");
+  return p.length === 3 ? (p[0] + "年" + (+p[1]) + "月" + (+p[2]) + "日") : s;
+}
+function periodLabel(p){ return {month:"每月",quarter:"每季度",half:"每半年",year:"每年",none:"不设周期"}[p] || p; }
+
+function addMonths(dateStr, m){
+  const p = String(dateStr).split("-");
+  const y = +p[0], mo = +p[1] - 1, d = +p[2];
+  const base = new Date(y, mo, 1);
+  base.setMonth(base.getMonth() + m);
+  const dim = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+  base.setDate(Math.min(d, dim));
+  return base.getFullYear() + "-" + String(base.getMonth()+1).padStart(2,"0") + "-" + String(base.getDate()).padStart(2,"0");
+}
+function nextRebalanceDate(last, period){
+  if(!last || period === "none") return null;
+  const m = {month:1, quarter:3, half:6, year:12}[period];
+  return m ? addMonths(last, m) : null;
+}
+function daysBetween(a, b){
+  const da = new Date(a + "T00:00:00"), db = new Date(b + "T00:00:00");
+  if(isNaN(da) || isNaN(db)) return null;
+  return Math.round((db - da) / 86400000);
+}
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("on");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("on"), 2100);
+}
+
+/* ============================ storage ============================ */
+function save(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      v:1, groups: state.groups, platforms: state.platforms, holdings: state.holdings, cfg: state.cfg
+    }));
+  }catch(e){ /* 隐私模式下静默失败 */ }
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(!d || typeof d !== "object") return false;
+    const s = blankState();
+    s.groups = Array.isArray(d.groups) ? d.groups : [];
+    s.platforms = Array.isArray(d.platforms) ? d.platforms : [];
+    s.holdings = Array.isArray(d.holdings) ? d.holdings : [];
+    s.cfg = Object.assign(s.cfg, d.cfg || {});
+    // 清洗
+    s.groups.forEach((g, i) => {
+      g.id = g.id || uid(); g.name = String(g.name || "未命名");
+      g.targetPct = num(g.targetPct); g.color = g.color || PALETTE[i % PALETTE.length];
+    });
+    s.platforms.forEach(p => { p.id = p.id || uid(); p.name = String(p.name || "未命名平台"); });
+    s.holdings = s.holdings.filter(h => h && h.name).map(h => ({
+      id: h.id || uid(), platformId: h.platformId || "", groupId: h.groupId || "",
+      name: String(h.name), amount: Math.max(0, num(h.amount)), note: h.note ? String(h.note) : ""
+    }));
+    state = s;
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ============================ lookups ============================ */
+const groupById = id => state.groups.find(g => g.id === id) || null;
+const platformById = id => state.platforms.find(p => p.id === id) || null;
+function groupColor(id, fallbackIdx){
+  const g = groupById(id);
+  return g && g.color ? g.color : PALETTE[(fallbackIdx || 0) % PALETTE.length];
+}
+function platformName(id){ const p = platformById(id); return p ? p.name : "未指定平台"; }
+function groupName(id){ const g = groupById(id); return g ? g.name : "未归类"; }
+
+/* ============================ model ============================ */
+/* 返回完整计算模型：总额、按组合聚合、按平台聚合、各持仓占比 */
+function model(){
+  const total = sum(state.holdings, h => h.amount);
+  const byGroup = new Map(), byPlatform = new Map();
+  state.holdings.forEach(h => {
+    byGroup.set(h.groupId, (byGroup.get(h.groupId) || 0) + h.amount);
+    byPlatform.set(h.platformId, (byPlatform.get(h.platformId) || 0) + h.amount);
+  });
+  const groups = state.groups.map((g, i) => {
+    const amount = byGroup.get(g.id) || 0;
+    return {
+      id: g.id, name: g.name, color: g.color || PALETTE[i % PALETTE.length],
+      targetPct: num(g.targetPct), amount,
+      curPct: total > 0 ? amount / total * 100 : 0,
+      holdings: state.holdings.filter(h => h.groupId === g.id)
+    };
+  });
+  // 未归类的持仓（groupId 指向已删除的组合）
+  const orphans = state.holdings.filter(h => !groupById(h.groupId));
+  if(orphans.length){
+    const amount = sum(orphans, h => h.amount);
+    groups.push({ id:"__orphan__", name:"未归类", color:"#B9AFA2", targetPct:0, amount,
+      curPct: total > 0 ? amount / total * 100 : 0, holdings: orphans });
+  }
+  const targetSum = sum(state.groups, g => num(g.targetPct));
+  return { total, groups, byPlatform, targetSum, orphanCount: orphans.length };
+}
+
+/* ============================ rebalance ============================ */
+/**
+ * 把「某个组合要调整的金额」按组内现有持仓的金额比例分摊到具体持仓上。
+ * 两种再平衡模式共用，保证交易项结构一致（group / holding / amount / platformName / name）。
+ * 组内没有持仓时，产出一条「新建一笔」的建议。
+ */
+function allocateGroupAmounts(rows, amounts, m){
+  const out = [];
+  rows.forEach((r, i) => {
+    const amt = amounts[i];
+    if(!(amt > 0.005)) return;
+    const grp = m.groups.find(g => g.id === r.id);
+    const pool = grp ? grp.holdings.filter(h => h.amount > 0) : [];
+    const poolSum = sum(pool, h => h.amount);
+    if(pool.length === 0 || poolSum <= 0){
+      out.push({
+        group: r, holding: null, amount: amt, platformName: "—",
+        name: r.name + "（新建一笔）", note: "该组合暂无持仓，可直接新建"
+      });
+      return;
+    }
+    pool.forEach(h => {
+      const a = amt * h.amount / poolSum;
+      if(a < 0.005) return;
+      out.push({
+        group: r, holding: h, amount: a,
+        platformName: platformName(h.platformId), name: h.name, note: ""
+      });
+    });
+  });
+  return out;
+}
+
+/**
+ * 生成再平衡方案
+ * full 模式：卖出超配、买入低配，总额不变
+ *   scope=triggered 时锁定未触发阈值的类别，只重分配触发项的份额
+ *   scope=all 时全部调至目标
+ * cash 模式：总额 = 现有 + 新增资金，只买不卖
+ */
+function buildPlan(){
+  const m = model();
+  const cfg = state.cfg;
+  const total = m.total;
+  const warnings = [];
+  if(total <= 0) return { ok:false, reason:"empty", m };
+
+  const tSum = m.targetSum;
+  if(tSum <= 0) return { ok:false, reason:"no-target", m };
+  if(Math.abs(tSum - 100) > 0.01) warnings.push("目标配比合计为 " + tSum.toFixed(2) + "%，已按比例归一化处理。");
+
+  const rows = m.groups.map(g => ({
+    id: g.id, name: g.name, color: g.color,
+    targetPct: g.targetPct, curPct: g.curPct, amount: g.amount,
+    // 归一化后的目标占比
+    normPct: g.targetPct / tSum * 100
+  }));
+
+  // 阈值触发判定
+  rows.forEach(r => {
+    r.absDev = r.curPct - r.normPct;
+    r.relDev = r.normPct > 0 ? Math.abs(r.absDev) / r.normPct * 100 : (r.amount > 0 ? Infinity : 0);
+    r.triggered = (Math.abs(r.absDev) >= cfg.absTh - 1e-9) || (r.relDev >= cfg.relTh - 1e-9);
+  });
+
+  const anyTriggered = rows.some(r => r.triggered);
+
+  /* ---------- 模式一：增量再平衡（只用新增资金） ---------- */
+  if(cfg.mode === "cash"){
+    const cash = Math.max(0, num(cfg.cash));
+    if(cash <= 0) return { ok:false, reason:"no-cash", m, warnings };
+    const newTotal = total + cash;
+    const gaps = rows.map(r => Math.max(0, newTotal * r.normPct / 100 - r.amount));
+    const gapSum = sum(gaps, x => x);
+    let alloc = new Array(rows.length).fill(0);
+    if(gapSum > 0){
+      if(cash <= gapSum){
+        rows.forEach((r, i) => alloc[i] = cash * gaps[i] / gapSum);
+      }else{
+        // 缺口填满后仍有剩余，按目标占比分配
+        rows.forEach((r, i) => alloc[i] = gaps[i]);
+        let rest = cash - gapSum;
+        const pctSum = sum(rows, r => r.normPct);
+        rows.forEach((r, i) => alloc[i] += rest * r.normPct / pctSum);
+      }
+    }
+    const buys = allocateGroupAmounts(rows, alloc, m);
+    // 与全额模式保持一致：rows 上也带上 delta / targetAmt / newPct，避免下游按模式分叉
+    rows.forEach(r => {
+      const add = sum(buys.filter(b => b.group.id === r.id), b => b.amount);
+      r.delta = add;
+      r.targetAmt = r.amount + add;
+      r.newPct = newTotal > 0 ? r.targetAmt / newTotal * 100 : 0;
+    });
+    return {
+      ok:true, mode:"cash", m, rows, warnings, newTotal, cash,
+      sells: [], buys,
+      sellTotal: 0, buyTotal: cash,
+      anyTriggered, maxAbsDev: Math.max(...rows.map(r => Math.abs(r.absDev)))
+    };
+  }
+
+  /* ---------- 模式二：全额再平衡（卖出 + 买入） ---------- */
+  // 目标金额
+  let targetAmt;
+  if(cfg.scope === "all" || !anyTriggered){
+    targetAmt = rows.map(r => total * r.normPct / 100);
+  }else{
+    // 锁定未触发项，只重分配触发项
+    const lockedSum = sum(rows, r => r.triggered ? 0 : r.amount);
+    const trigPctSum = sum(rows, r => r.triggered ? r.normPct : 0);
+    const pool = Math.max(0, total - lockedSum);
+    targetAmt = rows.map(r => {
+      if(!r.triggered) return r.amount;
+      if(trigPctSum <= 0) return r.amount;
+      return pool * r.normPct / trigPctSum;
+    });
+  }
+
+  rows.forEach((r, i) => {
+    r.targetAmt = targetAmt[i];
+    r.delta = targetAmt[i] - r.amount;              // >0 需买入，<0 需卖出
+    r.newPct = total > 0 ? targetAmt[i] / total * 100 : 0;
+  });
+
+  // 分配：卖出与买入共用同一套分摊逻辑，保证交易项结构一致
+  const sells = allocateGroupAmounts(rows, rows.map(r => r.delta < 0 ? -r.delta : 0), m);
+  const buys = allocateGroupAmounts(rows, rows.map(r => r.delta > 0 ? r.delta : 0), m);
+
+  sells.sort((a, b) => b.amount - a.amount);
+  buys.sort((a, b) => b.amount - a.amount);
+  const sellTotal = sum(sells, s => s.amount);
+  const buyTotal = sum(buys, b => b.amount);
+  const minTrade = Math.max(0, num(cfg.minTrade));
+  [...sells, ...buys].forEach(t => { t.tiny = minTrade > 0 && t.amount < minTrade; });
+
+  return {
+    ok:true, mode:"full", m, rows, warnings,
+    sells, buys, sellTotal, buyTotal, newTotal: total, cash: 0,
+    anyTriggered,
+    maxAbsDev: Math.max(...rows.map(r => Math.abs(r.absDev))),
+    tinyCount: [...sells, ...buys].filter(t => t.tiny).length
+  };
+}
+
+/* ============================ donut chart ============================ */
+function donutSVG(items, opts){
+  // items: [{pct, color}]  —— 外环
+  const size = 300, cx = 150, cy = 150;
+  const outer = { r: 132, w: 26 };
+  const inner = { r: 98, w: 20 };
+  const total = sum(items, i => i.pct) || 1;
+  const arc = (r, w, list, offsetRot) => {
+    const C = 2 * Math.PI * r;
+    let acc = 0;
+    return list.map((it, idx) => {
+      const frac = it.pct / total;
+      const len = C * frac;
+      const gap = list.length > 1 ? Math.min(2.4, len * 0.14) : 0;
+      const dash = Math.max(0, len - gap);
+      const off = -acc;
+      acc += len;
+      if(dash <= 0.01) return "";
+      return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + it.color +
+        '" stroke-width="' + w + '" stroke-dasharray="' + dash.toFixed(2) + ' ' + (C - dash).toFixed(2) +
+        '" stroke-dashoffset="' + off.toFixed(2) + '" stroke-linecap="butt"' +
+        (offsetRot ? ' transform="rotate(-90 ' + cx + ' ' + cy + ')"' : '') + '></circle>';
+    }).join("");
+  };
+  const cur = items.map(i => ({ pct: i.pct, color: i.color }));
+  const tgt = items.map(i => ({ pct: i.targetPct, color: i.color }));
+  return '<svg viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="当前占比与目标配比对比环形图">' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + outer.r + '" fill="none" stroke="var(--bg-2)" stroke-width="' + outer.w + '"></circle>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + inner.r + '" fill="none" stroke="var(--bg-2)" stroke-width="' + inner.w + '"></circle>' +
+    arc(outer.r, outer.w, cur, true) +
+    arc(inner.r, inner.w, tgt, true) +
+    '</svg>';
+}
+
+/* ============================ render: overview ============================ */
+function renderOverview(){
+  const el = document.getElementById("view-overview");
+  const m = model();
+
+  if(state.holdings.length === 0){
+    el.innerHTML = emptyStateHTML("还没有任何持仓数据",
+      "录入你在各个平台的每一笔资产，设置目标配比后即可查看当前占比、组合占比与再平衡建议。数据只保存在本机浏览器。",
+      true);
+    bindEmpty(el);
+    return;
+  }
+
+  const items = m.groups.map(g => ({ name:g.name, pct:g.curPct, targetPct:g.targetPct, color:g.color, amount:g.amount }));
+  const plan = buildPlan();
+
+  // 下次再平衡
+  const next = nextRebalanceDate(state.cfg.lastRebalance, state.cfg.period);
+  let dueHTML = '<span class="muted">未设置</span>';
+  if(next){
+    const dd = daysBetween(todayStr(), next);
+    if(dd == null) dueHTML = fmtDate(next);
+    else if(dd < 0) dueHTML = '<b style="color:var(--up)">已超期 ' + Math.abs(dd) + ' 天</b>';
+    else if(dd === 0) dueHTML = '<b style="color:var(--accent)">就是今天</b>';
+    else dueHTML = "还有 <b>" + dd + "</b> 天";
+  }
+
+  const trigCount = plan.ok ? plan.rows.filter(r => r.triggered).length : 0;
+
+  el.innerHTML =
+    '<div class="card">' +
+      '<div class="card-h"><h3>当前占比 vs 目标配比</h3>' +
+        '<div class="sp hint">外环 当前 · 内环 目标</div>' +
+      '</div>' +
+      '<div class="ov-top">' +
+        '<div class="donut-wrap">' + donutSVG(items) +
+          '<div class="donut-center">' +
+            '<div class="k">总资产</div>' +
+            '<div class="v">' + fmtMoney(m.total, 0) + '</div>' +
+            '<div class="s">' + state.holdings.length + ' 笔 · ' + state.platforms.length + ' 个平台</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="legend">' + items.map(it => {
+          const dev = it.pct - (m.targetSum > 0 ? it.targetPct / m.targetSum * 100 : 0);
+          const cls = Math.abs(dev) < 0.005 ? "flat" : (dev > 0 ? "up" : "down");
+          return '<div class="lg-row">' +
+            '<span class="sw" style="background:' + it.color + '"></span>' +
+            '<span class="nm">' + esc(it.name) + '<em>目标 ' + it.targetPct.toFixed(1) + '%</em></span>' +
+            '<span class="amt">' + fmtMoney(it.amount, 0) + '</span>' +
+            '<span class="pcts"><b>' + it.pct.toFixed(2) + '%</b>' +
+              '<span class="dev ' + cls + '">' + (dev >= 0 ? "+" : "−") + Math.abs(dev).toFixed(2) + '</span></span>' +
+          '</div>';
+        }).join("") + '</div>' +
+      '</div>' +
+      '<div class="stat-row">' +
+        '<div class="stat"><div class="k">目标配比合计</div><div class="v">' +
+          m.targetSum.toFixed(2) + '%' + (Math.abs(m.targetSum - 100) > 0.01 ? ' <small style="color:var(--up)">≠100%</small>' : '') +
+        '</div></div>' +
+        '<div class="stat"><div class="k">超出阈值类别</div><div class="v">' + trigCount +
+          ' <small>/ ' + plan.rows.length + '</small></div></div>' +
+        '<div class="stat"><div class="k">下次再平衡</div><div class="v" style="font-size:14px">' + dueHTML + '</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<div class="card-h"><h3>偏离度</h3><div class="sp hint">竖线为目标位置，条形为当前</div></div>' +
+      '<div class="bars">' + items.map(it => {
+        const t = m.targetSum > 0 ? it.targetPct / m.targetSum * 100 : 0;
+        const maxScale = Math.max(1, ...items.map(x => Math.max(x.pct, m.targetSum > 0 ? x.targetPct / m.targetSum * 100 : 0))) * 1.08;
+        const dev = it.pct - t;
+        const cls = Math.abs(dev) < 0.005 ? "flat" : (dev > 0 ? "up" : "down");
+        return '<div class="bar-item">' +
+          '<div class="bi-h"><span class="nm">' + esc(it.name) + '</span>' +
+            '<span class="sp">' + it.pct.toFixed(2) + '% <span class="dev ' + cls + '">' +
+            (dev >= 0 ? "+" : "−") + Math.abs(dev).toFixed(2) + 'pp</span></span></div>' +
+          '<div class="track">' +
+            '<div class="fill" style="width:' + (it.pct / maxScale * 100).toFixed(2) + '%;background:' + it.color + ';opacity:.85"></div>' +
+            '<div class="mark" style="left:' + (t / maxScale * 100).toFixed(2) + '%"></div>' +
+          '</div>' +
+        '</div>';
+      }).join("") + '</div>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<div class="card-h"><h3>平台分布</h3>' +
+        '<div class="sp"><button class="btn sm" data-goto="holdings">管理持仓</button></div></div>' +
+      '<div class="legend">' + state.platforms.map((p, i) => {
+        const amt = m.byPlatform.get(p.id) || 0;
+        const pct = m.total > 0 ? amt / m.total * 100 : 0;
+        return '<div class="lg-row">' +
+          '<span class="sw" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' +
+          '<span class="nm">' + esc(p.name) + '<em>' + state.holdings.filter(h => h.platformId === p.id).length + ' 笔</em></span>' +
+          '<span class="amt">' + fmtMoney(amt, 0) + '</span>' +
+          '<span class="pcts"><b>' + pct.toFixed(2) + '%</b></span>' +
+        '</div>';
+      }).join("") + '</div>' +
+    '</div>';
+
+  el.querySelectorAll("[data-goto]").forEach(b => b.onclick = () => switchTab(b.dataset.goto));
+}
+
+function emptyStateHTML(title, desc, withSeed){
+  return '<div class="empty">' +
+    '<div class="ico">◐</div>' +
+    '<h3>' + esc(title) + '</h3>' +
+    '<p>' + esc(desc) + '</p>' +
+    '<div class="acts">' +
+      (withSeed ? '<button class="btn primary" id="btnSeed">载入示例数据</button>' : '') +
+      '<button class="btn" id="btnFirst">直接开始录入</button>' +
+    '</div>' +
+  '</div>';
+}
+function bindEmpty(root){
+  const s = root.querySelector("#btnSeed");
+  if(s) s.onclick = () => { seedDemo(); };
+  const f = root.querySelector("#btnFirst");
+  if(f) f.onclick = () => { switchTab("holdings"); openHoldingModal(null); };
+}
+
+/* ============================ render: holdings ============================ */
+function renderHoldings(){
+  const el = document.getElementById("view-holdings");
+  const m = model();
+
+  let body = "";
+  if(state.holdings.length === 0){
+    body = emptyStateHTML("还没有持仓",
+      "先添加一个平台（如支付宝、天天基金、券商账户），再逐笔录入该平台下的资产。每笔资产需要指定它属于哪个组合——例如「易方达沪深300ETF联接A」属于「沪深300」组合。",
+      true);
+  }else if(ui.holdView === "platform"){
+    body = state.platforms.map((p, pi) => {
+      const hs = state.holdings.filter(h => h.platformId === p.id);
+      if(hs.length === 0 && state.platforms.length > 3) return "";
+      const amt = sum(hs, h => h.amount);
+      return '<div class="pf">' +
+        '<div class="pf-h">' +
+          '<span class="sw" style="width:9px;height:9px;border-radius:50%;background:' + PALETTE[pi % PALETTE.length] + '"></span>' +
+          '<span class="nm">' + esc(p.name) + '</span>' +
+          '<span class="meta">' + hs.length + ' 笔 · ' + fmtMoney(amt, 0) + '</span>' +
+          '<span class="sp">' +
+            '<button class="btn sm" data-add-h="' + p.id + '">+ 资产</button>' +
+            '<button class="icon-btn del" data-del-p="' + p.id + '" title="删除平台">' + ICON.trash + '</button>' +
+          '</span>' +
+        '</div>' +
+        (hs.length === 0
+          ? '<div class="pf-foot muted" style="justify-content:center">该平台下暂无资产</div>'
+          : hs.map(h => holdingRowHTML(h, m, true)).join("")) +
+      '</div>';
+    }).join("");
+
+    // 未指定平台的持仓
+    const orphanP = state.holdings.filter(h => !platformById(h.platformId));
+    if(orphanP.length){
+      body += '<div class="pf"><div class="pf-h"><span class="nm muted">未指定平台</span>' +
+        '<span class="meta">' + orphanP.length + ' 笔</span></div>' +
+        orphanP.map(h => holdingRowHTML(h, m, true)).join("") + '</div>';
+    }
+  }else{
+    // 按组合视图
+    body = m.groups.map(g => {
+      const hs = state.holdings.filter(h => h.groupId === g.id);
+      const target = g.targetPct;
+      const dev = g.curPct - (m.targetSum > 0 ? g.targetPct / m.targetSum * 100 : 0);
+      const cls = Math.abs(dev) < 0.005 ? "flat" : (dev > 0 ? "up" : "down");
+      return '<div class="pf">' +
+        '<div class="pf-h">' +
+          '<span class="sw" style="width:9px;height:9px;border-radius:50%;background:' + g.color + '"></span>' +
+          '<span class="nm">' + esc(g.name) + '</span>' +
+          '<span class="meta">' + hs.length + ' 笔 · ' + fmtMoney(g.amount, 0) + ' · ' + g.curPct.toFixed(2) + '%</span>' +
+          '<span class="sp">' +
+            '<span class="dev ' + cls + '">目标 ' + target.toFixed(1) + '%</span>' +
+            '<button class="btn sm" data-add-h-group="' + g.id + '">+ 资产</button>' +
+          '</span>' +
+        '</div>' +
+        (hs.length === 0
+          ? '<div class="pf-foot muted" style="justify-content:center">该组合下暂无持仓' + (target > 0 ? '，目标占比 ' + target.toFixed(1) + '%' : '') + '</div>'
+          : hs.map(h => holdingRowHTML(h, m, false)).join("")) +
+      '</div>';
+    }).join("");
+  }
+
+  el.innerHTML =
+    '<div class="card">' +
+      '<div class="card-h">' +
+        '<h3>持仓明细</h3>' +
+        '<div class="sp">' +
+          '<div class="seg" id="holdSeg">' +
+            '<button class="' + (ui.holdView === "platform" ? "on" : "") + '" data-hv="platform">按平台</button>' +
+            '<button class="' + (ui.holdView === "group" ? "on" : "") + '" data-hv="group">按组合</button>' +
+          '</div>' +
+          '<button class="btn sm" id="btnAddPlatform">+ 平台</button>' +
+          '<button class="btn primary sm" id="btnAddHolding">+ 添加资产</button>' +
+        '</div>' +
+      '</div>' +
+      body +
+      (state.holdings.length ? '<div class="hint" style="margin-top:14px">' +
+        '合计 <b class="num">' + fmtMoney(m.total) + '</b>，共 ' + state.holdings.length + ' 笔资产，分布于 ' +
+        state.platforms.length + ' 个平台、' + state.groups.length + ' 个组合。' +
+        (m.orphanCount ? ' <span style="color:var(--up)">有 ' + m.orphanCount + ' 笔持仓的组合已被删除，请重新归类。</span>' : '') +
+        '</div>' : '') +
+    '</div>';
+
+  // bind
+  el.querySelectorAll("[data-hv]").forEach(b => b.onclick = () => { ui.holdView = b.dataset.hv; renderHoldings(); });
+  el.querySelectorAll("[data-add-h]").forEach(b => b.onclick = () => openHoldingModal(null, b.dataset.addH));
+  el.querySelectorAll("[data-add-h-group]").forEach(b => b.onclick = () => openHoldingModal(null, null, b.dataset.addHGroup));
+  el.querySelectorAll("[data-del-p]").forEach(b => b.onclick = () => delPlatform(b.dataset.delP));
+  el.querySelectorAll("[data-edit-h]").forEach(b => b.onclick = () => openHoldingModal(b.dataset.editH));
+  el.querySelectorAll("[data-del-h]").forEach(b => b.onclick = () => delHolding(b.dataset.delH));
+  const ap = el.querySelector("#btnAddPlatform"); if(ap) ap.onclick = openPlatformModal;
+  const ah = el.querySelector("#btnAddHolding"); if(ah) ah.onclick = () => openHoldingModal(null);
+  bindEmpty(el);
+}
+
+function holdingRowHTML(h, m, showPlatform){
+  const g = groupById(h.groupId);
+  // 注意：g 是 state 里的原始组合（只有 name/targetPct/color），金额要从聚合模型 m 里取
+  const gAgg = m.groups.find(x => x.id === h.groupId);
+  const pct = m.total > 0 ? h.amount / m.total * 100 : 0;
+  return '<div class="hrow">' +
+    '<div class="nm"><b>' + esc(h.name) + '</b>' +
+      '<span>' +
+        (g ? '<span class="tag"><span class="sw" style="background:' + (g.color || "#B9AFA2") + '"></span>' + esc(g.name) + '</span>'
+           : '<span class="tag" style="color:var(--up)">未归类</span>') +
+        (showPlatform ? '<span>' + esc(platformName(h.platformId)) + '</span>' : '') +
+        (h.note ? '<span>' + esc(h.note) + '</span>' : '') +
+      '</span></div>' +
+    '<div class="amt num">' + fmtMoney(h.amount) + '</div>' +
+    '<div class="sh num">' + pct.toFixed(2) + '%<small>占总资产</small></div>' +
+    '<div class="sh num" style="font-size:12px">' + (gAgg ? fmtMoney(gAgg.amount, 0) : "—") + '<small>所属组合</small></div>' +
+    '<div class="ops">' +
+      '<button class="icon-btn" data-edit-h="' + h.id + '" title="编辑">' + ICON.edit + '</button>' +
+      '<button class="icon-btn del" data-del-h="' + h.id + '" title="删除">' + ICON.trash + '</button>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ============================ render: targets ============================ */
+function renderTargets(){
+  const el = document.getElementById("view-targets");
+  const m = model();
+  const tSum = m.targetSum;
+  const okTotal = Math.abs(tSum - 100) < 0.01;
+
+  const rowsHTML = state.groups.map((g, i) => {
+    const cur = m.groups.find(x => x.id === g.id);
+    const curPct = cur ? cur.curPct : 0;
+    const dev = curPct - (tSum > 0 ? num(g.targetPct) / tSum * 100 : 0);
+    const cls = Math.abs(dev) < 0.005 ? "flat" : (dev > 0 ? "up" : "down");
+    return '<div class="tg-row">' +
+      '<button class="sw-btn" data-color="' + g.id + '" style="background:' + (g.color || "#B9AFA2") + '" title="更换颜色"></button>' +
+      '<div class="tg-name">' + esc(g.name) +
+        '<small>' + fmtMoney(cur ? cur.amount : 0, 0) + ' · ' + (cur ? cur.holdings.length : 0) + ' 笔</small></div>' +
+      '<div class="cur-col" style="text-align:right;font-size:13px;font-variant-numeric:tabular-nums">' +
+        curPct.toFixed(2) + '%<span class="dev ' + cls + '" style="display:block;margin:2px 0 0">' +
+        (dev >= 0 ? "+" : "−") + Math.abs(dev).toFixed(2) + 'pp</span></div>' +
+      '<div class="pct-inp"><input class="inp num" type="number" inputmode="decimal" step="0.1" min="0" max="100" ' +
+        'value="' + (num(g.targetPct) || 0) + '" data-target="' + g.id + '"><span class="sfx">%</span></div>' +
+      '<div class="ops" style="display:flex;gap:2px;justify-content:flex-end">' +
+        '<button class="icon-btn" data-edit-g="' + g.id + '" title="重命名">' + ICON.edit + '</button>' +
+        '<button class="icon-btn del" data-del-g="' + g.id + '" title="删除">' + ICON.trash + '</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+
+  el.innerHTML =
+    '<div class="card">' +
+      '<div class="card-h"><h3>目标配比</h3>' +
+        '<div class="sp">' +
+          '<button class="btn sm" id="btnResetToCur" title="按当前市值占比生成一版目标，再手动微调">按当前占比重设</button>' +
+          '<button class="btn sm" id="btnAddGroup">+ 组合</button>' +
+        '</div></div>' +
+      (state.groups.length === 0
+        ? '<div class="hint" style="padding:16px 0;text-align:center">还没有组合。组合是目标配比的载体，例如「沪深300」「中证500」「债券」「现金」。' +
+          '<br><button class="btn primary sm" id="btnAddGroup2" style="margin-top:12px">+ 新建第一个组合</button></div>'
+        : rowsHTML +
+          '<div class="tg-total">合计' +
+            '<span class="badge ' + (okTotal ? "ok" : "bad") + '">' + (okTotal ? "正确" : (tSum > 100 ? "超出 " : "还差 ") + Math.abs(100 - tSum).toFixed(2) + "%") + '</span>' +
+            '<span class="sp">' + tSum.toFixed(2) + '%</span>' +
+          '</div>' +
+          '<div class="hint" style="margin-top:10px">' +
+            '目标配比合计应为 100%。即使不等于 100%，再平衡计算也会按比例归一化处理，但建议调整到位。' +
+            '同一个组合可以横跨多个平台的多只基金——它们会先合并计算该组合的占比，再与目标对比。' +
+          '</div>') +
+    '</div>';
+
+  el.querySelectorAll("[data-target]").forEach(inp => {
+    inp.onchange = () => {
+      const g = groupById(inp.dataset.target);
+      if(!g) return;
+      g.targetPct = clamp(num(inp.value), 0, 100);
+      save(); renderTargets(); renderOverview();
+    };
+    inp.oninput = () => {
+      // 实时更新合计
+      const g = groupById(inp.dataset.target);
+      if(g) g.targetPct = clamp(num(inp.value), 0, 100);
+      const s = sum(state.groups, x => num(x.targetPct));
+      const tot = el.querySelector(".tg-total .sp");
+      const badge = el.querySelector(".tg-total .badge");
+      if(tot) tot.textContent = s.toFixed(2) + "%";
+      if(badge){
+        const ok = Math.abs(s - 100) < 0.01;
+        badge.className = "badge " + (ok ? "ok" : "bad");
+        badge.textContent = ok ? "正确" : (s > 100 ? "超出 " : "还差 ") + Math.abs(100 - s).toFixed(2) + "%";
+      }
+    };
+  });
+  el.querySelectorAll("[data-edit-g]").forEach(b => b.onclick = () => openGroupModal(b.dataset.editG));
+  el.querySelectorAll("[data-del-g]").forEach(b => b.onclick = () => delGroup(b.dataset.delG));
+  el.querySelectorAll("[data-color]").forEach(b => b.onclick = () => cycleColor(b.dataset.color));
+  const a1 = el.querySelector("#btnAddGroup"); if(a1) a1.onclick = () => openGroupModal(null);
+  const a2 = el.querySelector("#btnAddGroup2"); if(a2) a2.onclick = () => openGroupModal(null);
+  const rc = el.querySelector("#btnResetToCur"); if(rc) rc.onclick = resetTargetsToCurrent;
+}
+
+function resetTargetsToCurrent(){
+  const m = model();
+  if(m.total <= 0){ toast("还没有持仓数据"); return; }
+  state.groups.forEach(g => {
+    const x = m.groups.find(y => y.id === g.id);
+    g.targetPct = Math.round((x ? x.curPct : 0) * 10) / 10;
+  });
+  // 修正舍入误差到 100
+  const s = sum(state.groups, g => num(g.targetPct));
+  const diff = Math.round((100 - s) * 10) / 10;
+  if(Math.abs(diff) >= 0.05 && state.groups.length){
+    let best = state.groups[0];
+    state.groups.forEach(g => { if(num(g.targetPct) > num(best.targetPct)) best = g; });
+    best.targetPct = Math.round((num(best.targetPct) + diff) * 10) / 10;
+  }
+  save(); renderTargets(); renderOverview();
+  toast("已按当前占比生成目标，可继续微调");
+}
+function cycleColor(gid){
+  const g = groupById(gid); if(!g) return;
+  const i = PALETTE.indexOf(g.color);
+  g.color = PALETTE[(i + 1 + PALETTE.length) % PALETTE.length];
+  save(); renderTargets(); renderOverview();
+}
+
+/* ============================ render: rebalance ============================ */
+function renderRebalance(){
+  const el = document.getElementById("view-rebalance");
+  const cfg = state.cfg;
+  const plan = buildPlan();
+
+  const cfgHTML =
+    '<div class="card">' +
+      '<div class="card-h"><h3>再平衡设置</h3>' +
+        '<div class="sp"><button class="btn primary sm" id="btnGen">生成方案</button></div></div>' +
+
+      '<div class="radio-row" style="margin-bottom:16px">' +
+        radioHTML("mode", "full", "全额再平衡", "卖出超配的资产，买入低配的资产，总资产不变。适合仓位已经明显偏离时。", cfg.mode === "full") +
+        radioHTML("mode", "cash", "增量再平衡", "不卖出，只用新增资金买入低配的类别。交易成本最低，适合有持续现金流入时。", cfg.mode === "cash") +
+      '</div>' +
+
+      '<div class="cfg-grid">' +
+        '<div class="field"><label>绝对偏离阈值</label>' +
+          '<div class="pct-inp"><input class="inp num" type="number" inputmode="decimal" step="0.5" min="0" max="100" value="' + cfg.absTh + '" data-cfg="absTh"><span class="sfx">pp</span></div>' +
+          '<span class="hint">占比偏离目标超过该值即触发</span></div>' +
+        '<div class="field"><label>相对偏离阈值</label>' +
+          '<div class="pct-inp"><input class="inp num" type="number" inputmode="decimal" step="1" min="0" max="500" value="' + cfg.relTh + '" data-cfg="relTh"><span class="sfx">%</span></div>' +
+          '<span class="hint">偏离 / 目标 超过该比例即触发</span></div>' +
+        '<div class="field"><label>最小交易金额</label>' +
+          '<div class="pct-inp"><input class="inp num" type="number" inputmode="decimal" step="100" min="0" value="' + cfg.minTrade + '" data-cfg="minTrade"><span class="sfx">元</span></div>' +
+          '<span class="hint">低于此金额的建议会被标记</span></div>' +
+        '<div class="field"><label>再平衡周期</label>' +
+          '<select class="inp" data-cfg="period">' +
+            ["month:每月","quarter:每季度","half:每半年","year:每年","none:不设周期"].map(o => {
+              const [v, t] = o.split(":");
+              return '<option value="' + v + '"' + (cfg.period === v ? " selected" : "") + '>' + t + '</option>';
+            }).join("") +
+          '</select></div>' +
+        '<div class="field"><label>上次再平衡日期</label>' +
+          '<input class="inp num" type="date" value="' + esc(cfg.lastRebalance) + '" data-cfg="lastRebalance"></div>' +
+        (cfg.mode === "cash"
+          ? '<div class="field"><label>本次新增资金</label>' +
+            '<div class="pct-inp"><input class="inp num" type="number" inputmode="decimal" step="1000" min="0" value="' + cfg.cash + '" data-cfg="cash"><span class="sfx">元</span></div>' +
+            '<span class="hint">准备投入的新钱，只买不卖</span></div>'
+          : '<div class="field"><label>调整范围</label>' +
+            '<select class="inp" data-cfg="scope">' +
+              '<option value="triggered"' + (cfg.scope === "triggered" ? " selected" : "") + '>只调整超阈值的类别</option>' +
+              '<option value="all"' + (cfg.scope === "all" ? " selected" : "") + '>全部调至目标</option>' +
+            '</select>' +
+            '<span class="hint">只调超阈值 = 交易更少</span></div>') +
+      '</div>' +
+    '</div>';
+
+  let resultHTML = "";
+  if(!plan.ok){
+    const msg = { empty:"还没有持仓数据，先去「持仓」页录入。",
+                  "no-target":"还没有设置目标配比，先去「目标配比」页设置。",
+                  "no-cash":"增量再平衡需要填写「本次新增资金」。" }[plan.reason] || "无法生成方案。";
+    resultHTML = '<div class="card"><div class="empty" style="padding:34px 20px;border-style:solid;border-color:var(--line)">' +
+      '<h3>暂时无法生成方案</h3><p style="margin-bottom:0">' + esc(msg) + '</p></div></div>';
+  }else{
+    resultHTML = planResultHTML(plan);
+  }
+
+  el.innerHTML = cfgHTML + resultHTML;
+  bindRebalance(el);
+}
+
+function radioHTML(name, value, title, desc, on){
+  return '<label class="radio' + (on ? " on" : "") + '">' +
+    '<input type="radio" name="' + name + '" value="' + value + '"' + (on ? " checked" : "") + ' data-cfg-radio="mode">' +
+    '<span><span class="t">' + esc(title) + '</span><span class="d">' + esc(desc) + '</span></span></label>';
+}
+
+function planResultHTML(plan){
+  const cfg = state.cfg;
+  const isCash = plan.mode === "cash";
+  const needAct = isCash ? plan.buys.length > 0 : (plan.sells.length > 0 || plan.buys.length > 0);
+
+  // 结论
+  let verdictCls = "verdict", verdictTitle, verdictBody;
+  if(isCash){
+    if(!needAct){ verdictTitle = "无需投入"; verdictBody = "当前所有类别都已达到或超过目标，新增资金无处可去。"; }
+    else{
+      verdictCls += " act";
+      verdictTitle = "新增资金分配方案";
+      verdictBody = "将 <b>" + fmtMoney(plan.cash, 0) + "</b> 按缺口比例投入 " + plan.buys.length + " 个低配类别，不产生任何卖出。";
+    }
+  }else{
+    if(!needAct){
+      verdictTitle = "当前无需再平衡";
+      verdictBody = "所有类别的偏离都在阈值之内（绝对阈值 " + cfg.absTh + "pp、相对阈值 " + cfg.relTh + "%），最大偏离 " +
+        plan.maxAbsDev.toFixed(2) + "pp。";
+    }else{
+      verdictCls += " act";
+      verdictTitle = "需要再平衡";
+      const trig = plan.rows.filter(r => r.triggered).length;
+      verdictBody = "有 <b>" + trig + "</b> 个类别偏离超过阈值。需要卖出 <b>" + fmtMoney(plan.sellTotal, 0) +
+        "</b>、买入 <b>" + fmtMoney(plan.buyTotal, 0) + "</b>，共 " + (plan.sells.length + plan.buys.length) + " 笔操作" +
+        (plan.tinyCount ? "（其中 " + plan.tinyCount + " 笔低于最小交易金额 " + fmtMoney(cfg.minTrade, 0) + "）" : "") + "。";
+      if(cfg.scope === "triggered") verdictBody += " 未超阈值的类别保持不动。";
+    }
+  }
+
+  const next = nextRebalanceDate(cfg.lastRebalance, cfg.period);
+  let dueLine = "";
+  if(next){
+    const dd = daysBetween(todayStr(), next);
+    dueLine = "下次计划再平衡：<b>" + fmtDate(next) + "</b>" +
+      (dd == null ? "" : dd < 0 ? '（已超期 ' + Math.abs(dd) + ' 天）' : dd === 0 ? "（就是今天）" : "（还有 " + dd + " 天）");
+  }
+
+  const iconOK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const iconAct = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v7M8 12.5v.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M8 3L5.2 6.2M8 3l2.8 3.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  let html = '<div class="card">' +
+    '<div class="' + verdictCls + '">' +
+      '<div class="mark-icon">' + (needAct ? iconAct : iconOK) + '</div>' +
+      '<div><h4>' + verdictTitle + '</h4><p>' + verdictBody + (dueLine ? '<br>' + dueLine : '') + '</p></div>' +
+    '</div>' +
+    (plan.warnings.length ? '<div class="hint" style="margin-top:12px;color:var(--accent)">' + plan.warnings.map(esc).join("<br>") + '</div>' : '') +
+  '</div>';
+
+  // 类别对比表
+  html += '<div class="card">' +
+    '<div class="card-h"><h3>调整前后对比</h3>' +
+      '<div class="sp hint">' + (isCash ? "总额 " + fmtMoney(plan.newTotal, 0) + "（含新增）" : "总额不变 " + fmtMoney(plan.m.total, 0)) + '</div></div>' +
+    '<table class="sum-table"><thead><tr>' +
+      '<th>组合</th><th>目标</th><th>当前</th><th></th><th>调整后</th><th>变动</th>' +
+    '</tr></thead><tbody>' +
+    plan.rows.map(r => {
+      const newPct = r.newPct, delta = r.delta;
+      const changed = Math.abs(delta) > 0.005;
+      const cls = r.triggered ? (r.absDev > 0 ? "up" : "down") : "flat";
+      return '<tr>' +
+        '<td><span class="gname"><span class="sw" style="background:' + r.color + '"></span>' + esc(r.name) +
+          (r.triggered ? ' <span class="dev ' + cls + '" style="margin-left:2px">' + (r.absDev > 0 ? "超配" : "低配") + '</span>' : '') + '</span></td>' +
+        '<td class="muted">' + r.normPct.toFixed(2) + '%</td>' +
+        '<td>' + r.curPct.toFixed(2) + '%</td>' +
+        '<td><span class="arrow">→</span></td>' +
+        '<td><b>' + newPct.toFixed(2) + '%</b></td>' +
+        '<td style="color:' + (changed ? (delta > 0 ? "var(--down)" : "var(--up)") : "var(--ink-3)") + '">' +
+          (changed ? fmtSigned(delta, 0) : "—") + '</td>' +
+      '</tr>';
+    }).join("") +
+    '</tbody></table>' +
+  '</div>';
+
+  // 交易清单
+  if(needAct){
+    html += '<div class="card">' +
+      '<div class="card-h"><h3>具体操作</h3>' +
+        '<div class="sp"><button class="btn sm" id="btnCopy">复制清单</button>' +
+        '<button class="btn sm" id="btnDone">标记为已完成</button></div></div>' +
+      (plan.sells.length ? tradeGroupHTML("卖出", plan.sells, "sell", plan.sellTotal, cfg) : "") +
+      (plan.buys.length ? tradeGroupHTML("买入", plan.buys, "buy", plan.buyTotal, cfg) : "") +
+      '<div class="hint" style="margin-top:14px">' +
+        (isCash ? "全部为买入操作，不产生赎回费用。" : "卖出端按组合内各持仓的金额比例分摊，买入端按组合内现有结构等比加仓，以保持组内结构不漂移。") +
+        (plan.tinyCount ? '<br><span class="mini-flag">标灰的 ' + plan.tinyCount + ' 笔低于最小交易金额，可忽略或累计到下次一并处理。</span>' : '') +
+        '<br>金额为建议值，实际下单时请按平台的最小交易单位（如 100 份 / 10 元起）取整。' +
+      '</div>' +
+    '</div>';
+  }
+
+  return html;
+}
+
+function tradeGroupHTML(title, list, kind, total, cfg){
+  return '<div class="trade-group">' +
+    '<div class="trade-h"><span class="tt">' + title + '</span>' +
+      '<span class="badge ' + (kind === "sell" ? "bad" : "ok") + '">' + list.length + ' 笔</span>' +
+      '<span class="sp">' + (kind === "sell" ? "−" : "+") + fmtMoney(total).slice(1) + '</span></div>' +
+    list.map(t => {
+      const noteBits = [];
+      if(t.note) noteBits.push(t.note);
+      else if(t.tiny) noteBits.push('<span class="mini-flag">低于最小交易额</span>');
+      return '<div class="trow ' + kind + (t.tiny ? " tiny" : "") + '">' +
+        '<div class="nm"><b>' + esc(t.name) + '</b><span>' +
+          '<span>' + esc(t.platformName) + '</span>' +
+          '<span class="tag"><span class="sw" style="background:' + t.group.color + '"></span>' + esc(t.group.name) + '</span>' +
+        '</span></div>' +
+        '<div class="amt num">' + (kind === "sell" ? "−" : "+") + fmtMoney(t.amount).slice(1) + '</div>' +
+        '<div class="note">' + (noteBits.join(" · ") || "&nbsp;") + '</div>' +
+      '</div>';
+    }).join("") +
+  '</div>';
+}
+
+function bindRebalance(el){
+  el.querySelectorAll("[data-cfg]").forEach(inp => {
+    const handler = () => {
+      const k = inp.dataset.cfg;
+      if(k === "lastRebalance" || k === "period") state.cfg[k] = inp.value;
+      else state.cfg[k] = num(inp.value);
+      save();
+      if(k === "period" || k === "lastRebalance") renderRebalance();
+    };
+    inp.onchange = handler;
+    if(inp.tagName === "SELECT") inp.onchange = () => { handler(); renderRebalance(); };
+  });
+  el.querySelectorAll("[data-cfg-radio]").forEach(r => {
+    r.onchange = () => {
+      state.cfg.mode = r.value;
+      save(); renderRebalance();
+    };
+  });
+  const gen = el.querySelector("#btnGen");
+  if(gen) gen.onclick = () => { renderRebalance(); toast("方案已更新"); };
+  const cp = el.querySelector("#btnCopy");
+  if(cp) cp.onclick = copyPlan;
+  const dn = el.querySelector("#btnDone");
+  if(dn) dn.onclick = markDone;
+}
+
+function currentPlanText(){
+  const plan = buildPlan();
+  if(!plan.ok || (!plan.sells.length && !plan.buys.length)) return null;
+  const lines = ["资产再平衡方案 " + todayStr(), "总资产 " + fmtMoney(plan.m.total, 0), ""];
+  if(plan.sells.length){
+    lines.push("【卖出】共 " + fmtMoney(plan.sellTotal, 0));
+    plan.sells.forEach(t => lines.push("  " + t.platformName + " · " + t.name + "（" + t.group.name + "）  −" + fmtMoney(t.amount, 2).slice(1)));
+    lines.push("");
+  }
+  if(plan.buys.length){
+    lines.push("【买入】共 " + fmtMoney(plan.buyTotal, 0));
+    plan.buys.forEach(t => lines.push("  " + t.platformName + " · " + t.name + "（" + t.group.name + "）  +" + fmtMoney(t.amount, 2).slice(1)));
+  }
+  return lines.join("\n");
+}
+function copyPlan(){
+  const txt = currentPlanText();
+  if(!txt){ toast("当前没有需要执行的操作"); return; }
+  const done = () => toast("清单已复制到剪贴板");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
+  }else fallbackCopy(txt, done);
+}
+function fallbackCopy(txt, cb){
+  const ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); cb(); }catch(e){ toast("复制失败，请手动选择"); }
+  document.body.removeChild(ta);
+}
+function markDone(){
+  state.cfg.lastRebalance = todayStr();
+  save(); renderRebalance(); renderOverview();
+  toast("已记录本次再平衡日期");
+}
+
+/* ============================ modals ============================ */
+const modalEl = document.getElementById("modal");
+let modalOnOk = null;
+
+function openModal(title, bodyHTML, onOk, okText){
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalBody").innerHTML = bodyHTML;
+  document.getElementById("modalOk").textContent = okText || "保存";
+  modalOnOk = onOk;
+  modalEl.hidden = false;
+  const first = modalEl.querySelector("input,select,textarea");
+  if(first) setTimeout(() => first.focus(), 60);
+}
+function closeModal(){ modalEl.hidden = true; modalOnOk = null; }
+modalEl.addEventListener("click", e => { if(e.target.closest("[data-close]")) closeModal(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !modalEl.hidden) closeModal(); });
+document.getElementById("modalOk").onclick = () => { if(modalOnOk) modalOnOk(); };
+modalEl.addEventListener("keydown", e => {
+  if(e.key === "Enter" && e.target.tagName !== "TEXTAREA"){ e.preventDefault(); if(modalOnOk) modalOnOk(); }
+});
+
+function fieldHTML(label, inner, hint){
+  return '<div class="field"><label>' + esc(label) + '</label>' + inner +
+    (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>';
+}
+
+/* --- 平台 --- */
+function openPlatformModal(){
+  openModal("添加平台",
+    fieldHTML("平台名称", '<input class="inp" id="mPName" placeholder="如：支付宝 / 天天基金 / 券商账户" maxlength="30">'),
+    () => {
+      const name = (document.getElementById("mPName").value || "").trim();
+      if(!name){ toast("请填写平台名称"); return; }
+      if(state.platforms.some(p => p.name === name)){ toast("该平台已存在"); return; }
+      state.platforms.push({ id: uid(), name });
+      save(); closeModal(); renderHoldings(); renderOverview();
+      toast("已添加平台「" + name + "」");
+    }, "添加");
+}
+
+function delPlatform(pid){
+  const p = platformById(pid); if(!p) return;
+  const hs = state.holdings.filter(h => h.platformId === pid);
+  if(hs.length){
+    openModal("删除平台",
+      '<div class="hint">平台「' + esc(p.name) + '」下有 <b>' + hs.length + '</b> 笔资产（合计 ' +
+      fmtMoney(sum(hs, h => h.amount)) + '）。删除平台会同时删除这些持仓记录，此操作不可撤销。</div>' +
+      '<div class="field"><label>确认请输入平台名称</label><input class="inp" id="mConfirm" placeholder="' + esc(p.name) + '"></div>',
+      () => {
+        const v = (document.getElementById("mConfirm").value || "").trim();
+        if(v !== p.name){ toast("名称不匹配"); return; }
+        state.holdings = state.holdings.filter(h => h.platformId !== pid);
+        state.platforms = state.platforms.filter(x => x.id !== pid);
+        save(); closeModal(); renderAll(); toast("已删除");
+      }, "删除");
+  }else{
+    state.platforms = state.platforms.filter(x => x.id !== pid);
+    save(); renderAll(); toast("已删除平台");
+  }
+}
+
+/* --- 持仓 --- */
+function openHoldingModal(hid, presetPlatform, presetGroup){
+  const editing = hid ? state.holdings.find(h => h.id === hid) : null;
+  if(state.platforms.length === 0 && !editing){
+    openPlatformModal(); toast("请先创建一个平台"); return;
+  }
+  if(state.groups.length === 0 && !editing){
+    toast("请先在「目标配比」页创建组合");
+    switchTab("targets"); openGroupModal(null);
+    return;
+  }
+  const pOpts = state.platforms.map(p =>
+    '<option value="' + p.id + '"' + ((editing ? editing.platformId : presetPlatform) === p.id ? " selected" : "") + '>' + esc(p.name) + '</option>').join("");
+  const gOpts = state.groups.map(g =>
+    '<option value="' + g.id + '"' + ((editing ? editing.groupId : presetGroup) === g.id ? " selected" : "") + '>' + esc(g.name) + '</option>').join("");
+
+  openModal(editing ? "编辑资产" : "添加资产",
+    fieldHTML("平台", '<select class="inp" id="mHPlatform">' + pOpts + '</select>') +
+    fieldHTML("资产名称", '<input class="inp" id="mHName" placeholder="如：易方达沪深300ETF联接A" maxlength="60" value="' + esc(editing ? editing.name : "") + '">') +
+    fieldHTML("归属组合", '<select class="inp" id="mHGroup">' + gOpts + '</select>',
+      "同一组合下可以有多个平台的多只基金，它们会合并计算占比") +
+    fieldHTML("当前金额", '<div class="pct-inp"><input class="inp num" id="mHAmount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" value="' + (editing ? editing.amount : "") + '"><span class="sfx">元</span></div>') +
+    fieldHTML("备注（可选）", '<input class="inp" id="mHNote" placeholder="如：定投 / 场内 / 锁定至 2027" maxlength="40" value="' + esc(editing ? editing.note : "") + '">') +
+    '<div class="err" id="mErr"></div>',
+    () => {
+      const name = (document.getElementById("mHName").value || "").trim();
+      const platformId = document.getElementById("mHPlatform").value;
+      const groupId = document.getElementById("mHGroup").value;
+      const amount = num(document.getElementById("mHAmount").value);
+      const note = (document.getElementById("mHNote").value || "").trim();
+      const err = document.getElementById("mErr");
+      if(!name){ err.textContent = "请填写资产名称"; return; }
+      if(amount < 0){ err.textContent = "金额不能为负"; return; }
+      if(editing){
+        Object.assign(editing, { name, platformId, groupId, amount, note });
+        toast("已保存");
+      }else{
+        state.holdings.push({ id: uid(), name, platformId, groupId, amount, note });
+        toast("已添加「" + name + "」");
+      }
+      save(); closeModal(); renderAll();
+    });
+}
+
+function delHolding(hid){
+  const h = state.holdings.find(x => x.id === hid); if(!h) return;
+  state.holdings = state.holdings.filter(x => x.id !== hid);
+  save(); renderAll(); toast("已删除「" + h.name + "」");
+}
+
+/* --- 组合 --- */
+function openGroupModal(gid){
+  const editing = gid ? groupById(gid) : null;
+  openModal(editing ? "编辑组合" : "新建组合",
+    fieldHTML("组合名称", '<input class="inp" id="mGName" placeholder="如：沪深300 / 中证500 / 债券 / 现金" maxlength="30" value="' + esc(editing ? editing.name : "") + '">',
+      "组合是目标配比的单位。同名标的在不同平台的多只基金，应归入同一个组合。") +
+    fieldHTML("目标占比", '<div class="pct-inp"><input class="inp num" id="mGTarget" type="number" inputmode="decimal" step="0.1" min="0" max="100" placeholder="0" value="' + (editing ? num(editing.targetPct) : "") + '"><span class="sfx">%</span></div>') +
+    '<div class="err" id="mErr"></div>',
+    () => {
+      const name = (document.getElementById("mGName").value || "").trim();
+      const targetPct = clamp(num(document.getElementById("mGTarget").value), 0, 100);
+      const err = document.getElementById("mErr");
+      if(!name){ err.textContent = "请填写组合名称"; return; }
+      if(editing){
+        editing.name = name; editing.targetPct = targetPct;
+      }else{
+        state.groups.push({ id: uid(), name, targetPct, color: PALETTE[state.groups.length % PALETTE.length] });
+      }
+      save(); closeModal(); renderAll();
+      toast(editing ? "已保存" : "已创建组合「" + name + "」");
+    });
+}
+
+function delGroup(gid){
+  const g = groupById(gid); if(!g) return;
+  const hs = state.holdings.filter(h => h.groupId === gid);
+  const doDel = () => {
+    state.groups = state.groups.filter(x => x.id !== gid);
+    save(); renderAll(); toast("已删除组合「" + g.name + "」");
+  };
+  if(hs.length){
+    openModal("删除组合",
+      '<div class="hint">组合「' + esc(g.name) + '」下有 <b>' + hs.length + '</b> 笔持仓（合计 ' + fmtMoney(sum(hs, h => h.amount)) +
+      '）。删除后这些持仓会变成「未归类」，金额不会丢失，但需要重新指定组合。</div>',
+      doDel, "删除");
+  }else doDel();
+}
+
+/* ============================ import / export ============================ */
+function exportJSON(){
+  const data = { v:1, exportedAt: new Date().toISOString(), groups: state.groups, platforms: state.platforms, holdings: state.holdings, cfg: state.cfg };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "资产配置_" + todayStr() + ".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("已导出备份文件");
+}
+function importJSON(file){
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.holdings)) throw new Error("格式不正确");
+      const s = blankState();
+      s.groups = d.groups || []; s.platforms = d.platforms || []; s.holdings = d.holdings || [];
+      s.cfg = Object.assign(s.cfg, d.cfg || {});
+      state = s;
+      save(); renderAll();
+      toast("已导入 " + s.holdings.length + " 笔持仓");
+    }catch(e){ toast("导入失败：文件格式不正确"); }
+  };
+  r.readAsText(file);
+}
+
+/* ============================ demo data ============================ */
+function seedDemo(){
+  state = blankState();
+  const pA = { id: uid(), name: "支付宝" };
+  const pB = { id: uid(), name: "天天基金" };
+  const pC = { id: uid(), name: "券商账户" };
+  state.platforms = [pA, pB, pC];
+
+  const gDefs = [
+    ["沪深300", 30], ["中证500", 15], ["纳斯达克100", 20], ["债券", 25], ["现金", 10]
+  ];
+  state.groups = gDefs.map((d, i) => ({ id: uid(), name: d[0], targetPct: d[1], color: PALETTE[i % PALETTE.length] }));
+  const G = {}; state.groups.forEach(g => G[g.name] = g.id);
+
+  const rows = [
+    [pA.id, "易方达沪深300ETF联接A", "沪深300", 42000, "每月定投"],
+    [pA.id, "天弘中证500指数A", "中证500", 12000, ""],
+    [pA.id, "博时信用债券A", "债券", 18000, ""],
+    [pB.id, "华夏沪深300ETF联接A", "沪深300", 21500, ""],
+    [pB.id, "广发纳斯达克100指数A", "纳斯达克100", 30000, "QDII"],
+    [pB.id, "易方达中债7-10年国开债A", "债券", 22000, ""],
+    [pC.id, "华泰柏瑞沪深300ETF", "沪深300", 15000, "场内"],
+    [pC.id, "南方中证500ETF", "中证500", 9000, "场内"],
+    [pC.id, "招商产业债券A", "债券", 11000, ""],
+    [pC.id, "现金 / 货币基金", "现金", 8500, "备用金"]
+  ];
+  state.holdings = rows.map(r => ({
+    id: uid(), platformId: r[0], name: r[1], groupId: G[r[2]], amount: r[3], note: r[4]
+  }));
+  state.cfg.lastRebalance = addMonths(todayStr(), -3);
+  state.cfg.cash = 10000;
+  save(); renderAll();
+  toast("已载入示例数据，可随时清空重来");
+}
+
+/* ============================ reset ============================ */
+function resetAll(){
+  openModal("清空全部数据",
+    '<div class="hint">将删除本机保存的全部平台、组合、持仓与设置。此操作不可撤销。' +
+    '<br>建议先「导出」一份 JSON 备份。</div>' +
+    '<div class="field"><label>确认请输入 <b>清空</b></label><input class="inp" id="mConfirm" placeholder="清空"></div>',
+    () => {
+      const v = (document.getElementById("mConfirm").value || "").trim();
+      if(v !== "清空"){ toast("输入不匹配"); return; }
+      state = blankState();
+      try{ localStorage.removeItem(LS_KEY); }catch(e){}
+      closeModal(); renderAll(); toast("已清空");
+    }, "清空");
+}
+
+/* ============================ tabs & boot ============================ */
+function switchTab(t){
+  ui.tab = t;
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id === "view-" + t));
+  window.scrollTo({ top:0, behavior:"auto" });
+}
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest(".tab"); if(b) switchTab(b.dataset.tab);
+});
+document.getElementById("btnExport").onclick = exportJSON;
+document.getElementById("btnImport").onclick = () => document.getElementById("fileInput").click();
+document.getElementById("fileInput").onchange = e => { if(e.target.files[0]) importJSON(e.target.files[0]); e.target.value = ""; };
+document.getElementById("btnReset").onclick = resetAll;
+
+/* icons */
+const ICON = {
+  edit: '<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M11.2 2.6l2.2 2.2L6 12.2l-3 .8.8-3 7.4-7.4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+  trash: '<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3.5 4.5h9M6.5 4.5V3h3v1.5M5 4.5l.6 8h4.8l.6-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+
+function renderAll(){
+  const m = model();
+  document.getElementById("hdrTotal").textContent = m.total > 0 ? fmtMoney(m.total, 0) : "—";
+  renderOverview(); renderHoldings(); renderTargets(); renderRebalance();
+}
+
+(function boot(){
+  const had = load();
+  renderAll();
+  if(!had && state.holdings.length === 0){
+    // 首次打开：停留在总览的空状态
+  }
+})();
+
+/* 暴露给自动化测试 */
+window.__APP__ = {
+  get state(){ return state; },
+  model, buildPlan, seedDemo, renderAll, switchTab,
+  setState(s){ state = s; save(); renderAll(); }
+};
+</script>
+</body>
+</html>
