@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>大模型是什么？—— 给小朋友的一堂课</title>
+<style>
+:root{
+  --paper:#FBF7F0;
+  --paper-2:#F5EFE4;
+  --card:#FFFFFF;
+  --ink:#2C2721;
+  --ink-2:#574F44;
+  --muted:#8C8377;
+  --line:#ECE3D5;
+  --line-2:#DED3C1;
+  --amber:#C96A20;
+  --amber-2:#E08A3C;
+  --amber-soft:#FBEBD9;
+  --teal:#2C7570;
+  --teal-soft:#E1EFEC;
+  --indigo:#48599E;
+  --indigo-soft:#E6EAF5;
+  --rose:#B84E38;
+  --rose-soft:#FAE5E0;
+  --green:#4C7A3A;
+  --green-soft:#E6EFE0;
+  --r-lg:22px;
+  --r-md:14px;
+  --r-sm:10px;
+  --shadow:0 1px 2px rgba(44,39,33,.04), 0 10px 28px rgba(44,39,33,.06);
+  --shadow-sm:0 1px 2px rgba(44,39,33,.05), 0 4px 12px rgba(44,39,33,.05);
+  --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--font);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:17px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* 纸张质感：极淡的暖色网点，不用图片 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(224,138,60,.07), transparent 42%),
+    radial-gradient(circle at 88% 22%, rgba(44,117,112,.06), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(72,89,158,.05), transparent 45%);
+}
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 22px}
+
+/* ---------- 顶部进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--amber),var(--teal));width:0;z-index:60;border-radius:0 2px 2px 0;transition:width .12s linear}
+
+/* ---------- 侧边导航点 ---------- */
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:55;display:flex;flex-direction:column;gap:11px}
+#dots a{
+  position:relative;width:11px;height:11px;border-radius:50%;
+  background:var(--line-2);border:2px solid var(--paper);
+  display:block;transition:background .25s, transform .25s;
+}
+#dots a.on{background:var(--amber);transform:scale(1.35)}
+#dots a span{
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  background:var(--ink);color:#fff;font-size:12.5px;padding:3px 9px;border-radius:7px;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;font-weight:600;letter-spacing:.02em;
+}
+#dots a:hover span{opacity:1}
+@media (max-width:1100px){#dots{display:none}}
+
+/* ---------- 通用 ---------- */
+section{padding:74px 0 20px;scroll-margin-top:20px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--amber);
+  background:var(--amber-soft);border-radius:999px;padding:5px 13px;margin-bottom:16px;
+}
+h1{font-size:clamp(32px,6.2vw,50px);line-height:1.28;margin:0 0 18px;letter-spacing:-.01em;font-weight:800}
+h2{font-size:clamp(25px,4.4vw,34px);line-height:1.35;margin:0 0 12px;letter-spacing:-.01em;font-weight:800}
+h3{font-size:19px;margin:0 0 8px;font-weight:800;letter-spacing:-.005em}
+.lede{font-size:clamp(17px,2.4vw,19.5px);color:var(--ink-2);margin:0 0 26px;max-width:62ch}
+p{margin:0 0 14px}
+.muted{color:var(--muted);font-size:15px}
+strong{font-weight:800}
+em{font-style:normal;background:linear-gradient(transparent 62%, var(--amber-soft) 62%);padding:0 2px;font-weight:700}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+
+.btn{
+  font-family:inherit;font-size:16px;font-weight:800;color:#fff;background:var(--amber);
+  border:none;border-radius:999px;padding:12px 22px;cursor:pointer;
+  box-shadow:0 2px 0 #A4561A, 0 6px 16px rgba(201,106,32,.24);
+  transition:transform .12s, box-shadow .12s, background .2s;
+}
+.btn:hover{background:var(--amber-2);transform:translateY(-1px)}
+.btn:active{transform:translateY(2px);box-shadow:0 0 0 #A4561A}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:var(--card);color:var(--ink-2);border:1.5px solid var(--line-2);box-shadow:none;font-weight:700}
+.btn.ghost:hover{background:var(--paper-2);transform:none}
+.btn.sm{font-size:14.5px;padding:9px 16px}
+.btn.dark{background:var(--ink);box-shadow:0 2px 0 #17130F}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- HERO ---------- */
+.hero{padding-top:64px}
+.hero-flex{display:grid;grid-template-columns:1.35fr .65fr;gap:28px;align-items:center}
+@media (max-width:700px){.hero-flex{grid-template-columns:1fr;gap:18px}.hero-art{order:-1;max-width:220px;margin:0 auto}}
+.hero-q{
+  font-size:clamp(20px,3.4vw,26px);font-weight:800;line-height:1.5;
+  border-left:5px solid var(--amber);padding-left:16px;margin:0 0 20px;color:var(--ink);
+}
+.hero-answer{
+  background:var(--teal-soft);border-radius:var(--r-md);padding:18px 20px;
+  font-size:clamp(17px,2.5vw,20px);font-weight:700;color:#1F5B57;line-height:1.65;
+}
+.hero-art svg{width:100%;height:auto;display:block}
+.scroll-hint{margin-top:30px;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.scroll-hint i{display:inline-block;animation:bob 1.8s ease-in-out infinite;font-style:normal}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ---------- 游乐场 ---------- */
+.paper-out{
+  background:var(--paper-2);border:1.5px dashed var(--line-2);border-radius:var(--r-md);
+  padding:20px;min-height:118px;font-size:clamp(19px,3vw,23px);line-height:2.05;font-weight:600;
+  word-break:break-all;position:relative;
+}
+.paper-out .seed{color:var(--muted);font-weight:600}
+.paper-out .gen{color:var(--ink)}
+.paper-out .cur{
+  color:var(--amber);animation:pop .32s cubic-bezier(.34,1.56,.64,1);
+  display:inline-block;
+}
+@keyframes pop{from{transform:scale(.2) translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+.caret{display:inline-block;width:3px;height:1.05em;background:var(--amber);vertical-align:-.18em;animation:blink 1s steps(2) infinite;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+
+.cand{display:grid;gap:8px;margin-top:14px}
+.cand-row{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:9px 13px;cursor:pointer;transition:border-color .15s, background .15s, transform .12s;
+  font-weight:700;
+}
+.cand-row:hover{border-color:var(--amber);background:var(--amber-soft);transform:translateX(3px)}
+.cand-row .ch{font-size:20px;min-width:1.6em;text-align:center}
+.cand-bar{height:9px;border-radius:99px;background:var(--paper-2);overflow:hidden}
+.cand-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber),var(--amber-2));transition:width .4s cubic-bezier(.2,.8,.3,1)}
+.cand-row:nth-child(2) .cand-bar i{background:linear-gradient(90deg,#8E7CC3,#A899DA)}
+.cand-row:nth-child(3) .cand-bar i{background:linear-gradient(90deg,#5A9E97,#7FBCB5)}
+.cand-row:nth-child(4) .cand-bar i{background:linear-gradient(90deg,#B79A86,#CBB3A1)}
+.cand-pct{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:3.4em;text-align:right}
+.cand-hint{font-size:13.5px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:7px;min-height:20px}
+.pill{display:inline-block;background:var(--indigo-soft);color:var(--indigo);font-size:12px;font-weight:800;padding:2px 9px;border-radius:99px}
+
+/* 控件 */
+.ctrl{background:var(--paper-2);border-radius:var(--r-md);padding:15px 17px;margin-top:16px}
+.ctrl + .ctrl{margin-top:10px}
+.ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14.5px;font-weight:800;margin-bottom:8px}
+.ctrl-head .val{color:var(--amber);font-variant-numeric:tabular-nums;font-size:13.5px}
+.ctrl-note{font-size:13px;color:var(--muted);margin-top:7px;line-height:1.6}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0;
+}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--line-2)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--card);
+  border:3px solid var(--amber);margin-top:-8px;box-shadow:0 2px 6px rgba(44,39,33,.18);
+}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:var(--line-2)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--card);border:3px solid var(--amber)}
+.scale{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:2px}
+
+input[type=text]{
+  font-family:inherit;font-size:17px;font-weight:700;color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:var(--r-sm);padding:12px 15px;width:100%;background:var(--card);
+}
+input[type=text]:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.stat{background:var(--paper-2);border-radius:var(--r-sm);padding:12px 14px;text-align:center}
+.stat b{display:block;font-size:clamp(20px,3.4vw,26px);font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:12.5px;color:var(--muted)}
+
+/* ---------- token ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px;min-height:60px}
+.chip{
+  padding:7px 12px;border-radius:9px;font-weight:800;font-size:17px;
+  border:1.5px solid transparent;cursor:default;
+  animation:pop .3s cubic-bezier(.34,1.56,.64,1) backwards;
+}
+.chip.c0{background:#FBE7D3;color:#8A4A16;border-color:#F0CBA6}
+.chip.c1{background:#DFEDE9;color:#1F5B57;border-color:#BADCD5}
+.chip.c2{background:#E5EAF6;color:#38478A;border-color:#C4CCEA}
+.chip.c3{background:#F7E4DF;color:#8E3A28;border-color:#EBCCC3}
+.chip.c4{background:#E7F0DC;color:#3E6A2C;border-color:#CFE2BC}
+
+/* ---------- 对错对比 ---------- */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:700px){.vs{grid-template-columns:1fr}}
+.vs-col{border-radius:var(--r-lg);padding:22px;border:1.5px solid}
+.vs-yes{background:var(--green-soft);border-color:#C9DDBB}
+.vs-no{background:var(--rose-soft);border-color:#EBC9C0}
+.vs-col h3{margin-bottom:14px}
+.vs-yes h3{color:#3C6430}
+.vs-no h3{color:#9C3E2A}
+.vs-col ul{margin:0;padding-left:0;list-style:none}
+.vs-col li{padding:7px 0 7px 26px;position:relative;font-size:16px;line-height:1.6}
+.vs-yes li::before{content:"✓";position:absolute;left:0;font-weight:900;color:var(--green)}
+.vs-no li::before{content:"✕";position:absolute;left:0;font-weight:900;color:var(--rose)}
+
+/* ---------- 判断卡 ---------- */
+.judge{border:1.5px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:12px;background:var(--card)}
+.judge-q{font-weight:700;font-size:17px;line-height:1.6;margin-bottom:12px}
+.judge-q .say{display:block;background:var(--paper-2);border-radius:var(--r-sm);padding:11px 14px;margin-bottom:11px;font-style:italic}
+.judge.ok{border-color:#B7D3A8;background:var(--green-soft)}
+.judge.bad{border-color:#E7BCAF;background:var(--rose-soft)}
+.judge-fb{font-size:15px;font-weight:700;margin-top:11px;display:none;line-height:1.65}
+.judge.ok .judge-fb,.judge.bad .judge-fb{display:block}
+.judge.ok .judge-fb{color:#3C6430}
+.judge.bad .judge-fb{color:#9C3E2A}
+
+/* ---------- 测验 ---------- */
+.q{border:1.5px solid var(--line);border-radius:var(--r-md);padding:20px;margin-bottom:14px}
+.q-t{font-weight:800;font-size:17.5px;margin-bottom:14px;line-height:1.55}
+.q-t i{font-style:normal;color:var(--amber);font-weight:900;margin-right:6px}
+.opts{display:grid;gap:9px}
+.opt{
+  text-align:left;font-family:inherit;font-size:16px;background:var(--card);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:var(--r-sm);padding:12px 15px;cursor:pointer;
+  font-weight:600;transition:all .15s;line-height:1.55;
+}
+.opt:hover:not([disabled]){border-color:var(--amber);background:var(--amber-soft)}
+.opt[disabled]{cursor:default}
+.opt.right{background:var(--green-soft);border-color:#A8C894;color:#33601F;font-weight:800}
+.opt.wrong{background:var(--rose-soft);border-color:#E0B3A7;color:#8E3A28}
+.q-fb{font-size:14.5px;margin-top:11px;display:none;line-height:1.65;color:var(--ink-2)}
+.q-fb.show{display:block}
+.score{
+  background:var(--ink);color:#fff;border-radius:var(--r-lg);padding:24px;text-align:center;margin-top:20px;display:none;
+}
+.score.show{display:block;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+.score b{display:block;font-size:38px;line-height:1.2;margin-bottom:4px}
+.score span{font-size:15.5px;opacity:.9}
+
+/* ---------- 好习惯 ---------- */
+.tip{display:grid;grid-template-columns:auto 1fr;gap:15px;align-items:start;padding:17px 0;border-bottom:1px solid var(--line)}
+.tip:last-child{border-bottom:none}
+.tip-ic{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  font-size:21px;font-weight:900;flex-shrink:0;
+}
+.tip:nth-child(1) .tip-ic{background:var(--amber-soft);color:var(--amber)}
+.tip:nth-child(2) .tip-ic{background:var(--teal-soft);color:var(--teal)}
+.tip:nth-child(3) .tip-ic{background:var(--rose-soft);color:var(--rose)}
+.tip:nth-child(4) .tip-ic{background:var(--indigo-soft);color:var(--indigo)}
+.tip h3{margin-bottom:3px}
+.tip p{margin:0;font-size:15.5px;color:var(--ink-2)}
+
+.callout{
+  background:var(--amber-soft);border:1.5px solid #F0D3AE;border-radius:var(--r-md);
+  padding:18px 20px;margin-top:18px;font-size:15.5px;line-height:1.7;
+}
+.callout b{color:#8A4A16}
+
+/* ---------- 结尾 ---------- */
+footer{margin-top:70px;padding:34px 0 60px;border-top:1px solid var(--line);font-size:14.5px;color:var(--muted);line-height:1.8}
+footer h3{font-size:16px;color:var(--ink);margin-bottom:8px}
+footer .f-note{max-width:70ch}
+.big-end{
+  text-align:center;padding:44px 24px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-lg);box-shadow:var(--shadow);margin-top:20px;
+}
+.big-end p{font-size:clamp(19px,3vw,24px);font-weight:800;line-height:1.6;margin:0}
+.big-end .sub{font-size:15px;font-weight:600;color:var(--muted);margin-top:12px}
+
+@media (max-width:600px){
+  body{font-size:16px}
+  section{padding:56px 0 16px}
+  .wrap{padding:0 17px}
+  .card{padding:19px}
+  .stats{grid-template-columns:1fr;gap:8px}
+  .stat{display:flex;justify-content:space-between;align-items:baseline;text-align:left}
+  .stat b{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+
+<nav id="dots" aria-label="章节导航">
+  <a href="#hero"><span>开场</span></a>
+  <a href="#play"><span>猜词游戏</span></a>
+  <a href="#data"><span>读了多少书</span></a>
+  <a href="#tokens"><span>把话切成块</span></a>
+  <a href="#wrong"><span>它会犯错</span></a>
+  <a href="#different"><span>它和我们</span></a>
+  <a href="#quiz"><span>小测验</span></a>
+  <a href="#tips"><span>用它的好习惯</span></a>
+</nav>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section id="hero" class="hero">
+    <div class="hero-flex">
+      <div>
+        <div class="eyebrow">◐ 给 6–12 岁的一堂课</div>
+        <h1>电脑是怎么<br>学会说话的？</h1>
+        <p class="hero-q">「大模型好像什么都懂。<br>它是真的在『想』吗？」</p>
+        <div class="hero-answer">
+          不是哦。它其实在玩一个游戏：<br>
+          <strong>猜下一个字该是什么。</strong><br>
+          一次只猜一个字，猜完接着猜下一个。
+        </div>
+        <div class="scroll-hint"><i>↓</i> 往下滚，你可以亲手玩一玩这个游戏</div>
+      </div>
+      <div class="hero-art">
+        <!-- 小机器人：小语 -->
+        <svg viewBox="0 0 200 220" role="img" aria-label="一个叫小语的机器人">
+          <ellipse cx="100" cy="208" rx="58" ry="8" fill="#2C2721" opacity=".07"/>
+          <path d="M100 44 L100 22" stroke="#C96A20" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="100" cy="15" r="7" fill="#E08A3C">
+            <animate attributeName="r" values="7;9;7" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <rect x="34" y="44" width="132" height="104" rx="30" fill="#2C7570"/>
+          <rect x="34" y="44" width="132" height="104" rx="30" fill="none" stroke="#1F5B57" stroke-width="3"/>
+          <rect x="52" y="68" width="96" height="52" rx="22" fill="#FBF7F0"/>
+          <circle cx="80" cy="94" r="10" fill="#2C2721">
+            <animate attributeName="ry" values="10;10;1.5;10;10" dur="0s" repeatCount="indefinite"/>
+          </circle>
+          <g>
+            <circle cx="80" cy="94" r="10" fill="#2C2721"/>
+            <circle cx="120" cy="94" r="10" fill="#2C2721"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="3s" repeatCount="indefinite"/>
+          </g>
+          <circle cx="83.5" cy="90.5" r="3.2" fill="#fff"/>
+          <circle cx="123.5" cy="90.5" r="3.2" fill="#fff"/>
+          <path d="M88 112 Q100 121 112 112" stroke="#2C2721" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+          <rect x="72" y="148" width="56" height="12" rx="6" fill="#1F5B57"/>
+          <rect x="60" y="164" width="80" height="26" rx="12" fill="#C96A20"/>
+          <text x="100" y="182" text-anchor="middle" font-size="14" font-weight="800" fill="#fff" font-family="-apple-system,PingFang SC,sans-serif">小语</text>
+          <path d="M20 78 L34 78" stroke="#C96A20" stroke-width="5" stroke-linecap="round"/>
+          <path d="M180 78 L166 78" stroke="#C96A20" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 01 猜词游戏 ============ -->
+  <section id="play">
+    <div class="eyebrow">01 · 亲手玩一玩</div>
+    <h2>来，和小语一起猜下一个字</h2>
+    <p class="lede">你给它一句话的开头，它会算出「接下来最可能是哪个字」，然后选一个接上去——接完再猜下一个。<strong>整个大模型做的事，就是这个。</strong></p>
+
+    <div class="card">
+      <label for="seed" style="font-size:14.5px;font-weight:800;display:block;margin-bottom:8px">给它一个开头：</label>
+      <input id="seed" type="text" value="从前有一只小猫" maxlength="40" placeholder="比如：太阳是一个">
+
+      <div class="paper-out" id="out" style="margin-top:16px" aria-live="polite">
+        <span class="seed">从前有一只小猫</span><span class="gen"></span>
+      </div>
+
+      <div class="cand" id="cand" aria-live="polite"></div>
+      <div class="cand-hint" id="candHint">点「接着写」，看看它想接什么。</div>
+
+      <div class="row" style="margin-top:16px">
+        <button class="btn" id="go">接着写 →</button>
+        <button class="btn ghost" id="again">再写一次</button>
+        <button class="btn ghost" id="clear">清空</button>
+        <label class="row" style="gap:7px;font-size:14.5px;font-weight:700;cursor:pointer;margin-left:auto">
+          <input type="checkbox" id="mine" style="width:17px;height:17px;accent-color:var(--amber)"> 我自己来选
+        </label>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><span>🌡️ 想象力旋钮（温度）</span><span class="val" id="tVal">0.7</span></div>
+        <input type="range" id="temp" min="0.2" max="1.6" step="0.1" value="0.7">
+        <div class="scale"><span>很保守 · 总选最有把握的</span><span>很跳脱 · 更有创意</span></div>
+        <div class="ctrl-note">调低：它总挑把握最大的那个字，话很稳但有点重复。调高：它也更愿意选把握小的字，更有意思，<strong>但也更容易说错</strong>。</div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><span>⚡ 写字速度</span><span class="val" id="sVal">中速</span></div>
+        <input type="range" id="speed" min="0" max="2" step="1" value="1">
+        <div class="scale"><span>慢（看得清）</span><span>中</span><span>快</span></div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:18px">
+      <b>小实验：</b>把「想象力旋钮」拉到最大，再点「再写一次」。你会看到它说的话变得……有点乱？
+      这就是同一个模型、同一个开头，只是<em>选字的胆子变大了</em>。
+    </div>
+  </section>
+
+  <!-- ============ 02 读了多少书 ============ -->
+  <section id="data">
+    <div class="eyebrow">02 · 它为什么猜得准</div>
+    <h2>因为它「读」过好多好多的书</h2>
+    <p class="lede">小语不是天生的聪明。它把成千上万本书、网页和文章都读过一遍，默默记住了「这个字后面通常跟什么字」。读得越多，它<strong>见过的情况就越多，说出来的话就越通顺</strong>。你可以拖下面的滑块，<strong>真的改变它读过多少东西</strong>。</p>
+
+    <div class="card">
+      <div class="ctrl" style="margin-top:0">
+        <div class="ctrl-head"><span>📚 让它读多少</span><span class="val" id="dVal">全部</span></div>
+        <input type="range" id="dslider" min="2" max="100" step="1" value="100">
+        <div class="scale"><span>只读 2 句</span><span id="dMax">全部</span></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b id="stSent">100</b><span>读过的句子</span></div>
+        <div class="stat"><b id="stChars">0</b><span>读过的字（总）</span></div>
+        <div class="stat"><b id="stVocab">0</b><span>认识的不同汉字</span></div>
+      </div>
+
+      <p class="muted" style="margin-top:16px">试试在开头里输入「小狗喜欢」，把滑块拉到最小，再拉到最大，比较一下它给出的候选字。</p>
+      <div class="row" style="margin-top:4px">
+        <button class="btn sm" id="tryDog">用「小狗喜欢」试一试 →</button>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:18px">
+      <div class="card" style="background:var(--amber-soft);border-color:#F0D3AE">
+        <h3 style="color:#8A4A16">页面里的这个「小语」</h3>
+        <p class="muted" style="margin:0">只读了 <strong><span id="nCorpus">183</span> 句话</strong>。所以你常常看到它说出奇怪的话——这不是 bug，是它读得太少了。</p>
+      </div>
+      <div class="card" style="background:var(--teal-soft);border-color:#BADCD5">
+        <h3 style="color:#1F5B57">真正的大模型</h3>
+        <p class="muted" style="margin:0">读过<strong>几百万本书、几乎整个互联网上的文字</strong>。里面有上千亿个「小旋钮」，每读一句话就调一点点。</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>为什么它有时会说出不通顺的话？</b>因为小语的见识太少。真正的大模型也是同一个道理，只是它的「见识」大到我们想象不出来——所以听起来才那么像人话。
+    </div>
+
+    <div class="callout" style="background:var(--indigo-soft);border-color:#C4CCEA">
+      <b>🤔 给好奇的小朋友：</b>把滑块从最小拉到最大，你会发现一个奇怪的事——它读得越多，对「下一个字」的把握<em>反而没有变得更高</em>，有时还低了一点。
+      因为它见过的可能性变多了，「下一个字」不再只有一个明显的答案。这在大模型身上也是真的。
+    </div>
+  </section>
+
+  <!-- ============ 03 token ============ -->
+  <section id="tokens">
+    <div class="eyebrow">03 · 偷偷看一眼它的工作台</div>
+    <h2>它不是一次读「一句话」，<br>而是一小块一小块</h2>
+    <p class="lede">大模型看文字的方式，像把一串乐高拆成小积木。「我喜欢吃草莓冰淇淋」在它眼里不是 11 个汉字那么简单，而是一堆<strong>小积木</strong>——有的是整个词，有的是半个词，有的是单个字。</p>
+
+    <div class="card">
+      <input id="tkIn" type="text" value="我喜欢吃草莓冰淇淋，因为它很甜。" maxlength="60">
+      <div class="row" style="margin-top:14px">
+        <button class="btn sm" data-mode="word" id="tkWord">按「词」切</button>
+        <button class="btn ghost sm" data-mode="char" id="tkChar">按「单个字」切</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="ctrl-note" id="tkNote" style="margin-top:14px;font-size:14.5px"></div>
+    </div>
+
+    <div class="callout">
+      <b>为什么要切小块？</b>因为这样它就能处理从来没见过的词了。哪怕「草莓味冰淇淋蛋糕」是个新词，它也能用「草莓」「冰淇淋」「蛋糕」这几块拼出来——<em>就像用积木拼出没见过的造型</em>。
+    </div>
+  </section>
+
+  <!-- ============ 04 会犯错 ============ -->
+  <section id="wrong">
+    <div class="eyebrow">04 · 最重要的部分</div>
+    <h2>它会一本正经地<span style="color:var(--rose)">说错</span></h2>
+    <p class="lede">大模型有个毛病，科学家给它起了个名字叫<strong>「幻觉」</strong>——就是它<em>编了一个听起来很像真的答案</em>。它并不是在撒谎，它只是在「猜字」，而它猜出来的字恰好拼成了一句假话。</p>
+
+    <div class="card" style="border-color:#EBC9C0;background:var(--rose-soft)">
+      <h3 style="color:#9C3E2A">亲眼看一下</h3>
+      <p style="font-size:16px;margin-bottom:14px">问小语一个它根本不可能知道的问题，它照样会接下去：</p>
+      <input id="hallIn" type="text" value="火星上有几只大象在跳舞？答案是" maxlength="60">
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" id="hallGo" style="background:var(--rose);box-shadow:0 2px 0 #8E3A28">让它回答 →</button>
+        <button class="btn ghost sm" id="hallAgain">再说一次</button>
+      </div>
+      <div class="paper-out" id="hallOut" style="margin-top:14px;background:var(--card);min-height:80px"><span class="seed">火星上有几只大象在跳舞？答案是</span><span class="gen"></span></div>
+      <div class="cand-hint" id="hallConf"></div>
+      <p class="muted" style="margin-top:14px;margin-bottom:0">看：它<strong>完全不知道</strong>答案，可它还是接了下去，而且接得很顺、很自信。真正的大模型也是这样——只是它编出来的话更像真的，更难发现。</p>
+    </div>
+
+    <h3 style="margin:34px 0 14px;font-size:21px">小侦探练习：这几句话，该不该再查一查？</h3>
+    <div id="judges"></div>
+  </section>
+
+  <!-- ============ 05 不一样 ============ -->
+  <section id="different">
+    <div class="eyebrow">05 · 划清界限</div>
+    <h2>它很厉害，但它不是人</h2>
+    <p class="lede">理解这一点，你就比很多大人更懂大模型了。</p>
+    <div class="vs">
+      <div class="vs-col vs-yes">
+        <h3>它确实很会 👍</h3>
+        <ul>
+          <li>把话说得很通顺、很像人</li>
+          <li>记住读过的海量知识</li>
+          <li>几秒钟写完一篇长文章</li>
+          <li>帮你解释难懂的词、一起想点子</li>
+          <li>不知疲倦、不会不耐烦</li>
+        </ul>
+      </div>
+      <div class="vs-col vs-no">
+        <h3>它其实不会 👎</h3>
+        <ul>
+          <li>它<strong>没有眼睛</strong>——没真的看见过小猫</li>
+          <li>它<strong>没有感受</strong>——说「我难过」只是在排字</li>
+          <li>它<strong>不会算数</strong>——它是在猜数字该长什么样</li>
+          <li>它<strong>不知道今天</strong>发生了什么</li>
+          <li>它<strong>不知道自己错了</strong>——错了也说得一样肯定</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <b>记住这句话：</b>大模型是在<em>排列文字</em>，不是在<em>思考世界</em>。它的话读起来像有想法，其实背后只有一件事：下一个字该是什么。
+    </div>
+  </section>
+
+  <!-- ============ 06 测验 ============ -->
+  <section id="quiz">
+    <div class="eyebrow">06 · 验收一下</div>
+    <h2>六道小题，看你懂了没</h2>
+    <p class="lede">选错了没关系，看看下面的解释就好。</p>
+    <div id="quizBox"></div>
+    <div class="score" id="score">
+      <b id="scoreNum">0 / 6</b>
+      <span id="scoreMsg"></span>
+      <div class="row" style="justify-content:center;margin-top:16px">
+        <button class="btn ghost" id="redo" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.35)">再做一次</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 好习惯 ============ -->
+  <section id="tips">
+    <div class="eyebrow">07 · 用它的正确姿势</div>
+    <h2>和它做朋友的四个约定</h2>
+    <div class="card">
+      <div class="tip">
+        <div class="tip-ic">?</div>
+        <div>
+          <h3>把它当「很会猜的助手」，不是「什么都知道的老师」</h3>
+          <p>它给的是<strong>可能性最大</strong>的答案，不是<strong>正确</strong>的答案。</p>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-ic">✓</div>
+        <div>
+          <h3>重要的地方，自己再查一遍</h3>
+          <p>尤其是<strong>数字、日期、人名、地名</strong>——这些正是它最容易编出来的东西。去书本或正规网站核对一下。</p>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-ic">!</div>
+        <div>
+          <h3>别告诉它你的秘密</h3>
+          <p>家里住址、学校名字、密码、真实姓名、照片……这些都不要发给它。就像不要告诉陌生人一样。</p>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-ic">★</div>
+        <div>
+          <h3>让它做你做不到的事，而不是替你思考</h3>
+          <p>让它编故事、解释难词、给你的作文提意见、陪你练英语对话。但<strong>想法要是你自己的</strong>。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="big-end">
+      <p>下次再看到大模型说话，<br>你就知道它在干什么了。</p>
+      <p class="sub">它只是一个把「猜下一个字」玩到了极致的游戏高手。</p>
+    </div>
+  </section>
+
+  <footer>
+    <h3>给爸爸妈妈 / 老师的话</h3>
+    <p class="f-note">
+      这个页面里的「小语」<strong>不是一个假装出来的动画</strong>，而是一个真正跑在浏览器里的<strong>字符级三元语言模型（trigram）</strong>，
+      语料是本页内置的一百八十多句话。所以：温度滑块真的在改变采样分布，读书量滑块真的在重建模型，概率条是真实的 n-gram 统计。
+      它说出的乱话不是 bug，而是「小模型见识太少」的真实写照——这恰好是本页想教的第一件事。
+      页面零外部依赖，完全离线可用，没有收集任何数据。
+    </p>
+    <p class="f-note" style="margin-top:10px">
+      概念上做了适合 6–12 岁的简化：真实的 LLM 预测的是 subword token 而非汉字，用的是神经网络而非计数表，参数量在千亿级；
+      但「预测下一个 token + 采样 + 温度 + 规模决定质量 + 幻觉」这条主线是一致的。
+    </p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   1. 语料 —— 小语读过的所有「书」
+   ========================================================= */
+const CORPUS = [
+  // 动物
+  "小猫喜欢在阳光下睡觉。","小猫追着毛线球跑来跑去。","小狗摇着尾巴跑过来。",
+  "小狗喜欢和小朋友一起玩。","大象的鼻子很长很长。","大象用鼻子喝水。",
+  "长颈鹿可以吃树上的叶子。","长颈鹿的脖子最高。","兔子爱吃胡萝卜和青菜。",
+  "兔子的耳朵很长。","老虎的身上有黑色的条纹。","老虎是很厉害的动物。",
+  "熊猫最喜欢吃竹子。","熊猫住在中国的山上。","小鸟在树上唱歌。",
+  "小鸟会飞到很远的地方。","小鱼在水里游来游去。","小鱼吐出一串泡泡。",
+  "蜜蜂会采花蜜。","蜜蜂在花丛中飞来飞去。","蚂蚁可以搬很重的东西。",
+  "蚂蚁住在地下的洞里。","蝴蝶的翅膀很漂亮。","蝴蝶是从毛毛虫变来的。",
+  "青蛙会跳也会游泳。","青蛙在荷叶上唱歌。","猴子喜欢爬树。",
+  "猴子最爱吃桃子。","马跑得很快。","马喜欢吃草。",
+  "奶牛给我们牛奶。","奶牛在草地上吃草。","羊的毛可以做衣服。",
+  "鸭子会游泳但不会飞高。","鸭子走路一摇一摆。","狐狸很聪明。",
+  "熊在冬天会冬眠。","熊最爱吃蜂蜜。",
+  // 太空
+  "太阳是一个大火球。","太阳给我们光和热。","太阳每天从东边升起来。",
+  "月亮围着地球转。","月亮在夜里发光。","地球围着太阳转。",
+  "地球是我们美丽的家。","地球上有大海和高山。","星星在夜空中闪烁。",
+  "星星离我们非常远。","宇航员坐火箭去太空。","宇航员在太空里飘起来。",
+  "火箭飞得很快很快。","火箭可以飞到月亮上。","火星是红色的星球。",
+  "火星上有很多石头。","银河里有很多星星。","流星划过夜空。",
+  "望远镜可以看见远处的星星。","月球上没有空气。",
+  // 天气与自然
+  "今天天气很好。","天气冷的时候要穿外套。","下雨的时候要带伞。",
+  "下雨以后会出现彩虹。","雪花是白色的。","雪花有六个角。",
+  "风把树叶吹走了。","风吹过来很凉快。","彩虹有七种颜色。",
+  "云在天上慢慢地飘。","云有各种各样的形状。","夏天的太阳很热。",
+  "夏天可以吃冰淇淋。","冬天会下雪。","冬天要戴手套。",
+  "春天花儿开了。","春天小草变绿了。","秋天树叶黄了。",
+  "秋天是丰收的季节。",
+  // 食物
+  "苹果是红色的水果。","苹果长在树上。","香蕉是黄色的。",
+  "香蕉剥了皮才能吃。","妈妈做的饭很香。","妈妈做的菜最好吃。",
+  "冰淇淋在夏天最受欢迎。","冰淇淋很快就化了。","面包是用面粉做的。",
+  "牛奶对身体好。","牛奶是白色的。","米饭是我们每天吃的。",
+  "蛋糕在生日的时候吃。","蛋糕上面有蜡烛。","水是我们每天都需要的。",
+  "蔬菜让我们长得高。","蔬菜有很多颜色。","草莓是红色的，很甜。",
+  "草莓冰淇淋是我最爱吃的。",
+  // 学校
+  "我们在学校里学习。","我们在学校里交朋友。","老师教我们认字。",
+  "老师对我们很好。","书本里有很多知识。","书本是我们的好朋友。",
+  "铅笔可以用来写字。","同学一起玩游戏。","同学之间要互相帮助。",
+  "上课要认真听。","图书馆里很安静。","图书馆里有好多的书。",
+  "数学题要认真算。","数学很有意思。","画画的时候要用心。",
+  "操场上有好多同学。","操场上可以踢足球。",
+  // 海洋
+  "大海是蓝色的。","大海里有各种各样的鱼。","海豚很聪明也很友善。",
+  "海豚会跳出水面。","鲸鱼是很大的动物。","鲸鱼会喷水。",
+  "贝壳在沙滩上。","海龟游得很慢。","海龟可以活很久。",
+  "珊瑚有很多颜色。","章鱼有八只脚。","海浪拍打着沙滩。",
+  // 恐龙
+  "恐龙很久以前住在地球上。","恐龙已经灭绝了。","霸王龙有很尖的牙齿。",
+  "有些恐龙会飞。","恐龙蛋很大。","科学家研究恐龙的骨头。",
+  // 机器与科技
+  "机器人可以帮我们做事。","机器人需要电才能动。","电脑可以很快地算数。",
+  "电脑可以帮我们找资料。","手机可以打电话。","人会造出聪明的机器。",
+  "大模型可以回答问题。","大模型读过很多书。",
+  // 运动、音乐、植物、身体
+  "跑步让我们更健康。","跑步可以锻炼腿。","足球是很多人喜欢的运动。",
+  "篮球要投进篮筐里。","篮球打起来很热闹。","游泳在水中进行。",
+  "跳绳很好玩。","音乐让人开心。","音乐有快有慢。",
+  "钢琴有很多琴键。","钢琴的声音很好听。","鼓会发出很大的声音。",
+  "唱歌要用嗓子。","花草需要水和阳光。","花草在春天长得最快。",
+  "树在春天长出新叶子。","树可以活很多年。","种子会长成大树。",
+  "花有很多颜色。","花闻起来很香。","我们用眼睛看东西。",
+  "眼睛要好好保护。","耳朵可以听见声音。","耳朵能听见鸟叫。",
+  "手可以做很多事。","心脏一直在跳动。","心脏把血送到全身。",
+  "大脑帮助我们思考。","大脑每天都在工作。","身体要多多锻炼。",
+  // 生活与情感
+  "我喜欢和好朋友一起玩。","我喜欢听故事。","我喜欢吃草莓冰淇淋。",
+  "小朋友都喜欢玩游戏。","小朋友在公园里跑来跑去。","爸爸带我去公园。",
+  "妈妈给我讲故事。","故事里有勇敢的人。","故事让我们学到道理。",
+  "遇到不懂的问题要问。","答案要自己想一想。","知道得越多懂得越多。",
+  "学习是一件快乐的事。","每天学一点就会进步。"
+];
+
+/* =========================================================
+   2. 模型：uni / bi / tri 计数 + 回退 + 温度采样
+   ========================================================= */
+// 注意：参与插值的是「归一化后的概率」而不是原始计数。
+// 原始计数量级差太大（「。」出现 183 次，多数三元组只出现 1 次），
+// 直接加权会让高频字把上下文信息彻底淹没，输出变成「。小。小朋。小。小」。
+const EPS = 0.004;
+const W_TRI = 1, W_BI_MAIN = 0.8, W_BI_SMOOTH = 0.25, W_UNI = 0.15;
+let model = null;
+
+function buildModel(nSent){
+  const uni = new Map(), bi = new Map(), tri = new Map();
+  const sents = CORPUS.slice(0, Math.max(1, Math.round(nSent)));
+  // 关键：把所有句子连成一条连续的文字流。
+  // 否则每句末尾的「。」后面永远没有下一个字，模型学不到「句号之后该接什么」，
+  // 一遇到句号就只能回退到最常见的字，输出会变成「。。。的。。。的」死循环。
+  const t = sents.join("").replace(/\s+/g, "");
+  for (let i = 0; i < t.length; i++){
+    const c = t[i];
+    uni.set(c, (uni.get(c) || 0) + 1);
+    if (i > 0){
+      const k = t[i-1];
+      let m = bi.get(k); if (!m){ m = new Map(); bi.set(k, m); }
+      m.set(c, (m.get(c) || 0) + 1);
+    }
+    if (i > 1){
+      const k = t.slice(i-2, i);
+      let m = tri.get(k); if (!m){ m = new Map(); tri.set(k, m); }
+      m.set(c, (m.get(c) || 0) + 1);
+    }
+  }
+  const uniTop = [...uni.entries()].sort((a, b) => b[1] - a[1]).slice(0, 60);
+  let uniTotal = 0;
+  for (const n of uni.values()) uniTotal += n;
+  return { uni, bi, tri, uniTop, uniTotal, nSent: sents.length, chars: t.length, vocab: uni.size };
+}
+
+// 返回按概率排序的候选；level 表示这次用到了几字上下文
+// 用加权插值而不是硬性回退：长上下文主导，短上下文兜底平滑
+function predict(ctx, T, topN){
+  const score = new Map();
+  // 先把该 map 在该 key 下的计数归一成概率，再按权重累加
+  const bump = (map, key, w, total) => {
+    if (!map || !key) return;
+    const m = map.get(key);
+    if (!m) return;
+    let tot = total;
+    if (tot === undefined){ tot = 0; for (const n of m.values()) tot += n; }
+    if (!tot) return;
+    for (const [c, n] of m) score.set(c, (score.get(c) || 0) + (n / tot) * w);
+  };
+
+  const c2 = ctx.length >= 2 ? ctx.slice(-2) : null;
+  const c1 = ctx.length >= 1 ? ctx.slice(-1) : null;
+  const hasTri = !!(c2 && model.tri.has(c2));
+  const hasBi  = !!(c1 && model.bi.has(c1));
+
+  let level;
+  if (hasTri){ bump(model.tri, c2, W_TRI); level = "看前 2 个字"; }
+  else if (hasBi){ bump(model.bi, c1, W_BI_MAIN); level = "看前 1 个字"; }
+  else { level = "没见过，只能凭印象"; }
+
+  if (hasTri && hasBi) bump(model.bi, c1, W_BI_SMOOTH);   // 平滑，避免长上下文太武断
+  for (const [c, n] of model.uniTop) score.set(c, (score.get(c) || 0) + (n / model.uniTotal) * W_UNI);
+
+  const w = [...score.entries()].map(([c, n]) => [c, Math.pow(n + EPS, 1 / T)]);
+  const sum = w.reduce((a, [, v]) => a + v, 0);
+  const list = w.map(([c, v]) => ({ c, p: v / sum }))
+                 .sort((a, b) => b.p - a.p)
+                 .slice(0, topN || 4);
+  return { list, level, pool: score.size };
+}
+
+function sample(list){
+  const r = Math.random();
+  let acc = 0;
+  for (const it of list){ acc += it.p; if (r <= acc) return it.c; }
+  return list[list.length - 1].c;
+}
+
+// 按概率抽一个字；抽到会造成死循环 / 连续句号的就重抽。
+// 必须走采样而不是「永远取第一名」，否则温度滑块只改显示的数字、不改输出，等于摆设。
+function pick(list, ctx){
+  const ok = (ch) => !loops(ctx + ch) && !badNext(ctx, ch);
+  for (let k = 0; k < 4; k++){
+    const c = sample(list);
+    if (ok(c)) return c;
+  }
+  for (const it of list) if (ok(it.c)) return it.c;   // 兜底：按概率顺序取第一个合规的
+  return list[list.length - 1].c;
+}
+
+// 防止「字字字字」「。。的。。的」这类死循环
+function loops(text){
+  return /(.)\1{3,}$/.test(text)      // 同一个字连着 4 次
+      || /(..)\1{2,}$/.test(text)     // 同一个 2 字块连着 3 次
+      || /(...)\1{1,}$/.test(text)    // 同一个 3 字块连着 2 次
+      || /。。$/.test(text);          // 连续句号
+}
+// 句号后面不该马上又是一个句号
+function badNext(ctx, ch){
+  return ch === "。" && /。$/.test(ctx);
+}
+
+/* =========================================================
+   3. 游乐场：生成动画
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+const SEED_DEFAULT = "从前有一只小猫";
+const SPEEDS = [1100, 620, 260];
+const SPEED_LABELS = ["慢速", "中速", "快速"];
+
+let genText = "";          // 已生成的部分
+let running = false;
+let awaiting = false;      // 等用户点候选
+let pendingList = [];
+let token = 0;             // 生成批次号，防止旧动画串台
+
+const outEl = $("out"), candEl = $("cand"), hintEl = $("candHint");
+
+function renderOut(seedText, isHall){
+  const gen = isHall ? $("hallOut") : outEl;
+  gen.innerHTML =
+    '<span class="seed">' + esc(seedText) + '</span>' +
+    '<span class="gen">' + esc(genText) + '</span>' +
+    (running ? '<span class="caret"></span>' : '');
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+}
+
+function renderCand(list, level, clickable){
+  candEl.innerHTML = "";
+  const maxP = list.length ? list[0].p : 1;
+  list.forEach((it, i) => {
+    const row = document.createElement("div");
+    row.className = "cand-row";
+    row.setAttribute("role", "button");
+    row.tabIndex = 0;
+    row.innerHTML =
+      '<span class="ch">' + esc(it.c) + '</span>' +
+      '<span class="cand-bar"><i style="width:0%"></i></span>' +
+      '<span class="cand-pct">' + (it.p * 100).toFixed(1) + '%</span>';
+    candEl.appendChild(row);
+    requestAnimationFrame(() => {
+      row.querySelector("i").style.width = Math.max(4, (it.p / maxP) * 100) + "%";
+    });
+    if (clickable){
+      const pick = () => { if (awaiting){ awaiting = false; accept(it.c); } };
+      row.addEventListener("click", pick);
+      row.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+    }
+  });
+  hintEl.innerHTML = list.length
+    ? '<span class="pill">' + level + '</span> 它觉得下一个字最可能是这些。' +
+      (awaiting ? ' <strong>点一个你喜欢的 →</strong>' : '')
+    : '';
+}
+
+function accept(ch){
+  genText += ch;
+  renderOut(currentSeed(), false);
+}
+
+function currentSeed(){
+  const v = $("seed").value.trim();
+  return v || SEED_DEFAULT;
+}
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+async function generate(isHall){
+  if (running) return;
+  const myToken = ++token;
+  const manual = $("mine").checked && !isHall;
+  const T = parseFloat($("temp").value);
+  const delay = SPEEDS[parseInt($("speed").value, 10)];
+  const stepDelay = isHall ? 260 : delay;
+
+  running = true;
+  $("go").disabled = true;
+  const target = isHall ? 60 : 46;
+
+  const seed = isHall ? $("hallIn").value.trim() : currentSeed();
+  let ctx = seed;
+
+  while (genText.length < target){
+    if (myToken !== token) { running = false; return; }
+    const { list, level } = predict(ctx, T, 4);
+    renderCand(list, level, manual);
+    if (isHall){
+      $("hallConf").innerHTML = list.length
+        ? '<span class="pill">' + level + '</span> 它对自己选的字有 <strong>' +
+          (list[0].p * 100).toFixed(0) + '%</strong> 的把握——可它根本不知道答案。'
+        : '';
+    }
+    if (manual){
+      awaiting = true;
+      pendingList = list;
+      renderCand(list, level, true);
+      hintEl.innerHTML = '<span class="pill">' + level + '</span> <strong>你来选：点上面一个字 →</strong>';
+      // 等用户点击
+      let waited = 0;
+      while (awaiting && myToken === token){ await sleep(80); waited += 80; if (waited > 30000) break; }
+      if (myToken !== token){ running = false; return; }
+      awaiting = false;
+    } else {
+      await sleep(stepDelay);
+      if (myToken !== token){ running = false; return; }
+      // 按概率采样（不是取最高分），跳过会造成死循环 / 连续句号的字
+      const chosen = pick(list, ctx);
+      genText += chosen;
+      renderOut(seed, isHall);
+    }
+    ctx = seed + genText;
+    // 遇到句号就收一句；再点「接着写」它会继续往下说
+    if (/。$/.test(genText) && genText.length >= (isHall ? 4 : 10)) break;
+  }
+
+  running = false;
+  $("go").disabled = false;
+  renderOut(seed, isHall);
+  if (!isHall){
+    hintEl.innerHTML = '✋ 它写出一句就停了。注意：<strong>它不知道自己「说完了」</strong>——是页面在句号这里喊停的。再点一次「接着写」，它会继续说下去。';
+  }
+}
+
+function resetPlay(){
+  token++;
+  running = false; awaiting = false; genText = "";
+  $("go").disabled = false;
+  renderOut(currentSeed(), false);
+  candEl.innerHTML = "";
+  hintEl.textContent = '点「接着写」，看看它想接什么。';
+}
+
+/* =========================================================
+   4. 控件绑定
+   ========================================================= */
+$("seed").addEventListener("input", resetPlay);
+$("go").addEventListener("click", () => {
+  if (!running && genText.length >= 46){ resetPlay(); }
+  if (!running) generate(false);
+  else if (awaiting){ /* 等待中，忽略 */ }
+});
+$("again").addEventListener("click", () => { resetPlay(); generate(false); });
+$("clear").addEventListener("click", () => { $("seed").value = ""; resetPlay(); });
+
+$("temp").addEventListener("input", e => { $("tVal").textContent = parseFloat(e.target.value).toFixed(1); });
+$("speed").addEventListener("input", e => {
+  const i = parseInt(e.target.value, 10);
+  $("sVal").textContent = SPEED_LABELS[i];
+});
+
+$("mine").addEventListener("change", e => {
+  hintEl.textContent = e.target.checked
+    ? '已开启：它会把候选摆出来，等你来点。'
+    : '点「接着写」，看看它想接什么。';
+});
+
+/* 读书量滑块 */
+function rebuild(){
+  const max = parseInt($("dslider").max, 10);
+  const n = parseInt($("dslider").value, 10);
+  const m = buildModel(n);
+  model = m;
+  $("stSent").textContent = m.nSent;
+  $("stChars").textContent = m.chars.toLocaleString("zh-CN");
+  $("stVocab").textContent = m.vocab;
+  $("dVal").textContent = n >= max ? "全部（" + max + " 句）" : n + " 句";
+  $("nCorpus").textContent = CORPUS.length;
+}
+$("dslider").addEventListener("input", rebuild);
+$("tryDog").addEventListener("click", () => {
+  $("seed").value = "小狗喜欢";
+  resetPlay();
+  generate(false);
+  document.getElementById("play").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* 幻觉演示 */
+$("hallIn").addEventListener("input", () => {
+  token++; running = false; genText = "";
+  $("hallOut").innerHTML = '<span class="seed">' + esc($("hallIn").value.trim()) + '</span><span class="gen"></span>';
+  candEl.innerHTML = "";
+  $("hallConf").textContent = "";
+});
+$("hallGo").addEventListener("click", () => {
+  token++; running = false; genText = "";
+  $("hallOut").innerHTML = '<span class="seed">' + esc($("hallIn").value.trim()) + '</span><span class="gen"></span>';
+  generate(true);
+});
+$("hallAgain").addEventListener("click", () => $("hallGo").click());
+
+/* =========================================================
+   5. Token 切块
+   ========================================================= */
+const WORDS = new Set([
+  "大模型","机器人","电脑","手机","太阳","太阳系","月亮","地球","火星","星星","夜空","火箭",
+  "宇航员","太空","银河","流星","望远镜","宇宙","小猫","小狗","大象","长颈鹿","兔子","老虎",
+  "熊猫","小鸟","小鱼","蜜蜂","蚂蚁","蝴蝶","青蛙","猴子","奶牛","狐狸","海豚","鲸鱼","海龟",
+  "珊瑚","章鱼","贝壳","沙滩","大海","恐龙","霸王龙","科学家","图书馆","铅笔","数学","画画",
+  "操场","老师","同学","知识","冰淇淋","香蕉","苹果","面包","牛奶","米饭","蛋糕","蔬菜",
+  "水果","草莓","巧克力","天气","下雨","雪花","彩虹","颜色","冬天","夏天","春天","秋天",
+  "季节","音乐","钢琴","声音","花草","树叶","种子","眼睛","耳朵","心脏","大脑","身体",
+  "喜欢","我们","可以","因为","所以","但是","时候","地方","东西","小朋友","问题","答案",
+  "故事","知道","觉得","学习","游戏","真的","非常","一起","慢慢","很快","公园","朋友"
+]);
+
+function tokenize(s, mode){
+  if (mode === "char") return [...s].filter(c => c.trim() !== "");
+  const out = []; let i = 0;
+  while (i < s.length){
+    if (!s[i].trim()){ i++; continue; }
+    let hit = null;
+    for (let L = Math.min(3, s.length - i); L >= 2; L--){
+      const sub = s.substr(i, L);
+      if (WORDS.has(sub)){ hit = sub; break; }
+    }
+    if (hit){ out.push(hit); i += hit.length; }
+    else { out.push(s[i]); i++; }
+  }
+  return out;
+}
+
+let tkMode = "word";
+function renderTokens(){
+  const s = $("tkIn").value.trim() || "我喜欢吃草莓冰淇淋，因为它很甜。";
+  const parts = tokenize(s, tkMode);
+  const box = $("chips");
+  box.innerHTML = "";
+  parts.forEach((p, i) => {
+    const el = document.createElement("span");
+    el.className = "chip c" + (i % 5);
+    el.style.animationDelay = (i * 45) + "ms";
+    el.textContent = p;
+    box.appendChild(el);
+  });
+  $("tkNote").innerHTML = tkMode === "word"
+    ? '切成 <strong>' + parts.length + '</strong> 块。像不像一堆积木？「草莓」「冰淇淋」是两块大积木，别的字各是一块。'
+    : '切成 <strong>' + parts.length + '</strong> 块，一个字一块。块越多，它每一次要猜的次数就越多。';
+}
+$("tkIn").addEventListener("input", renderTokens);
+$("tkWord").addEventListener("click", () => { tkMode = "word"; syncTk(); renderTokens(); });
+$("tkChar").addEventListener("click", () => { tkMode = "char"; syncTk(); renderTokens(); });
+function syncTk(){
+  const w = $("tkWord"), c = $("tkChar");
+  if (tkMode === "word"){ w.className = "btn sm"; c.className = "btn ghost sm"; }
+  else { c.className = "btn sm"; w.className = "btn ghost sm"; }
+}
+
+/* =========================================================
+   6. 小侦探练习
+   ========================================================= */
+const JUDGES = [
+  {
+    say: "「李白是唐朝的诗人，写过《静夜思》。」",
+    q: "这句话要不要再查一查？",
+    ans: "no",
+    fb: "可以不查。这是书本里写得很清楚、到处都能找到的事实，大模型记这种东西很准。"
+  },
+  {
+    say: "「我们学校一共有 1,247 名学生。」",
+    q: "这句话要不要再查一查？",
+    ans: "yes",
+    fb: "一定要查！具体数字是它最容易「编」出来的东西——听起来精确，其实可能是随口猜的。"
+  },
+  {
+    say: "「昨天下午三点，北京下了一场大雨。」",
+    q: "这句话要不要再查一查？",
+    ans: "yes",
+    fb: "要查。大模型不知道「昨天」发生了什么，它的知识停在训练结束的那一天。"
+  },
+  {
+    say: "「猫是哺乳动物，一般会抓老鼠。」",
+    q: "这句话要不要再查一查？",
+    ans: "no",
+    fb: "可以不查。这是很普通的常识，很多书里都这么写。"
+  },
+  {
+    say: "「吃胡萝卜能让近视眼恢复正常视力。」",
+    q: "这句话要不要再查一查？",
+    ans: "yes",
+    fb: "要查，而且要问医生。关于身体的说法，尤其是听起来「特别有效」的，一定要找真正懂的人确认。"
+  }
+];
+
+function renderJudges(){
+  const box = $("judges");
+  box.innerHTML = "";
+  JUDGES.forEach((j, i) => {
+    const d = document.createElement("div");
+    d.className = "judge";
+    d.innerHTML =
+      '<div class="judge-q"><span class="say">' + esc(j.say) + '</span>' + esc(j.q) + '</div>' +
+      '<div class="row">' +
+        '<button class="btn sm" data-a="yes">🔍 该查一查</button>' +
+        '<button class="btn ghost sm" data-a="no">✓ 不用查</button>' +
+      '</div>' +
+      '<div class="judge-fb"></div>';
+    d.querySelectorAll("button").forEach(b => {
+      b.addEventListener("click", () => {
+        const a = b.dataset.a;
+        const ok = a === j.ans;
+        d.classList.remove("ok", "bad");
+        d.classList.add(ok ? "ok" : "bad");
+        d.querySelector(".judge-fb").textContent =
+          (ok ? "✅ 答对了！" : "❌ 再想想～") + " " + j.fb;
+        d.querySelectorAll("button").forEach(x => x.disabled = true);
+        b.style.opacity = 1;
+      });
+    });
+    box.appendChild(d);
+  });
+}
+
+/* =========================================================
+   7. 测验
+   ========================================================= */
+const QUIZ = [
+  {
+    t: "大模型回答你的时候，其实在做什么？",
+    o: ["在书上把答案找出来抄给你", "一个字一个字地猜，挑最可能接下去的", "像人一样在脑子里想清楚再回答"],
+    a: 1,
+    fb: "它从头到尾只做一件事：猜下一个字。猜完一个，把它接上，再猜下一个。"
+  },
+  {
+    t: "它读过几百万本书，所以——",
+    o: ["它什么都知道，永远不会错", "它猜得更准，但还是会错", "它已经变成人了"],
+    a: 1,
+    fb: "读得多只让「猜」更准。猜得再准也还是猜，所以还是会错。"
+  },
+  {
+    t: "它说话的口气非常肯定，说明——",
+    o: ["它说的肯定是对的", "它可能还是错的", "它说的肯定是错的"],
+    a: 1,
+    fb: "这是它最需要小心的地方：语气和正确与否没有关系。错了它也一样自信。"
+  },
+  {
+    t: "大模型真的会感到开心或难过吗？",
+    o: ["会，它和人一样有感情", "不会，它只是把字排得像是开心", "有时候会"],
+    a: 1,
+    fb: "它没有感受。说「我很开心」只是因为这句话在这个位置最可能出现。"
+  },
+  {
+    t: "下面哪一样不应该告诉大模型？",
+    o: ["你家的地址和密码", "你最喜欢的动物", "今天的天气"],
+    a: 0,
+    fb: "地址、学校、密码、真实姓名、照片——这些都不要发给它，就像不要告诉陌生人一样。"
+  },
+  {
+    t: "它告诉你的答案，你应该怎么做？",
+    o: ["全部照信", "重要的地方自己再查一查", "完全不用管它"],
+    a: 1,
+    fb: "把它当好帮手，但别当标准答案。数字、日期、人名尤其要自己核一遍。"
+  }
+];
+
+let answered = 0, correct = 0;
+
+function renderQuiz(){
+  const box = $("quizBox");
+  box.innerHTML = "";
+  answered = 0; correct = 0;
+  $("score").classList.remove("show");
+  QUIZ.forEach((q, qi) => {
+    const d = document.createElement("div");
+    d.className = "q";
+    d.innerHTML = '<div class="q-t"><i>' + (qi + 1) + '</i>' + esc(q.t) + '</div><div class="opts"></div><div class="q-fb"></div>';
+    const opts = d.querySelector(".opts");
+    q.o.forEach((text, oi) => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.type = "button";
+      b.textContent = text;
+      b.addEventListener("click", () => {
+        if (opts.dataset.done) return;
+        opts.dataset.done = "1";
+        Array.from(opts.children).forEach((x, xi) => {
+          x.disabled = true;
+          if (xi === q.a) x.classList.add("right");
+          else if (xi === oi) x.classList.add("wrong");
+        });
+        const ok = oi === q.a;
+        if (ok) correct++;
+        answered++;
+        const fb = d.querySelector(".q-fb");
+        fb.textContent = (ok ? "✅ 对了！" : "❌ 正确答案是：「" + q.o[q.a] + "」") + " " + q.fb;
+        fb.classList.add("show");
+        if (answered === QUIZ.length) showScore();
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(d);
+  });
+}
+
+function showScore(){
+  const s = $("score");
+  $("scoreNum").textContent = correct + " / " + QUIZ.length;
+  let msg;
+  if (correct === QUIZ.length) msg = "满分！你现在比很多大人都懂大模型了 🎉";
+  else if (correct >= 4) msg = "很不错！记住那句最重要的话：它是在猜下一个字。";
+  else if (correct >= 2) msg = "有点意思了，往回翻一翻，再试一次吧。";
+  else msg = "没关系，把上面几节再看一遍，你会懂的。";
+  $("scoreMsg").textContent = msg;
+  s.classList.add("show");
+  s.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+$("redo").addEventListener("click", () => {
+  renderQuiz();
+  $("quiz").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* =========================================================
+   8. 滚动进度 + 导航高亮
+   ========================================================= */
+const secs = Array.from(document.querySelectorAll("section[id]"));
+const dotLinks = Array.from(document.querySelectorAll("#dots a"));
+
+function onScroll(){
+  const h = document.documentElement;
+  const pct = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+  $("bar").style.width = (pct * 100) + "%";
+  let idx = 0;
+  secs.forEach((s, i) => { if (s.getBoundingClientRect().top <= 140) idx = i; });
+  dotLinks.forEach((a, i) => a.classList.toggle("on", i === idx));
+}
+window.addEventListener("scroll", onScroll, { passive: true });
+
+/* =========================================================
+   9. 启动
+   ========================================================= */
+$("dslider").max = CORPUS.length;
+$("dslider").value = CORPUS.length;
+$("dMax").textContent = "全部 " + CORPUS.length + " 句";
+rebuild();
+renderOut(currentSeed(), false);
+renderTokens();
+syncTk();
+renderJudges();
+renderQuiz();
+onScroll();
+</script>
+</body>
+</html>
