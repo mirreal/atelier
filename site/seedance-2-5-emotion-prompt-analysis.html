@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用可观察的动作替代情绪词 · Seedance 2.5 情感短片提示词拆解</title>
+<style>
+:root{
+  --bg:#FBF9F5;
+  --card:#FFFFFF;
+  --ink:#1F1D1A;
+  --ink-2:#56524B;
+  --ink-3:#8B867D;
+  --line:rgba(31,29,26,.11);
+  --line-2:rgba(31,29,26,.06);
+  --amber:#BA7517; --amber-bg:#FAEEDA; --amber-ink:#854F0B;
+  --teal:#0F6E56;  --teal-bg:#E1F5EE;  --teal-ink:#085041;
+  --blue:#185FA5;  --blue-bg:#E6F1FB;  --blue-ink:#0C447C;
+  --red:#A32D2D;   --red-bg:#FCEBEB;   --red-ink:#791F1F;
+  --r:12px;
+  --maxw:880px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  font-size:15px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ---------- header ---------- */
+header{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;letter-spacing:.08em;color:var(--ink-3);
+  text-transform:uppercase;margin-bottom:20px;
+}
+.eyebrow::before{content:"";width:18px;height:1px;background:var(--amber)}
+h1{
+  font-family:Georgia,"Times New Roman","Songti SC","Source Han Serif SC",serif;
+  font-size:30px;line-height:1.4;font-weight:400;
+  margin:0 0 14px;letter-spacing:-.01em;
+}
+h1 .jp{display:block;font-size:21px;color:var(--ink-2);margin-bottom:6px;line-height:1.5}
+.lede{font-size:15.5px;color:var(--ink-2);margin:0 0 26px;max-width:64ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--ink-3)}
+.meta a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line)}
+.meta a:hover{color:var(--amber-ink);border-color:var(--amber)}
+
+/* ---------- generic section ---------- */
+section{padding:52px 0;border-bottom:1px solid var(--line-2)}
+section:last-of-type{border-bottom:none}
+.sec-head{margin-bottom:26px}
+.sec-num{font-size:12px;color:var(--amber);letter-spacing:.1em;font-weight:500}
+h2{font-size:19px;font-weight:500;margin:6px 0 8px;letter-spacing:-.005em}
+.sec-sub{font-size:14px;color:var(--ink-3);margin:0}
+
+/* ---------- tldr ---------- */
+.tldr{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tldr-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 18px 20px;
+}
+.tldr-card .tag{
+  display:inline-block;font-size:11.5px;font-weight:500;
+  padding:2px 9px;border-radius:20px;margin-bottom:10px;letter-spacing:.02em;
+}
+.t-ok{background:var(--teal-bg);color:var(--teal-ink)}
+.t-mid{background:var(--blue-bg);color:var(--blue-ink)}
+.t-warn{background:var(--red-bg);color:var(--red-ink)}
+.tldr-card p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.7}
+
+/* ---------- claim ---------- */
+.claim{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:26px 28px;
+}
+.claim p{margin:0 0 14px}
+.claim p:last-child{margin-bottom:0}
+.claim strong{font-weight:500;color:var(--ink)}
+.stat-row{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;
+  padding-top:20px;border-top:1px solid var(--line-2);
+}
+.stat{
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;
+  padding:9px 14px;font-size:13px;color:var(--ink-2);
+}
+.stat b{font-weight:500;color:var(--ink);font-size:15px;margin-right:5px}
+
+/* ---------- workflow ---------- */
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;position:relative;
+}
+.step .n{
+  width:24px;height:24px;border-radius:50%;background:var(--bg);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--ink-2);margin-bottom:12px;
+}
+.step h3{font-size:14.5px;font-weight:500;margin:0 0 4px}
+.step .tool{font-size:12.5px;color:var(--amber-ink);margin-bottom:10px}
+.step p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.7}
+
+/* ---------- timeline ---------- */
+.tl-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.lang-switch{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:3px}
+.lang-switch button{
+  border:none;background:none;font:inherit;font-size:12.5px;color:var(--ink-3);
+  padding:4px 14px;border-radius:16px;cursor:pointer;
+}
+.lang-switch button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.bar{display:flex;gap:3px;margin-bottom:6px}
+.bar button{
+  flex-grow:1;flex-basis:0;min-width:0;
+  border:1px solid var(--line);background:var(--card);border-radius:8px;
+  padding:11px 2px;font:inherit;font-size:12px;color:var(--ink-2);
+  cursor:pointer;transition:background .18s,color .18s,border-color .18s;
+  white-space:nowrap;overflow:hidden;
+}
+.bar button:hover{border-color:var(--amber);color:var(--amber-ink)}
+.bar button[aria-selected="true"]{background:var(--amber-bg);border-color:var(--amber);color:var(--amber-ink);font-weight:500}
+.bar button .dlg{display:block;font-size:10.5px;color:var(--amber);letter-spacing:.06em;margin-top:2px}
+.bar-caption{font-size:12px;color:var(--ink-3);margin-bottom:22px}
+
+.panel{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px 26px;
+}
+.panel .p-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.panel .p-time{font-size:13px;color:var(--amber-ink);font-weight:500;letter-spacing:.02em}
+.panel .p-name{font-size:15px;font-weight:500}
+.panel .p-body{margin:0 0 18px;color:var(--ink-2);font-size:14.5px}
+.state{
+  display:flex;gap:12px;background:var(--bg);border-radius:8px;
+  padding:13px 16px;font-size:13.5px;color:var(--ink-2);
+}
+.state .lbl{color:var(--ink-3);flex:0 0 auto;font-size:12.5px;padding-top:2px}
+.dlg-line{
+  margin-top:12px;display:flex;gap:12px;align-items:baseline;
+  background:var(--amber-bg);border-radius:8px;padding:13px 16px;
+}
+.dlg-line .lbl{color:var(--amber-ink);font-size:12.5px;flex:0 0 auto}
+.dlg-line .txt{font-size:15px;color:var(--amber-ink)}
+.dlg-line .zh{font-size:13px;color:var(--ink-2);margin-left:6px}
+.arc{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:22px;padding-top:20px;border-top:1px solid var(--line-2);
+  font-size:13px;color:var(--ink-3);
+}
+.arc b{font-weight:500;color:var(--ink-2)}
+.arc .arrow{color:var(--amber)}
+
+/* ---------- technique compare ---------- */
+.tech{display:flex;flex-direction:column;gap:14px}
+.tech-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;
+}
+.tech-card .tc-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.tech-card h3{margin:0;font-size:15px;font-weight:500}
+.badge{
+  font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:20px;
+  background:var(--teal-bg);color:var(--teal-ink);letter-spacing:.02em;
+}
+.badge.part{background:var(--blue-bg);color:var(--blue-ink)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cmp .col .cl{font-size:12px;color:var(--ink-3);margin-bottom:5px}
+.cmp .col p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.7}
+
+/* ---------- factcheck ---------- */
+.facts{display:flex;flex-direction:column;gap:0}
+.fact{
+  display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line-2);
+  align-items:flex-start;
+}
+.fact:first-child{padding-top:0}
+.fact:last-child{border-bottom:none;padding-bottom:0}
+.dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;margin-top:8px}
+.d-ok{background:var(--teal)}
+.d-warn{background:var(--amber)}
+.fact .f-body{flex:1;min-width:0}
+.fact .f-title{font-size:14.5px;font-weight:500;margin-bottom:3px}
+.fact .f-note{font-size:13.5px;color:var(--ink-2)}
+.fact .f-tag{
+  flex:0 0 auto;font-size:11.5px;padding:2px 9px;border-radius:20px;
+  background:var(--bg);color:var(--ink-3);border:1px solid var(--line);
+  white-space:nowrap;margin-top:3px;
+}
+
+/* ---------- prompts ---------- */
+details{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:0;margin-bottom:12px;overflow:hidden;
+}
+details summary{
+  cursor:pointer;padding:17px 22px;font-size:14.5px;font-weight:500;
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"＋";color:var(--ink-3);font-size:15px;font-weight:400}
+details[open] summary::after{content:"－"}
+details .d-body{padding:0 22px 22px;font-size:13.5px;color:var(--ink-2)}
+details .d-body ul{margin:0;padding-left:18px}
+details .d-body li{margin-bottom:7px}
+details .d-body li:last-child{margin-bottom:0}
+code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:12.5px;background:var(--bg);padding:1px 6px;border-radius:5px;
+  border:1px solid var(--line-2);color:var(--ink-2);
+}
+
+/* ---------- takeaway ---------- */
+.take{display:flex;flex-direction:column;gap:12px;counter-reset:tk}
+.tk-item{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 22px;display:flex;gap:16px;align-items:flex-start;
+}
+.tk-item .idx{
+  flex:0 0 auto;font-size:12px;color:var(--amber);font-weight:500;
+  padding-top:3px;letter-spacing:.05em;
+}
+.tk-item .tk-body p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.75}
+.tk-item .tk-body strong{font-weight:500;color:var(--ink)}
+
+/* ---------- footer ---------- */
+footer{padding:44px 0 64px;font-size:12.5px;color:var(--ink-3);line-height:1.9}
+footer .src{margin-bottom:10px}
+footer a{color:var(--ink-2)}
+
+/* ---------- responsive ---------- */
+@media (max-width:760px){
+  .tldr{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}
+  .cmp{grid-template-columns:1fr;gap:12px}
+}
+@media (max-width:560px){
+  .wrap{padding:0 18px}
+  header{padding:48px 0 32px}
+  h1{font-size:24px}
+  h1 .jp{font-size:17px}
+  section{padding:40px 0}
+  .bar{gap:2px}
+  .bar button{padding:10px 1px;font-size:11px}
+  .bar button .unit{display:none}
+  .panel{padding:20px 18px}
+  .claim{padding:22px 20px}
+  .state,.dlg-line{flex-direction:column;gap:4px}
+  .fact{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="eyebrow">文章拆解 · note.com</div>
+  <h1>
+    <span class="jp">AI動画の「それっぽく動く」、終わりました</span>
+    用可观察的动作，替代情绪词
+  </h1>
+  <p class="lede">一篇用 Seedance 2.5 × Midjourney V8.2 制作 15 秒人物短片的实操教程。作者公开了三段完整提示词，核心手法是把「悲伤地」这类情绪词，全部翻译成眼、眉、眼睑、唇、呼吸的具体动作。</p>
+  <div class="meta">
+    <span>作者 さきすた</span>
+    <span>2026-08-16</span>
+    <span>原文 <a href="https://note.com/sakisuta/n/n827957193da5" target="_blank" rel="noopener">note.com/sakisuta/n/n827957193da5</a></span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">结论速览</div>
+      <h2>三句话读完这篇文章</h2>
+    </div>
+    <div class="tldr">
+      <div class="tldr-card">
+        <span class="tag t-ok">方法可信</span>
+        <p>作者总结的三条技巧，与字节官方提示词指南逐条吻合，不是个人臆测。</p>
+      </div>
+      <div class="tldr-card">
+        <span class="tag t-mid">实例有用</span>
+        <p>文章真正的价值是三段可直接套用的提示词，方法论部分基本是官方指南的复述。</p>
+      </div>
+      <div class="tldr-card">
+        <span class="tag t-warn">断言打折</span>
+        <p>标题严重夸张，且部分数字（如提示词 15,000 字上限）在官方文档中查无出处。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">核心主张</div>
+      <h2>跃迁不在画质，在「表演」</h2>
+      <p class="sec-sub">作者认为 Seedance 2.5 拉开差距的地方是情绪表达，而非画面精度。</p>
+    </div>
+    <div class="claim">
+      <p>以前的 AI 视频擅长<strong>动作和炫技</strong>——因为动作好做。难的是人物戏：微妙的表情变化、停顿的节奏、与台词配合的语调。</p>
+      <p>他的例证是一段 <strong>15 秒短片</strong>：全片只有两句日语对白，情绪走「垂下视线 → 抬眼看 → 微笑」三段，靠面部微动作而不是台词撑起戏剧张力。</p>
+      <p>这个判断站得住。音视频同生成、且对白语言可控，是这一代模型的实际变化——意味着配音、口型、表演可以在一次生成里完成。</p>
+      <div class="stat-row">
+        <div class="stat"><b>15</b>秒成片</div>
+        <div class="stat"><b>2</b>句对白</div>
+        <div class="stat"><b>6</b>个时间区间</div>
+        <div class="stat"><b>1</b>次推镜</div>
+        <div class="stat"><b>0</b>次剪辑</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">制作流程</div>
+      <h2>三个模型，各管一段</h2>
+      <p class="sec-sub">先用图像模型定住「长相」，再用视频模型演出「情绪」。</p>
+    </div>
+    <div class="flow">
+      <div class="step">
+        <div class="n">1</div>
+        <h3>生成基准帧</h3>
+        <div class="tool">Midjourney V8.2</div>
+        <p>用肩越肩构图生成一张电影感基准图，它同时定义了整片的质感、光线、色调与起始取景。</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h3>生成表情参考表</h3>
+        <div class="tool">GPTImage2 / NanoBanana</div>
+        <p>3×2 网格、6 种克制表情的同一人物。目的是让「张嘴时牙齿排列」在全片保持一致。</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h3>生成成片</h3>
+        <div class="tool">Seedance 2.5（经由 Runway）</div>
+        <p>两张参考图分别指派职责，15 秒 / 16:9 / 720p，一镜到底并同步生成日语对白。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">提示词核心</div>
+      <h2>15 秒被切成 6 段，每段只做一件事</h2>
+      <p class="sec-sub">点击任意区间查看该段写法。注意全片只有开头和结尾有台词，中间四段全是沉默。</p>
+    </div>
+
+    <div class="tl-top">
+      <div class="lang-switch" role="group" aria-label="提示词语言">
+        <button type="button" id="btn-zh" aria-pressed="true">中文</button>
+        <button type="button" id="btn-ja" aria-pressed="false">日本語原文</button>
+      </div>
+    </div>
+
+    <div class="bar" role="tablist" aria-label="时间区间">
+      <button role="tab" aria-selected="true" aria-controls="tl-panel" data-i="0" style="flex-grow:3">0–3<span class="unit">s</span><span class="dlg">对白</span></button>
+      <button role="tab" aria-selected="false" aria-controls="tl-panel" data-i="1" style="flex-grow:2">3–5<span class="unit">s</span><span class="dlg">&nbsp;</span></button>
+      <button role="tab" aria-selected="false" aria-controls="tl-panel" data-i="2" style="flex-grow:2">5–7<span class="unit">s</span><span class="dlg">&nbsp;</span></button>
+      <button role="tab" aria-selected="false" aria-controls="tl-panel" data-i="3" style="flex-grow:3">7–10<span class="unit">s</span><span class="dlg">&nbsp;</span></button>
+      <button role="tab" aria-selected="false" aria-controls="tl-panel" data-i="4" style="flex-grow:2">10–12<span class="unit">s</span><span class="dlg">&nbsp;</span></button>
+      <button role="tab" aria-selected="false" aria-controls="tl-panel" data-i="5" style="flex-grow:3">12–15<span class="unit">s</span><span class="dlg">对白</span></button>
+    </div>
+    <div class="bar-caption">色块宽度 = 该区间时长。台词只出现在 0–3s 与 12–15s，中间 9 秒完全是沉默。</div>
+
+    <div class="panel" id="tl-panel" role="tabpanel" tabindex="0">
+      <div class="p-head">
+        <span class="p-time" id="p-time"></span>
+        <span class="p-name" id="p-name"></span>
+      </div>
+      <p class="p-body" id="p-body"></p>
+      <div class="state"><span class="lbl">结束状态</span><span id="p-end"></span></div>
+      <div class="dlg-line" id="p-dlg-wrap" hidden>
+        <span class="lbl">台词</span>
+        <span><span class="txt" id="p-dlg"></span><span class="zh" id="p-dlg-zh"></span></span>
+      </div>
+    </div>
+
+    <div class="arc">
+      <span>情绪三阶段：</span>
+      <b>垂下视线</b><span class="arrow">→</span><b>抬眼看</b><span class="arrow">→</span><b>微笑</b>
+      <span>· 镜头：全片无剪辑一镜到底，只有一次极缓慢的连续推近，男人从画面左端移出画外</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">交叉验证</div>
+      <h2>三条技巧 vs 官方提示词指南</h2>
+      <p class="sec-sub">我把作者的三条「诀窍」逐条拿去和字节官方指南对照，结论是三条全部一致。</p>
+    </div>
+    <div class="tech">
+
+      <div class="tech-card">
+        <div class="tc-head">
+          <h3>① 按时间区间写，不要写满</h3>
+          <span class="badge part">一致 · 文章更细</span>
+        </div>
+        <div class="cmp">
+          <div class="col">
+            <div class="cl">文章做法</div>
+            <p>0–3s、3–5s、7–10s 逐段写，并刻意留出「什么都不发生」的沉默区间，认为这能制造余白与节奏。</p>
+          </div>
+          <div class="col">
+            <div class="cl">官方口径</div>
+            <p>长视频拆成连续「阶段」，每阶段只安排一个主要状态变化；只有关键交接与转场才用 1 秒为单位的时间戳。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-head">
+          <h3>② 不写情绪词，写身体动作</h3>
+          <span class="badge">完全一致</span>
+        </div>
+        <div class="cmp">
+          <div class="col">
+            <div class="cl">文章做法</div>
+            <p>写「悲伤地」「难过地」会让表演不稳定；要写清眼、眉、眼睑、唇、呼吸里，具体哪一个怎么动。</p>
+          </div>
+          <div class="col">
+            <div class="cl">官方口径</div>
+            <p>只写情绪词，模型发挥空间很大。须写明可见可听的表现：眼神、眉头、嘴角、呼吸、视线、手部动作。单次转折选 2–4 个最明确的表现。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-head">
+          <h3>③ 每个区间写「结束状态」</h3>
+          <span class="badge">完全一致</span>
+        </div>
+        <div class="cmp">
+          <div class="col">
+            <div class="cl">文章做法</div>
+            <p>写明结束状态，等于锁定了下一段的起始位置，能减少区间衔接处的卡顿与表情重置。</p>
+          </div>
+          <div class="col">
+            <div class="cl">官方口径</div>
+            <p>「写清该阶段结束时的可见状态」是官方明确要求，并列入提交前自查清单第 5 条。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">事实核查</div>
+      <h2>哪些能信，哪些要打折</h2>
+      <p class="sec-sub">文章混着产品宣传与技术事实，需要分开看。</p>
+    </div>
+    <div class="facts">
+
+      <div class="fact">
+        <span class="dot d-ok"></span>
+        <div class="f-body">
+          <div class="f-title">Seedance 2.5 与 Midjourney V8.2 确实存在</div>
+          <div class="f-note">Seedance 2.5 为字节 Seed 团队 2026 年 7 月发布；Midjourney V8.2 于 2026-07-24 起成为默认模型。与文章发布时间吻合。</div>
+        </div>
+        <span class="f-tag">已核实</span>
+      </div>
+
+      <div class="fact">
+        <span class="dot d-ok"></span>
+        <div class="f-body">
+          <div class="f-title">技术参数与官方指南一致</div>
+          <div class="f-note">参考素材上限 50 份（图 ≤30 / 视频 ≤10 且总 ≤30s / 音频 ≤10 且总 ≤30s）、单次生成 4–30 秒、分辨率 480p 与 720p、支持对白与音效同步生成。</div>
+        </div>
+        <span class="f-tag">已核实</span>
+      </div>
+
+      <div class="fact">
+        <span class="dot d-warn"></span>
+        <div class="f-body">
+          <div class="f-title">「提示词上限 15,000 字」查无出处</div>
+          <div class="f-note">官方指南通篇没有提到任何提示词长度上限，字符数与 token 数均未给出。这个数字来源不明，不要当规范使用。</div>
+        </div>
+        <span class="f-tag">存疑</span>
+      </div>
+
+      <div class="fact">
+        <span class="dot d-warn"></span>
+        <div class="f-body">
+          <div class="f-title">「用哪个服务生成结果都一样」过于绝对</div>
+          <div class="f-note">模型权重相同不代表参数暴露、参考素材处理、后处理管线相同，聚合服务之间仍会有差异。</div>
+        </div>
+        <span class="f-tag">存疑</span>
+      </div>
+
+      <div class="fact">
+        <span class="dot d-warn"></span>
+        <div class="f-body">
+          <div class="f-title">「情感表现领先其他模型一个头」是主观判断</div>
+          <div class="f-note">没有横向对比实验支撑，属于作者个人观感。</div>
+        </div>
+        <span class="f-tag">存疑</span>
+      </div>
+
+      <div class="fact">
+        <span class="dot d-warn"></span>
+        <div class="f-body">
+          <div class="f-title">标题严重夸张，且只覆盖单镜头</div>
+          <div class="f-note">「それっぽく動く、終わりました」实际只验证了 15 秒、单镜头、单人情绪戏。多镜头剪辑、长片人物一致性、复杂场面调度都没有涉及。</div>
+        </div>
+        <span class="f-tag">打折</span>
+      </div>
+
+      <div class="fact">
+        <span class="dot d-warn"></span>
+        <div class="f-body">
+          <div class="f-title">只展示成功案例，未披露失败率</div>
+          <div class="f-note">生成成本高的模型，成功率与重试次数才是关键指标。文章只列了「良かった点」。</div>
+        </div>
+        <span class="f-tag">打折</span>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">原始提示词</div>
+      <h2>三段提示词的分工</h2>
+      <p class="sec-sub">这是文章最有实用价值的部分——官方文档不会给成品实例。</p>
+    </div>
+
+    <details>
+      <summary>图像生成提示词 · 定义全片质感</summary>
+      <div class="d-body">
+        <ul>
+          <li><strong>构图</strong>：<code>Over-the-shoulder shot</code>（肩越肩镜头），左端是虚焦的男人肩与后脑。</li>
+          <li><strong>摄影机</strong>：<code>ARRI Alexa with a 50mm f/2.8 spherical lens</code>，非必需，但能显著影响质感。</li>
+          <li><strong>皮肤</strong>：要求可见毛孔、轻微色调不匀、无美颜、非对称表情，视线不完全对镜头。</li>
+          <li><strong>排除项</strong>：CG 质感、塑料皮肤、过饱和、喷枪修图、摆拍姿态、左右对称脸。</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>表情参考表提示词 · 6 种克制表情</summary>
+      <div class="d-body">
+        <ul>
+          <li>3×2 网格，同一人物，相同正面角度 / 距离 / 脸部大小，只有表情不同；平面中灰背景。</li>
+          <li>六个表情依次为：视线全落（咽下什么）、眉下上目线（带警戒）、眨眼中间（睫毛压眼）、直视前看（下睫毛微湿）、话到嘴边（呼吸停住）、眉松开嘴角小幅上扬。</li>
+          <li>关键约束：全部是<strong>抑制的、细微的</strong>表情，不许夸张。</li>
+          <li>作者踩的坑：写了「不使用衣服」，结果模型改变了背心颜色——「不使用」被理解成了别的意思。复用时应直接删掉衣服相关描述。</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>视频生成提示词 · 结构与负面词</summary>
+      <div class="d-body">
+        <ul>
+          <li><strong>素材指派</strong>：<code>@image1</code> 定义人物长相、服装、背景、光线、调色与起始取景，并定义全片的写实水准；<code>@image2</code> 只定义表情的幅度与细腻度，并明确排除其灰背景、衣服、网格布局、灯光、取景。</li>
+          <li><strong>角色绑定</strong>：<code>&lt;Woman&gt;</code> 与 <code>&lt;Man&gt;</code> 分别对应 image1 中的两人。</li>
+          <li><strong>焦点规则</strong>：全片只有女人对焦；男人始终在左端柔焦，永不清晰、不露脸。</li>
+          <li><strong>台词记法</strong>：台词前需声明语言，如「台词语言：日语」，随后用花括号包裹内容。</li>
+          <li><strong>写实性条款</strong>：要求镜头推近时皮肤细节「获得」而非「丢失」；任何时刻不得磨皮、提亮、修饰；最终帧必须看起来只是同一张照片靠近了。</li>
+          <li><strong>头发条款</strong>：室内完全静止，无风无气流；头发不飘、不摇、不流动；只在自身小动作后延迟数毫秒动几毫米。</li>
+          <li><strong>负面词</strong>：CG 质感、塑料皮肤、磨皮、喷枪、美颜、过饱和、蜡感、渲染感、3D 动画感、面部运动模糊、五官变形、闪烁、夸张表情、剪辑、镜头抖动、网格布局、多面板、风、飘发、光泽发、湿发感、头发结块。</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>音频与符号体系（官方规范）</summary>
+      <div class="d-body">
+        <ul>
+          <li><code>( )</code> 音乐 &nbsp;·&nbsp; <code>&lt; &gt;</code> 音效 &nbsp;·&nbsp; <code>{ }</code> 台词 &nbsp;·&nbsp; <code>【 】</code> 字幕</li>
+          <li>台词非中文时，须在台词前声明语言，推荐公式：<code>台词语言 + 地区变体或口音 + 表达方式 + 说话人 + {台词内容}</code></li>
+          <li>本片的音频设定：无 BGM，只有安静的房间底噪、轻微衣物摩擦声，以及两句台词；所有沉默区间除底噪外保持静音。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">可迁移</div>
+      <h2>如果要自己动手，先记住这四条</h2>
+    </div>
+    <div class="take">
+      <div class="tk-item">
+        <span class="idx">01</span>
+        <div class="tk-body"><p><strong>情绪永远翻译成可观察动作，一次只给 2–4 个。</strong>这是全文最硬的干货，也是官方唯一明确给出数量的地方，给多了反而糊。</p></div>
+      </div>
+      <div class="tk-item">
+        <span class="idx">02</span>
+        <div class="tk-body"><p><strong>参考素材逐份写「用什么 + 不用什么」。</strong>照片天然带着背景、光线、旁人，不写排除项就一定会渗出来——作者自己就栽在「不使用衣服」上。</p></div>
+      </div>
+      <div class="tk-item">
+        <span class="idx">03</span>
+        <div class="tk-body"><p><strong>每段结尾写可见状态，把下一段起点钉死。</strong>这能显著减少区间衔接处的跳变与表情重置。</p></div>
+      </div>
+      <div class="tk-item">
+        <span class="idx">04</span>
+        <div class="tk-body"><p><strong>结尾关于「重さ（重量感）」的感悟，属于作者个人直觉。</strong>他认为要告诉模型物体的轻重密度、头发是「被设定的」还是「自然状态」。方向上有道理，但官方指南没有此条，也无法证伪，参考价值有限。</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="src">原文：<a href="https://note.com/sakisuta/n/n827957193da5" target="_blank" rel="noopener">AI動画の「それっぽく動く」、終わりました。｜さきすた（note.com，2026-08-16）</a></div>
+  <div class="src">核对来源：字节 Seedance 2.5 官方提示词指南、Midjourney 官方更新日志（Version 8.2）。本页为第三方拆解，非原文翻译，观点与事实核查标注均基于公开资料比对。</div>
+</footer>
+
+<script>
+(function(){
+  var DATA = [
+    {
+      time:'0–3s', name:'垂下视线',
+      zh:{body:'男人低声说「对不起」。他说话时，虚焦的肩膀与后脑微微移动几厘米，下颌线后侧随轮廓轻动，说完肩膀略微下沉。女人的视线完全落下，眼睑低垂，嘴唇微抿，下巴略微下沉。',
+          end:'视线朝下、嘴闭、肩不动。男人停止动作。',
+          dlg:'ごめん', dlgZh:'（对不起）'},
+      ja:{body:'〈Man〉が静かに話す。ボケた肩と後頭部が数センチ動く。話し終わりに肩がわずかに下がる。〈Woman〉の視線が完全に下へ落ちる。まぶたは伏せ、唇はわずかに結ばれ、顎がほんの少し下がる。',
+          end:'視線は下、口は閉じ、肩は動いていない。',
+          dlg:'ごめん', dlgZh:'（对不起）'}
+    },
+    {
+      time:'3–5s', name:'带警戒的上目线',
+      zh:{body:'沉默。男人从此在全片余下部分完全静止，不再说话。女人保持下巴收回，只抬起眼睛，从眉毛下方看他。',
+          end:'带警戒感的上目线，下巴仍然低着。'},
+      ja:{body:'沈黙。〈Man〉は残り全編を通して完全に静止し、二度と話さない。〈Woman〉は顎を引いたまま、目だけを上げて眉の下から〈Man〉を見上げる。',
+          end:'警戒を含んだ上目遣い、顎は低いまま。'}
+    },
+    {
+      time:'5–7s', name:'一次不慌不忙的眨眼',
+      zh:{body:'沉默。女人不慌不忙地眨一次眼，眨眼中间睫毛低低地落在眼睛上方。脸部其他部分不动。',
+          end:'眼睛重新睁开，视线不变，脸的其他部分没有动。'},
+      ja:{body:'沈黙。〈Woman〉は急がない瞬きを1回する。中間点でまつげが目の上に低くかかる。',
+          end:'目は再び開き、視線は変わらず、顔の他の部分は動いていない。'}
+    },
+    {
+      time:'7–10s', name:'直视他',
+      zh:{body:'沉默。下巴抬起，视线笔直地锁定他。下睫毛边缘泛起一层淡淡的湿润，眉内侧微微上抬。',
+          end:'笔直看着他。眼睛微湿，表情还没有得出结论。'},
+      ja:{body:'沈黙。顎が上がり、視線が〈Man〉にまっすぐ定まる。下まつげに沿ってかすかな潤みが溜まる。眉の内側がわずかに上がる。',
+          end:'彼をまっすぐ見ている。目はわずかに潤み、表情はまだ結論に至っていない。'}
+    },
+    {
+      time:'10–12s', name:'话到嘴边',
+      zh:{body:'沉默。嘴唇极轻微地张开，像话已到嘴边又停住。呼吸停着。',
+          end:'嘴微张，视线固定在他身上。'},
+      ja:{body:'沈黙。言葉が出かかって止まったように唇がほんのわずかに開く。呼吸は止まっている。',
+          end:'口はわずかに開き、視線は彼に固定されたまま。'}
+    },
+    {
+      time:'12–15s', name:'眉松开，浅浅微笑',
+      zh:{body:'眉毛松开，嘴角小幅地、克制地上扬。女人用很轻的、几乎是气声的声音说话。',
+          end:'保持浅浅的微笑，看着他。',
+          dlg:'……あ、なんで謝るの', dlgZh:'（……啊，干嘛道歉）'},
+      ja:{body:'眉が緩み、口角が小さく抑えたまま上がる。〈Woman〉は軽く、ほとんど息のような声で言う。',
+          end:'かすかに微笑んだまま、彼を見ている。',
+          dlg:'……あ、なんで謝るの', dlgZh:'（……啊，干嘛道歉）'}
+    }
+  ];
+
+  var lang = 'zh';
+  var idx = 0;
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.bar [role="tab"]'));
+  var elTime = document.getElementById('p-time');
+  var elName = document.getElementById('p-name');
+  var elBody = document.getElementById('p-body');
+  var elEnd  = document.getElementById('p-end');
+  var elDlgWrap = document.getElementById('p-dlg-wrap');
+  var elDlg  = document.getElementById('p-dlg');
+  var elDlgZh= document.getElementById('p-dlg-zh');
+  var panel  = document.getElementById('tl-panel');
+  var btnZh  = document.getElementById('btn-zh');
+  var btnJa  = document.getElementById('btn-ja');
+
+  function render(){
+    var d = DATA[idx];
+    var t = d[lang];
+    elTime.textContent = d.time;
+    elName.textContent = d.name;
+    elBody.textContent = t.body;
+    elEnd.textContent  = t.end;
+    if (t.dlg){
+      elDlgWrap.hidden = false;
+      elDlg.textContent = t.dlg;
+      elDlgZh.textContent = t.dlgZh || '';
+    } else {
+      elDlgWrap.hidden = true;
+    }
+    tabs.forEach(function(b, i){
+      b.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+      b.tabIndex = i === idx ? 0 : -1;
+    });
+    btnZh.setAttribute('aria-pressed', lang === 'zh' ? 'true' : 'false');
+    btnJa.setAttribute('aria-pressed', lang === 'ja' ? 'true' : 'false');
+  }
+
+  tabs.forEach(function(b){
+    b.addEventListener('click', function(){
+      idx = Number(b.getAttribute('data-i'));
+      render();
+    });
+  });
+
+  document.querySelector('.bar').addEventListener('keydown', function(e){
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    idx = (idx + (e.key === 'ArrowRight' ? 1 : DATA.length - 1)) % DATA.length;
+    render();
+    tabs[idx].focus();
+  });
+
+  btnZh.addEventListener('click', function(){ lang = 'zh'; render(); });
+  btnJa.addEventListener('click', function(){ lang = 'ja'; render(); });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
