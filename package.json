@@ -5,7 +5,9 @@
   "type": "module",
   "description": "static site generator for Atelier",
   "scripts": {
-    "index": "node scripts/build-index.mjs",
+    "flatland": "node flatland/build.mjs",
+    "prebuild": "npm run flatland",
+    "index": "npm run prebuild && node scripts/build-index.mjs",
     "index:check": "node scripts/build-index.mjs --check"
   }
 }
