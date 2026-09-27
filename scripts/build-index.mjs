@@ -388,6 +388,8 @@ footer{
   font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:2.1;position:relative;z-index:2;
 }
 footer .gen{opacity:.75}
+footer .totop{color:inherit;text-decoration:none;border-bottom:1px solid var(--line-2);transition:.2s}
+footer .totop:hover{color:var(--accent);border-color:var(--accent)}
 
 @media (max-width:640px){
   body{font-size:16.5px}
@@ -406,7 +408,7 @@ footer .gen{opacity:.75}
 </head>
 <body>
 
-<header class="hero">
+<header class="hero" id="top">
   <div class="wrap">
     <span class="tag">Index</span>
 ${lockup}
@@ -427,30 +429,43 @@ ${body.join("\n\n")}
 
 <footer>
   <div class="wrap">
-    ${updated ? `<div>索引于 ${updated} · ${works} 个页面 / ${sections} 个目录</div>\n    ` : ""}<div><a href="./" style="color:inherit">回到顶部</a></div>
+    ${updated ? `<div>索引于 ${updated} · ${works} 个页面 / ${sections} 个目录</div>\n    ` : ""}<div><a href="#top" class="totop">回到顶部</a></div>
   </div>
 </footer>
 
 <script>
 (function(){
   "use strict";
+
+  // 筛选
   var q=document.getElementById("q");
-  if(!q) return;
-  var counter=document.getElementById("count"),
-      none=document.getElementById("none"),
-      rows=[].slice.call(document.querySelectorAll(".entry"));
-  function apply(){
-    var s=q.value.trim().toLowerCase(), hit=0;
-    rows.forEach(function(row){
-      var ok=!s||row.dataset.search.indexOf(s)>-1;
-      row.classList.toggle("hide",!ok);
-      if(ok) hit++;
-    });
-    counter.textContent=hit===rows.length?(rows.length+" 个页面"):(hit+" / "+rows.length+" 个页面");
-    none.style.display=hit?"none":"block";
+  if(q){
+    var counter=document.getElementById("count"),
+        none=document.getElementById("none"),
+        rows=[].slice.call(document.querySelectorAll(".entry"));
+    var apply=function(){
+      var s=q.value.trim().toLowerCase(), hit=0;
+      rows.forEach(function(row){
+        var ok=!s||row.dataset.search.indexOf(s)>-1;
+        row.classList.toggle("hide",!ok);
+        if(ok) hit++;
+      });
+      counter.textContent=hit===rows.length?(rows.length+" 个页面"):(hit+" / "+rows.length+" 个页面");
+      none.style.display=hit?"none":"block";
+    };
+    q.addEventListener("input",apply);
+    apply();
   }
-  q.addEventListener("input",apply);
-  apply();
+
+  // 回到顶部：接管点击，免得整页重载；没有 JS 时靠 href="#top" 也能跳
+  var top=document.querySelector(".totop");
+  if(top){
+    top.addEventListener("click",function(e){
+      e.preventDefault();
+      var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({top:0,left:0,behavior:reduce?"auto":"smooth"});
+    });
+  }
 })();
 </script>
 </body>
