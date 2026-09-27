@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="j9eFQHrOcAjTfkXchJfCfo">
+<head data-page-node-id="1qz96uWrzuOhIhOfndTFGg">
+<meta charset="utf-8" data-page-node-id="OQfLkFCVzy1oztnUs5siJG">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="hWnUiDDYDSBxITQTmvnXth">
+<title>重塑火星 Terraforming Mars · 互动上手指南</title>
+<meta name="description" content="用互动方式快速了解桌游《重塑火星》(Terraforming Mars)：主题背景、核心机制、全球参数、玩家面板、回合流程、计分方式与新手建议。" data-page-node-id="DpO3O5vfWHglh7BUsoXj8A">
+<style>
+/* ============ 基础 ============ */
+:root{
+  --bg:#faf6f1;
+  --bg-2:#f4ece3;
+  --surface:#ffffff;
+  --surface-2:#fdf9f5;
+  --ink:#241a14;
+  --ink-2:#5b4638;
+  /* 三个 token 的取值由「必须通过 WCAG AA 4.5:1」反推，不是随手挑的：
+     --ink-3 是次要文字色，会落在白/米白/各种 soft 底上，取最差底（--purple-soft #f0eafb）≥4.5 的最浅值；
+     --gold / --green 两头都要过：白字压在它身上当底色 ≥4.5，它自己当文字落在 soft 底上也要 ≥4.5。 */
+  --ink-3:#7d6555;
+  --rust:#c1440e;
+  --rust-2:#e2711d;
+  --rust-3:#f5a623;
+  --rust-soft:#fdeee3;
+  --teal:#0f766e;
+  --teal-soft:#e2f4f0;
+  --gold:#96601a;
+  --gold-soft:#fbf1dc;
+  --blue:#1d6fa5;
+  --blue-soft:#e4f1f9;
+  --green:#3d7a1f;
+  --green-soft:#eaf4e2;
+  --purple:#6d4aa8;
+  --purple-soft:#f0eafb;
+  --line:#e8ddd2;
+  --line-2:#f1e7dd;
+  --shadow-sm:0 1px 2px rgba(90,60,35,.06), 0 2px 8px rgba(90,60,35,.05);
+  --shadow:0 2px 6px rgba(90,60,35,.07), 0 12px 28px rgba(90,60,35,.07);
+  --shadow-lg:0 8px 20px rgba(90,60,35,.10), 0 24px 60px rgba(90,60,35,.10);
+  --r:16px;
+  --r-sm:10px;
+  --nav-h:56px;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-size:16px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;line-height:1.25;font-weight:800;letter-spacing:-.01em}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+input{font:inherit;color:inherit}
+a{color:var(--rust);text-decoration:none}
+a:hover{text-decoration:underline}
+svg{display:block}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ============ 导航 ============ */
+.nav{
+  position:sticky;top:0;z-index:60;
+  background:rgba(250,246,241,.86);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.nav-in{max-width:var(--maxw);margin:0 auto;padding:0 12px;height:var(--nav-h);display:flex;align-items:center;gap:14px}
+.nav-brand{display:flex;align-items:center;gap:9px;flex:0 0 auto;font-weight:800;font-size:14.5px;white-space:nowrap}
+.nav-dot{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#e8916a,#c9612f 48%,#8a3b17);box-shadow:0 0 0 2px rgba(193,68,14,.14);flex:0 0 auto}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:4px 2px;flex:1 1 auto}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{
+  flex:0 0 auto;padding:6px 11px;border-radius:999px;font-size:13.5px;color:var(--ink-2);
+  font-weight:600;white-space:nowrap;transition:.18s;text-decoration:none;
+}
+.nav-links a:hover{background:var(--rust-soft);color:var(--rust);text-decoration:none}
+.nav-links a.on{background:var(--rust);color:#fff}
+
+/* ============ 通用排版 ============ */
+.sec{padding:76px 0;scroll-margin-top:calc(var(--nav-h) + 10px)}
+.sec.alt{background:var(--bg-2);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--rust);background:var(--rust-soft);
+  padding:5px 12px;border-radius:999px;margin-bottom:16px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rust)}
+.h2{font-size:clamp(26px,3.6vw,40px);margin-bottom:14px}
+.h3{font-size:19px;margin-bottom:8px}
+.lead{font-size:17px;color:var(--ink-2);max-width:74ch}
+.sec-head{margin-bottom:38px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;box-shadow:var(--shadow-sm);
+}
+.muted{color:var(--ink-3);font-size:13.5px}
+/* 只给读屏看的文本。注意不能用 display:none / visibility:hidden，
+   否则元素从无障碍树里消失，aria-live 也不再播报。 */
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0;
+}
+
+/* ============ 顶部 Hero ============ */
+.hero{
+  position:relative;overflow:hidden;
+  padding:64px 0 70px;
+  background:
+    radial-gradient(900px 460px at 88% 8%, rgba(226,113,29,.13), transparent 62%),
+    radial-gradient(700px 420px at 6% 92%, rgba(15,118,110,.09), transparent 60%),
+    linear-gradient(180deg,#fffaf5 0%, var(--bg) 70%);
+  border-bottom:1px solid var(--line);
+}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:44px;align-items:center}
+.hero h1{font-size:clamp(38px,6.2vw,72px);letter-spacing:-.03em;margin-bottom:6px}
+.hero h1 .en{display:block;font-size:clamp(15px,2vw,22px);font-weight:700;letter-spacing:.24em;color:var(--rust);text-transform:uppercase;margin-bottom:12px}
+.hero-sub{font-size:clamp(16px,1.6vw,19px);color:var(--ink-2);max-width:56ch;margin-top:14px}
+.hero-quote{
+  margin-top:24px;padding:14px 18px;border-left:3px solid var(--rust);
+  background:rgba(255,255,255,.7);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  font-size:14.5px;color:var(--ink-2);max-width:60ch;
+}
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.stat-chip{
+  display:flex;align-items:baseline;gap:6px;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;box-shadow:var(--shadow-sm);
+}
+.stat-chip b{font-size:15px;color:var(--rust)}
+.stat-chip span{font-size:12.5px;color:var(--ink-3);font-weight:600}
+.hero-visual{position:relative;display:flex;justify-content:center;align-items:center}
+#marsSvg{width:100%;max-width:460px;height:auto;filter:drop-shadow(0 26px 50px rgba(138,59,23,.22))}
+.mars-caption{
+  text-align:center;font-size:12.5px;color:var(--ink-3);margin-top:10px;font-weight:600;letter-spacing:.04em;
+}
+.scroll-hint{
+  display:flex;align-items:center;gap:8px;justify-content:center;margin-top:34px;
+  font-size:13px;color:var(--ink-3);font-weight:600;
+}
+.scroll-hint svg{width:16px;height:16px;animation:bob 1.9s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ============ 速览 ============ */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:15px 16px;box-shadow:var(--shadow-sm)}
+.fact dt{font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;margin-bottom:5px}
+.fact dd{margin:0;font-size:16.5px;font-weight:800;color:var(--ink)}
+.fact dd small{display:block;font-size:12.5px;font-weight:600;color:var(--ink-3);margin-top:2px}
+
+/* ============ 机制卡 ============ */
+.mech{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px}
+.mech-item{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px;box-shadow:var(--shadow-sm);transition:.2s;position:relative;overflow:hidden;
+}
+.mech-item::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--rust);opacity:0;transition:.2s}
+.mech-item:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#e0cdbc}
+.mech-item:hover::after{opacity:1}
+.mech-ico{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;margin-bottom:11px;
+  background:var(--rust-soft);color:var(--rust);font-size:17px;font-weight:800;
+}
+.mech-item h3{font-size:16px;margin-bottom:6px}
+.mech-item p{font-size:14px;color:var(--ink-2)}
+.mech-item .tag-en{font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase;display:block;margin-bottom:3px}
+
+/* ============ 全球参数模拟器 ============ */
+.sim{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;
+  background:var(--surface);border:1px solid var(--line);border-radius:22px;
+  padding:26px;box-shadow:var(--shadow);
+}
+.sim-controls{display:flex;flex-direction:column;gap:20px}
+.ctrl{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:14px 16px}
+.ctrl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:10px}
+.ctrl-name{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:7px}
+.ctrl-name i{width:9px;height:9px;border-radius:3px;display:inline-block;font-style:normal}
+.ctrl-val{font-weight:800;font-size:17px;color:var(--rust)}
+.ctrl-val small{font-size:12px;color:var(--ink-3);font-weight:600;margin-left:4px}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;display:block;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:8px;border-radius:99px;background:linear-gradient(90deg,var(--rust) var(--pct,0%),#e9ddd2 var(--pct,0%));
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;
+  border:3px solid var(--rust);margin-top:-7px;box-shadow:0 2px 6px rgba(90,60,35,.25);cursor:pointer;
+}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:#e9ddd2}
+input[type=range]::-moz-range-progress{height:8px;border-radius:99px;background:var(--rust)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--rust);cursor:pointer}
+.ctrl-scale{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-3);font-weight:600;margin-top:3px}
+.ctrl-scale .goal{color:var(--teal);font-weight:800}
+.sim-visual{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+#simMars{width:100%;max-width:330px;height:auto}
+.sim-readout{
+  width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:6px;
+}
+.ro{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px;text-align:center}
+.ro b{display:block;font-size:21px;font-weight:800;color:var(--rust);line-height:1.2}
+.ro span{font-size:11.5px;color:var(--ink-3);font-weight:700;letter-spacing:.03em}
+.sim-bar{
+  width:100%;height:9px;border-radius:99px;background:#ece0d4;overflow:hidden;margin-top:4px;
+}
+.sim-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rust-2),var(--teal));transition:width .4s ease}
+.sim-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 17px;border-radius:999px;font-size:14px;font-weight:700;
+  background:var(--rust);color:#fff;transition:.18s;box-shadow:0 2px 8px rgba(193,68,14,.22);
+}
+.btn:hover{background:#a83a0b;transform:translateY(-1px);text-decoration:none}
+.btn.ghost{background:var(--surface);color:var(--ink-2);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:var(--rust-soft);color:var(--rust);border-color:#eccfb8}
+.btn.teal{background:var(--teal);box-shadow:0 2px 8px rgba(15,118,110,.22)}
+.btn.teal:hover{background:#0b5c56}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
+.btn.sm{padding:6px 13px;font-size:13px}
+
+/* ============ 玩家面板 ============ */
+.board{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:24px;align-items:start}
+.board-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;box-shadow:var(--shadow-sm)}
+.prow{
+  display:grid;grid-template-columns:34px minmax(52px,auto) 1fr auto auto;gap:10px;align-items:center;
+  padding:9px 8px;border-radius:var(--r-sm);transition:.15s;
+}
+.prow+.prow{border-top:1px solid var(--line-2)}
+.prow:hover{background:var(--surface-2)}
+.pico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:13.5px;font-weight:800;color:#fff}
+.pname{font-size:13.5px;font-weight:800;white-space:nowrap}
+.pname em{display:block;font-style:normal;font-size:11px;color:var(--ink-3);font-weight:600}
+.track{display:flex;gap:3px;align-items:center}
+.tick{flex:1 1 0;min-width:3px;height:15px;border-radius:3px;background:#eee2d6;transition:.2s}
+.tick.f{background:linear-gradient(180deg,#e2711d,#c1440e)}
+.tick.mile{background:#e3d4c5}
+.pval{font-size:15px;font-weight:800;width:26px;text-align:right;color:var(--ink)}
+.pbtns{display:flex;gap:4px}
+.pbtns button{
+  width:25px;height:25px;border-radius:7px;border:1px solid var(--line);background:var(--surface);
+  font-size:14px;font-weight:800;color:var(--ink-2);display:grid;place-items:center;transition:.15s;line-height:1;
+}
+.pbtns button:hover{background:var(--rust);color:#fff;border-color:var(--rust)}
+.stock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stock{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:9px 10px;text-align:center}
+.stock b{display:block;font-size:19px;font-weight:800;line-height:1.25}
+.stock span{font-size:11px;color:var(--ink-3);font-weight:700}
+.log{
+  margin-top:12px;background:#2a1d16;color:#f3e6dc;border-radius:var(--r-sm);padding:12px 14px;
+  font-size:13px;min-height:96px;max-height:150px;overflow-y:auto;line-height:1.75;
+}
+.log b{color:#ffb066}
+.log .ok{color:#8ee0c4}
+.log::-webkit-scrollbar{width:6px}
+.log::-webkit-scrollbar-thumb{background:#5a4234;border-radius:9px}
+
+/* ============ 回合流程 ============ */
+.gen-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.gstep{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;
+  text-align:left;transition:.2s;position:relative;box-shadow:var(--shadow-sm);
+}
+.gstep:hover{border-color:#e0cdbc;transform:translateY(-2px)}
+.gstep.on{background:var(--rust);border-color:var(--rust);color:#fff;box-shadow:0 10px 24px rgba(193,68,14,.24)}
+.gstep .num{font-size:11.5px;font-weight:800;letter-spacing:.12em;opacity:.7;display:block;margin-bottom:6px}
+.gstep .nm{font-size:15.5px;font-weight:800;display:block}
+.gstep .en{font-size:11px;font-weight:700;letter-spacing:.06em;opacity:.7;display:block;margin-top:2px;text-transform:uppercase}
+/* 选中态是「白字压锈红底」，半透明白会直接掉到 2.9:1 不可读。
+   白字在 --rust 上满不透明也只有 5.1:1，实测 opacity .9 就只剩 4.43:1，
+   所以这里必须回满，层级改由字号/字重承担。 */
+.gstep.on .num,.gstep.on .en{opacity:1}
+.gen-detail{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow-sm)}
+.gen-detail ul{margin:10px 0 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.gen-detail li{font-size:14.5px;color:var(--ink-2);padding-left:20px;position:relative}
+.gen-detail li::before{content:"";position:absolute;left:4px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--rust-2)}
+.kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.kv span{background:var(--surface-2);border:1px solid var(--line-2);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700;color:var(--ink-2)}
+
+/* ============ 卡牌翻转 ============ */
+.flips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.flip{perspective:1000px;height:224px;cursor:pointer}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.flip-face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:var(--r);padding:18px;display:flex;flex-direction:column;border:1px solid var(--line);
+  background:var(--surface);box-shadow:var(--shadow-sm);
+}
+.flip-front{justify-content:space-between}
+.flip-back{transform:rotateY(180deg);background:var(--surface-2)}
+.flip-stripe{height:6px;border-radius:99px;width:52px;margin-bottom:14px}
+.flip-face h3{font-size:17px;margin-bottom:6px}
+.flip-face .en{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.flip-face p{font-size:13.5px;color:var(--ink-2)}
+.flip-hint{font-size:11.5px;color:var(--ink-3);font-weight:700;display:flex;align-items:center;gap:5px;margin-top:auto;padding-top:12px}
+.c-green{background:var(--green)}.c-blue{background:var(--blue)}.c-red{background:#c0392b}.c-purple{background:var(--purple)}
+.bg-green{background:var(--green-soft)}.bg-blue{background:var(--blue-soft)}.bg-red{background:#fdeceb}.bg-purple{background:var(--purple-soft)}
+.t-green{color:var(--green)}.t-blue{color:var(--blue)}.t-red{color:#c0392b}.t-purple{color:var(--purple)}
+
+/* ============ 标签 ============ */
+.tagboard{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:22px;align-items:start}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tagchip{
+  display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface);font-size:13.5px;font-weight:700;transition:.18s;box-shadow:var(--shadow-sm);
+}
+.tagchip:hover{border-color:#e0cdbc;transform:translateY(-2px)}
+.tagchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tagchip i{width:10px;height:10px;border-radius:3px;display:block;font-style:normal}
+.taginfo{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow-sm);min-height:230px}
+.taginfo h3{font-size:20px;margin-bottom:4px}
+.taginfo .en{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px}
+.taginfo p{font-size:14.5px;color:var(--ink-2)}
+.taginfo .uses{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.taginfo .uses div{font-size:13.5px;color:var(--ink-2);padding-left:18px;position:relative}
+.taginfo .uses div::before{content:"→";position:absolute;left:0;color:var(--rust);font-weight:800}
+
+/* ============ 标准项目 / 里程碑 ============ */
+.sp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px}
+.sp{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:15px;box-shadow:var(--shadow-sm);transition:.18s}
+.sp:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#e0cdbc}
+.sp b{display:block;font-size:15px;margin-bottom:3px}
+.sp .cost{font-size:12.5px;font-weight:800;color:var(--rust);margin-bottom:7px;display:block}
+.sp p{font-size:13px;color:var(--ink-2)}
+.sp.free .cost{color:var(--teal)}
+.toggle{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;box-shadow:var(--shadow-sm);flex-wrap:wrap}
+.toggle button{padding:7px 15px;border-radius:999px;font-size:13.5px;font-weight:700;color:var(--ink-2);transition:.18s}
+.toggle button.on{background:var(--rust);color:#fff}
+.awlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:18px}
+.aw{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;box-shadow:var(--shadow-sm)}
+.aw b{display:block;font-size:15px;margin-bottom:3px}
+.aw .en{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.aw p{font-size:13.5px;color:var(--ink-2);margin-top:6px}
+
+/* ============ 计分器 ============ */
+.calc{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:24px;align-items:start}
+.calc-rows{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow-sm)}
+.crow{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:11px 2px}
+.crow+.crow{border-top:1px solid var(--line-2)}
+.crow label{font-size:14.5px;font-weight:700}
+.crow label small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:600}
+.crow input[type=number]{
+  width:74px;padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
+  font-size:15px;font-weight:700;text-align:center;
+}
+.crow input[type=number]:focus{outline:2px solid rgba(193,68,14,.35);outline-offset:1px;border-color:var(--rust)}
+.crow .pts{font-size:13px;font-weight:800;color:var(--rust);min-width:56px;text-align:right}
+.total-box{
+  background:linear-gradient(150deg,#2a1d16,#3d2a1e);color:#fff;border-radius:var(--r);padding:26px;
+  box-shadow:var(--shadow-lg);position:sticky;top:calc(var(--nav-h) + 16px);
+}
+.total-box .lab{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.62}
+.total-box .big{font-size:64px;font-weight:800;line-height:1.05;letter-spacing:-.03em;color:#ffb066;margin:4px 0 2px}
+.total-box .sub{font-size:13px;opacity:.72;margin-bottom:16px}
+.breakdown{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.breakdown div{display:flex;justify-content:space-between;gap:12px;opacity:.85}
+.breakdown div span:last-child{font-weight:800;color:#ffcfa0}
+
+/* ============ 测验 ============ */
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow-sm)}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.qprog{font-size:12.5px;font-weight:800;color:var(--ink-3);letter-spacing:.08em}
+.qbar{height:6px;border-radius:99px;background:#eee2d6;overflow:hidden;margin-bottom:20px}
+.qbar i{display:block;height:100%;width:0;background:var(--rust);transition:width .35s ease}
+.qtext{font-size:19px;font-weight:800;margin-bottom:16px;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{
+  text-align:left;padding:13px 17px;border-radius:var(--r-sm);border:1px solid var(--line);
+  background:var(--surface-2);font-size:14.5px;font-weight:600;transition:.16s;display:flex;gap:11px;align-items:flex-start;
+}
+.opt:hover:not(:disabled){border-color:var(--rust);background:var(--rust-soft);transform:translateX(3px)}
+.opt .k{
+  flex:0 0 auto;width:22px;height:22px;border-radius:6px;background:#fff;border:1px solid var(--line);
+  display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--ink-2);
+}
+.opt.right{background:var(--green-soft);border-color:#a8cf8a}
+.opt.right .k{background:var(--green);color:#fff;border-color:var(--green)}
+.opt.wrong{background:#fdeceb;border-color:#e8a9a3}
+.opt.wrong .k{background:#c0392b;color:#fff;border-color:#c0392b}
+.opt:disabled{cursor:default}
+.qexp{
+  margin-top:16px;padding:14px 17px;border-radius:var(--r-sm);background:var(--teal-soft);
+  border-left:3px solid var(--teal);font-size:14px;color:#134e4a;display:none;
+}
+.qexp.show{display:block}
+.qexp b{color:var(--teal)}
+.qresult{text-align:center;padding:12px 0}
+.qresult .score{font-size:56px;font-weight:800;color:var(--rust);line-height:1.1}
+.qresult .msg{font-size:16px;color:var(--ink-2);margin:8px 0 18px}
+
+/* ============ 新手 / 扩展 / 术语 ============ */
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px}
+.tip{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-sm);display:flex;gap:13px}
+.tip .n{
+  flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--rust);color:#fff;
+  display:grid;place-items:center;font-size:13.5px;font-weight:800;
+}
+.tip h3{font-size:15.5px;margin-bottom:5px}
+.tip p{font-size:13.5px;color:var(--ink-2)}
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl{position:relative;padding-bottom:18px}
+.tl::before{
+  content:"";position:absolute;left:-24px;top:7px;width:12px;height:12px;border-radius:50%;
+  background:var(--surface);border:3px solid var(--rust);
+}
+.tl.major::before{background:var(--rust);box-shadow:0 0 0 4px rgba(193,68,14,.15)}
+.tl .yr{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--rust)}
+.tl h3{font-size:15.5px;margin:2px 0 3px}
+.tl p{font-size:13.5px;color:var(--ink-2)}
+details.gl{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 17px;box-shadow:var(--shadow-sm)}
+details.gl+details.gl{margin-top:9px}
+details.gl summary{font-weight:800;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+details.gl summary::-webkit-details-marker{display:none}
+details.gl summary::after{content:"+";font-size:19px;color:var(--rust);font-weight:700;line-height:1}
+details.gl[open] summary::after{content:"–"}
+details.gl p{font-size:13.5px;color:var(--ink-2);margin-top:9px}
+
+/* ============ 页脚 ============ */
+.foot{background:#2a1d16;color:#cbb8ab;padding:44px 0 34px;margin-top:0}
+.foot-in{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.foot h3{color:#fff;font-size:17px;margin-bottom:10px}
+.foot p{font-size:13.5px;line-height:1.8;max-width:80ch}
+.foot .rule{border-top:1px solid rgba(255,255,255,.12);margin:22px 0 16px}
+.foot small{font-size:12.5px;opacity:.85;display:block;line-height:1.8}
+
+/* ============ 表格 ============ */
+.table-wrap{overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--line-2)}
+th{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:800;background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+td b{color:var(--rust)}
+
+/* ============ 入场动画 ============ */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+
+/* ============ 微动画 ============ */
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.16)}100%{transform:scale(1)}}
+.pop{animation:pop .42s cubic-bezier(.3,1.4,.5,1)}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-22px)}}
+.clouds{animation:drift 26s ease-in-out infinite alternate}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp .4s ease both}
+.gstep:focus-visible,.opt:focus-visible,.tagchip:focus-visible,.flip:focus-visible,.btn:focus-visible,.toggle button:focus-visible{
+  outline:2px solid var(--rust);outline-offset:2px;
+}
+.flip:focus-visible{outline-offset:4px}
+
+/* ============ 响应式 ============ */
+@media (max-width:1000px){
+  .hero-grid{grid-template-columns:1fr;gap:34px}
+  .hero-visual{order:-1}
+  #marsSvg{max-width:330px}
+  .sim,.board,.tagboard,.calc{grid-template-columns:1fr}
+  .g4,.flips,.gen-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .total-box{position:static}
+}
+@media (max-width:640px){
+  .sec{padding:52px 0}
+  .wrap{padding:0 16px}
+  .g2,.g3,.g4,.flips,.gen-steps{grid-template-columns:1fr}
+  .sim{padding:18px}
+  .prow{grid-template-columns:30px 1fr auto;grid-template-areas:"ico name btns" ". track track" ". val val";row-gap:7px}
+  .pico{grid-area:ico}.pname{grid-area:name}.track{grid-area:track}.pval{grid-area:val;text-align:left;width:auto}.pbtns{grid-area:btns}
+  .flip{height:210px}
+  .total-box .big{font-size:52px}
+  .hero h1{letter-spacing:-.02em}
+  .crow{grid-template-columns:1fr auto;grid-template-areas:"lab input" "pts pts";row-gap:2px}
+  .crow label{grid-area:lab}.crow input{grid-area:input}.crow .pts{grid-area:pts;text-align:left}
+}
+</style>
+</head>
+<body data-page-node-id="2M7bUFg8VYfVIESG7tcuXl">
+
+<nav class="nav" data-page-node-id="dw3RtEaOuP6ZIbsQBzkRcE">
+  <div class="nav-in" data-page-node-id="GQ3bkMoGZM7cByw6njC3pe">
+    <div class="nav-brand" data-page-node-id="Wd2Ia0CyhbglfChT9J8ocn"><span class="nav-dot" data-page-node-id="POCycGmS9H79ZB3d91jYXC"></span>重塑火星</div>
+    <div class="nav-links" id="navLinks" data-page-node-id="odCv14aaAj6l8kH94MFWhA">
+      <a href="#overview" data-page-node-id="MNSr0YKpB1HEmiY4uDztLE">速览</a>
+      <a href="#theme" data-page-node-id="fPIrwzTlOWxUUVOW351F50">背景</a>
+      <a href="#mechanics" data-page-node-id="9ff3JFJpxXUB2852CPPZhI">核心机制</a>
+      <a href="#parameters" data-page-node-id="wVuu4mw78SNuBX8JyGXH4w">改造火星</a>
+      <a href="#board" data-page-node-id="pqTMOMdmaquG5YdDhQ3tP8">玩家面板</a>
+      <a href="#generation" data-page-node-id="nAJLBOL4y53jeuSfQoq65M">一个世代</a>
+      <a href="#cards" data-page-node-id="kPZ3oz5uhtXdOuE6NE61mP">卡牌</a>
+      <a href="#tags" data-page-node-id="8bPm8kGLdSY7DrNvk2J9sM">标签</a>
+      <a href="#standard" data-page-node-id="AKWUiDapPK8D7HW6EDnjec">标准项目</a>
+      <a href="#awards" data-page-node-id="kEvx5U8IBLGHrs1E1hBAsA">里程碑·奖项</a>
+      <a href="#scoring" data-page-node-id="qOEaZFfFlY20HxshaQfFHY">计分器</a>
+      <a href="#start" data-page-node-id="FQd6fzrKnJY3HkSs7GEqvo">新手上路</a>
+      <a href="#expansions" data-page-node-id="LrNv21zJ6w5y2y1SMvAyCc">扩展</a>
+      <a href="#quiz" data-page-node-id="r8gGkvEqLvCxhz5T699qav">小测验</a>
+          <a href="#glossary" data-page-node-id="L1hmkF31SceynSCwLAvK0I">术语</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" data-page-node-id="t28BlJNZkAgFyK1j0JEG5k">
+  <div class="wrap hero-grid" data-page-node-id="jWx64EHPAgtqdLpm2dxIxN">
+    <div data-page-node-id="XoeMGrd3CB6F8oY5YdLWEm">
+      <h1 data-page-node-id="tX4H1rYryl2umvX3wFWCk4"><span class="en" data-page-node-id="0w4YoZElyJpf0sFlkzed4k">Terraforming Mars</span>重塑火星</h1>
+      <p class="hero-sub" data-page-node-id="7koT302HJUF6BGGHDCiKvf">公元 2400 年，你是一家公司的 CEO。地球政府开出合约：谁能让这颗红色死星重新呼吸，谁就能拥有它的土地、空气与财富。</p>
+      <div class="hero-quote" data-page-node-id="NfQRf530MtvCovMOkcLjYz">
+        把温度推到 +8°C、氧气拉到 14%、铺满 9 块海洋——三项全球参数全部达标的那一刻，火星就变成了人类的新家园，而得分最高的人赢得一切。
+      </div>
+      <div class="hero-stats" data-page-node-id="kX3itWjqgsZQ9xPFUIcFH8">
+        <div class="stat-chip" data-page-node-id="F0iV6uKEfzLg487bat5dT4"><b data-page-node-id="UTRdUtvFcD4pUeG9386SdP">1–5</b><span data-page-node-id="3Qr5fSuGc6FalAatxiGC0t">人</span></div>
+        <div class="stat-chip" data-page-node-id="wzC5bpnFU3LaLD8ijx3DS2"><b data-page-node-id="yPmeC5M33HA3a5Th5K4Bec">90–150</b><span data-page-node-id="kmBaPCKGEIBV5oHxcWNV9F">分钟</span></div>
+        <div class="stat-chip" data-page-node-id="wQVV8JmHWjjE3kGwDzGLmX"><b data-page-node-id="942cMFdRJihyLoPXYYnLV9">12+</b><span data-page-node-id="yWR0CZqRpoNuZn3FivTbp9">岁</span></div>
+        <div class="stat-chip" data-page-node-id="oZrkhh3sDLrTBoE0RUGgj1"><b data-page-node-id="Zu1IHVxkAsEGNSIQkaarAo">2016</b><span data-page-node-id="3MIFZT5Li2JRWdwiOBoBti">年出版</span></div>
+        <div class="stat-chip" data-page-node-id="URKbOFyxAofkEWFLhVuiRF"><b data-page-node-id="9LE10hTsezsUFKc5zkSOCw">Jacob Fryxelius</b><span data-page-node-id="tDAiQLw9T0mh8ydWk1vnUU">设计</span></div>
+      </div>
+    </div>
+    <div class="hero-visual" data-page-node-id="HdFRqxnHc2vGdbCkcC6KFh">
+      <div data-page-node-id="K01WPt6wshEjGNgpmhf4wK">
+        <svg id="marsSvg" viewBox="0 0 420 420" role="img" aria-label="火星示意图" data-page-node-id="1KHgXGMieErOQXH90HrMs7"></svg>
+        <div class="mars-caption" id="marsCaption" data-page-node-id="Wr5CtNF2AFBvAs3mTD0SAO">起始状态 · 平均温度 −30°C · 氧气 0% · 海洋 0</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint" data-page-node-id="hTmxaUR9RV7ADgSKlLLwG5">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="hqx7nmlNq0rtPHL4jrxalb"><path d="M12 5v14M19 12l-7 7-7-7" data-page-node-id="20CLK5j9ETY9bdNDFH1l1Y"/></svg>
+    往下滚，边玩边学
+  </div>
+</header>
+
+<main data-page-node-id="8uyESWLplGC8KJBygqU7xz">
+
+<!-- ================= 速览 ================= -->
+<section class="sec" id="overview" data-page-node-id="yXGXLZzk0hn2RuFmvmPjsc">
+  <div class="wrap" data-page-node-id="LB3nUeCAUdlAD8wzqH4Wpd">
+    <div class="sec-head reveal" data-page-node-id="e6WyY7lfczajYGUMKQelZq">
+      <span class="eyebrow" data-page-node-id="Nbofe6nxsQ9jQnsdikHG2N">At a glance</span>
+      <h2 class="h2" data-page-node-id="hT80rIXlRjkdsdh2Sw4YmL">30 秒认识它</h2>
+      <p class="lead" data-page-node-id="yYKQaKGBesFryGFi9DvGpC">《重塑火星》是 2016 年由瑞典设计师 Jacob Fryxelius 设计、FryxGames 出版的中重策略游戏。它的核心是<strong data-page-node-id="f7GnDjYyjFGToYEb5ezPGF">引擎构筑</strong>：你打出的每一张卡都在给你的「改造机器」添零件，产量越高，滚雪球越快。长期位居 BoardGameGeek 全球排行榜前列，也是许多玩家的「入门中策第一课」。</p>
+    </div>
+    <dl class="facts reveal" data-page-node-id="EBJBClKMRHCv4h7xtRQz6a">
+      <div class="fact" data-page-node-id="G7sRkYyE7Bs1ZoDh94sUuk"><dt data-page-node-id="VEaZ3hWFhLAT9HHUbeiGX6">人数</dt><dd data-page-node-id="hMlHveg5JUziCIjGzHNaeB">1–5 人<small data-page-node-id="D4f8Jijz1m64BEmtVitKMO">3–4 人体验最佳</small></dd></div>
+      <div class="fact" data-page-node-id="qTgVteENAmf8N3WGilqbIl"><dt data-page-node-id="GTzKZskRyH718mZ2efZpRf">时长</dt><dd data-page-node-id="Co3IqlYHYoxHEG5dJM1dBv">90–150 分钟<small data-page-node-id="fasrOb57NkmkEINJFUhqSb">新手首局约 2.5 小时</small></dd></div>
+      <div class="fact" data-page-node-id="TYdnhndWObp0hBh9YdymV3"><dt data-page-node-id="DtAcscg9Mgw2Oelk7dDkJ5">设计师</dt><dd data-page-node-id="DUpaROteODUsQQL0kjEpdb">Jacob Fryxelius<small data-page-node-id="tgavvXGGpEJYAcT22CoQSM">FryxGames（瑞典）</small></dd></div>
+      <div class="fact" data-page-node-id="qc9P1sBqSYZbizK2JaVBOs"><dt data-page-node-id="6V8ZRqERlSP5Iw6jUIZlNG">出版年</dt><dd data-page-node-id="0xf4hmKPifSbobHDQucn4E">2016<small data-page-node-id="jsih6xlkOnfYtvBAwKqSzS">中文版由游人码头代理</small></dd></div>
+      <div class="fact" data-page-node-id="ddMTuHSJeFk3ccuJIHyyMo"><dt data-page-node-id="ppP74gq0ZGrzPFCl9GS3vI">类型</dt><dd data-page-node-id="GmeJ01ax74Ry5NPkGyFRGT">中重策略<small data-page-node-id="RtDpwgd7r2uPGDGJq4GEKc">引擎构筑 · 卡牌驱动</small></dd></div>
+      <div class="fact" data-page-node-id="3E2fHANQaL9wMfN13OHiPy"><dt data-page-node-id="AHUxqbZ3RmvTmVGiqcW25B">核心张力</dt><dd data-page-node-id="Zd9GMcy22mxdKH8359JuBA">合作改造 + 各自竞争<small data-page-node-id="atoc5JaOE9ghvAMWO3XCHe">参数共享，分数独享</small></dd></div>
+    </dl>
+    <div class="grid g3 reveal" style="margin-top:20px" data-page-node-id="Hj28rCNe6g2jJn2xPX0SyI">
+      <div class="card" data-page-node-id="tYRLGtp7JG1RR1vd5p8KNE">
+        <h3 class="h3" data-page-node-id="qoi0AmwReWyrPQzwVHz5Z6">一句话讲清规则</h3>
+        <p class="muted" style="font-size:14.5px" data-page-node-id="L1hmkF31SceynSCwLAvK0I">全桌人一起把火星的<strong data-page-node-id="NsyxwkOhaR5sFY5ExKXm44">温度、氧气、海洋</strong>三项参数推到目标值；谁在这个过程中积累的分数最多，谁就赢。</p>
+      </div>
+      <div class="card" data-page-node-id="qBF2CyswaKp5UPFm2ue0D0">
+        <h3 class="h3" data-page-node-id="l9pteL0rAPiEdpjw2MyNTW">最妙的设计</h3>
+        <p class="muted" style="font-size:14.5px" data-page-node-id="3vLURdvvfSpt8GuOxAAQYZ"><strong data-page-node-id="hSzHQpCMon7Br23tITpEO5">TR（改造度）既是终局分数，又是每世代收入。</strong>每涨 1 点 TR，你以后每一轮都多拿 1 M€——复利效应贯穿全局。</p>
+      </div>
+      <div class="card" data-page-node-id="pf1jm6fdgy1kxQrr9ASgiZ">
+        <h3 class="h3" data-page-node-id="vTl2RapSylbVQyIWCYtz4u">新手最容易踩的坑</h3>
+        <p class="muted" style="font-size:14.5px" data-page-node-id="j2j8fL5XIDuwJXpCm6QVv5">只顾着买卡堆手牌，忘了推参数涨 TR。手牌不会自己变分数，<strong data-page-node-id="BABrEFjg4FosS9mJBWnCqN">产量和 TR 才会</strong>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 主题背景 ================= -->
+<section class="sec alt" id="theme" data-page-node-id="csLCh3rtxnbzn2sWZXqfmH">
+  <div class="wrap" data-page-node-id="hyBe1q0IHrauNfIWSjqufv">
+    <div class="sec-head reveal" data-page-node-id="yyRZT5gzoo1JFXaTSydXl2">
+      <span class="eyebrow" data-page-node-id="87LfS2MopCy9ySzUmg56ND">Theme</span>
+      <h2 class="h2" data-page-node-id="R5SWCjniSSEChp3vqwQTld">主题：把一颗死星变成家园</h2>
+      <p class="lead" data-page-node-id="MTxAANn44Vm0UCYrQOok1V">这不是一场战争，而是一场跨越几百年的工程。游戏把「行星改造」这件宏大叙事，拆成了你可以用手里的卡牌一步步推进的具体行动。</p>
+    </div>
+    <div class="grid g2 reveal" data-page-node-id="Ie8ogrX40rpPAzus7nqQpf">
+      <div class="card" style="padding:24px" data-page-node-id="4YmKtUqTbAU6JqCBysnoWj">
+        <h3 class="h3" style="font-size:22px" data-page-node-id="onm6BZH55WCy56gGr1niqa">公元 2400 年</h3>
+        <p style="margin-top:12px;color:var(--ink-2);font-size:15px" data-page-node-id="FMkKEhuh7Sw3KmEwq8moZu">
+          地球资源枯竭，人类把目光投向了火星。地球政府（World Government）向全球企业发出公开合约：<strong data-page-node-id="as0FeFPZWdDpOlAA5As5Ug">谁能改造火星的大气与地表，谁就获得那里的土地所有权</strong>。
+        </p>
+        <p style="margin-top:12px;color:var(--ink-2);font-size:15px" data-page-node-id="7lb5Jctvivj9OBUwRPPmeP">
+          于是，采矿公司、生物科技巨头、航天承包商、能源集团纷纷入场。你代表其中一家，用科研项目、工程建筑和太空技术，一点一点改变这颗行星。
+        </p>
+        <p style="margin-top:12px;color:var(--ink-2);font-size:15px" data-page-node-id="Ab4q9wsjedbm67ujtVa1e0">
+          你们是<strong data-page-node-id="nPrz1AizNP03dJguQAphvm">合作</strong>的——火星必须被改造成功，游戏才能结束；你们也是<strong data-page-node-id="swFHpUmVxPOiACZT4C1QSh">竞争</strong>的——每一度温度、每一格氧气，都是一次得分机会，谁抢到就是谁的。
+        </p>
+      </div>
+      <div data-page-node-id="cWb6mQxS6kHNz4njYLeTSj">
+        <div class="card" style="margin-bottom:14px" data-page-node-id="1lDArvWV1FeFQM0AdTmyLT">
+          <h3 class="h3" data-page-node-id="H13aqqJe94R6abZKjGzSfD">为什么这个主题好玩</h3>
+          <ul style="margin:10px 0 0;padding-left:18px;color:var(--ink-2);font-size:14.5px;line-height:1.9" data-page-node-id="c5BGaDfIpHbozummXueMdK">
+            <li data-page-node-id="dAMcGr9zzkKOOjQTB7W614">你打出的卡真的会<strong data-page-node-id="9sHchz60YbZGnmX4xlWYEP">改变桌面上那张火星地图</strong>——海洋、绿化、城市一块块铺上去</li>
+            <li data-page-node-id="i4062sJUsh5GsEEj8ASJmx">每张卡都有真实的科幻设定（太阳能、地热、基因工程、太空电梯……）</li>
+            <li data-page-node-id="JKsyVjdDO7DOvdPETnUqM3">进度是<strong data-page-node-id="5qHEBzh7QtBB5fMLsMOVN8">看得见</strong>的：温度计往上爬，氧气条在涨，地图从红变蓝变绿</li>
+          </ul>
+        </div>
+        <div class="card" data-page-node-id="NQ74mMyu4PCNKwGT6BrWVM">
+          <h3 class="h3" data-page-node-id="Y2h430anFoigYRTrO41uuG">三件事，决定胜负</h3>
+          <div class="kv" data-page-node-id="DsqFWjm1uHZbiPmeceCUcQ">
+            <span data-page-node-id="NQyAjBOpuC9ak0qZsQELM3">① 温度 → +8°C</span>
+            <span data-page-node-id="C85EoiQVGlFFGU7vVWyFih">② 氧气 → 14%</span>
+            <span data-page-node-id="mAqAfYoiCZJSvzckwCHbRr">③ 海洋 → 9 块</span>
+          </div>
+          <p class="muted" style="margin-top:12px" data-page-node-id="BvOTykyR6ZQ9aiDa8PZEee">每推进一格，推动者的 TR 就 +1。三项全部达标后，本世代结束，进入最终计分。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 核心机制 ================= -->
+<section class="sec" id="mechanics" data-page-node-id="N8GM7GwF3G2vXyTx55fHfh">
+  <div class="wrap" data-page-node-id="twcxaXmwswwloYsMgAdSxo">
+    <div class="sec-head reveal" data-page-node-id="dGZKJLaOV0SAAcxPWFFVRH">
+      <span class="eyebrow" data-page-node-id="hUio6PaBtXMmWkkry2WhHR">Core mechanics</span>
+      <h2 class="h2" data-page-node-id="L1EjbiKEOJ9Y8TQkMU6p6j">八条核心机制</h2>
+      <p class="lead" data-page-node-id="jnmPqzcoOwxzbt97KvHvRC">《重塑火星》把好几套经典机制缝在了一起。理解这八条，你就理解了整个游戏的骨架。</p>
+    </div>
+    <div class="mech reveal" id="mechGrid" data-page-node-id="K2wAFEY85ViRnXyyTJetem"></div>
+  </div>
+</section>
+
+<!-- ================= 全球参数模拟器 ================= -->
+<section class="sec alt" id="parameters" data-page-node-id="etu1EQ4exTSqIL2hTJ9pP5">
+  <div class="wrap" data-page-node-id="rcJFJJUYTQVopRBSaGSrng">
+    <div class="sec-head reveal" data-page-node-id="LiPfLoASUr2nwVDsYCwGV6">
+      <span class="eyebrow" data-page-node-id="BWzWjsRymzezgmqNcINCqf">Global parameters</span>
+      <h2 class="h2" data-page-node-id="iKlMQCF4Yk8AFEF6ymkmiB">亲手改造一次火星</h2>
+      <p class="lead" data-page-node-id="Jc6omolHRvhz5qv0Gm20Ym">拖动下面三根滑块，模拟一场行星改造。观察右侧的火星如何从冰封荒原变成蓝色星球——同时注意 TR 的增长，那是这个游戏真正的分数来源。</p>
+    </div>
+    <div class="sim reveal" data-page-node-id="l2ZpvEA9NP5iISF1nATXaR">
+      <div class="sim-controls" data-page-node-id="860PY14Eu7iqs8LF01gMcM">
+        <div class="ctrl" data-page-node-id="aBvi6SWzlbHdQxOKAOfpqY">
+          <div class="ctrl-top" data-page-node-id="zelex1nq9ZWqhKvPHbY5bt">
+            <div class="ctrl-name" data-page-node-id="125EYEjEmIfCo8nz64lNMB"><i style="background:#c1440e" data-page-node-id="H5ynTNGzW9jBc0ywtkdx53"></i>温度 Temperature</div>
+            <div class="ctrl-val" data-page-node-id="JYCLoz5XK4Ve3hLhphaGFa"><span id="valTemp" data-page-node-id="A2cn3FcXEb2OhB5fRVgWsK">−30</span><small data-page-node-id="3VlOjJSP7l64Yri6ShCEi6">°C</small></div>
+          </div>
+          <input type="range" id="rngTemp" min="0" max="19" value="0" aria-label="温度" data-page-node-id="BvqbybDhcl1fdnjfmCk6Cp">
+          <div class="ctrl-scale" data-page-node-id="WhyEs8JWPXO7Hpjzmrjp70"><span data-page-node-id="1kDJd1V1w2Lh7tkC1SIHzO">−30°C</span><span class="goal" data-page-node-id="7YCWaOBSBIHbQ9iC3xu2Du">目标 +8°C</span></div>
+        </div>
+        <div class="ctrl" data-page-node-id="tYQWIlUeM3qzgDDgwqptCY">
+          <div class="ctrl-top" data-page-node-id="HvepnyA2Iam0BZjONWJLpC">
+            <div class="ctrl-name" data-page-node-id="RbptrlkYYrQ7mwCBgnmsNH"><i style="background:#1d6fa5" data-page-node-id="0YM2a3ChbInT6rMyAsyumv"></i>氧气 Oxygen</div>
+            <div class="ctrl-val" data-page-node-id="CCFMsjI3EZ8lxVAGmR3uEE"><span id="valOxy" data-page-node-id="cpah9Iy50YA9WCIVFBr5kz">0</span><small data-page-node-id="xT9YCvkg3uPOjRfVQPeZYv">%</small></div>
+          </div>
+          <input type="range" id="rngOxy" min="0" max="14" value="0" aria-label="氧气" data-page-node-id="ajd2sJ5VlsX7lt7E8dlIXc">
+          <div class="ctrl-scale" data-page-node-id="AzQNcwrgNKLQ0hnK0ntdTE"><span data-page-node-id="ZC6I0PnHODyGHozpx8xZip">0%</span><span class="goal" data-page-node-id="UO9ZybyvYFw7UJNODvg0jL">目标 14%</span></div>
+        </div>
+        <div class="ctrl" data-page-node-id="NHfDNDjuljbXLSnLEYfFNI">
+          <div class="ctrl-top" data-page-node-id="HHxfWdQdo1c4v6hZNf3Pvr">
+            <div class="ctrl-name" data-page-node-id="sukcGaKLUyZ2mwhsbud4eY"><i style="background:#0f766e" data-page-node-id="l7MYnxzu9dxT3ejQPvMoU2"></i>海洋 Ocean</div>
+            <div class="ctrl-val" data-page-node-id="R8V7MV1rlNeGyRnEWHdCOY"><span id="valOcn" data-page-node-id="NimMhwzvDK1B6bbZoS5bnE">0</span><small data-page-node-id="KVDGo3A9o1KSB8OCsCg6dO">块</small></div>
+          </div>
+          <input type="range" id="rngOcn" min="0" max="9" value="0" aria-label="海洋" data-page-node-id="LChtzSzHtbk2EahGJ7js8w">
+          <div class="ctrl-scale" data-page-node-id="19Qpp0Nd80RWbzXHxKb5yc"><span data-page-node-id="dA8xfWToKzDwc4bZg5lpXL">0</span><span class="goal" data-page-node-id="PSNFypDOPGY0pr3NFjJK24">目标 9 块</span></div>
+        </div>
+        <div class="sim-actions" data-page-node-id="8fmTJtyqhETbt4WbnPdzWv">
+          <button class="btn" id="btnTerraform" data-page-node-id="mcxqv0AHL4CZOH7DR7GbPo">一键完成改造</button>
+          <button class="btn ghost" id="btnResetParams" data-page-node-id="lJrRlvUn0HLZ2y8NhGklIF">重置</button>
+        </div>
+        <p class="muted" id="paramNote" data-page-node-id="JEGe29OOqgjirRRU5SUAGZ">提示：三项参数是全桌共享的。别人推上去，你也能享受宜居的火星——但 TR 分数只归推进的人。</p>
+      </div>
+      <div class="sim-visual" data-page-node-id="vZRZFgqmNwkdbVxQ9ecbRW">
+        <svg id="simMars" viewBox="0 0 420 420" role="img" aria-label="火星改造进度可视化" data-page-node-id="XnX9q32gbKkcf3ad8kvUe9"></svg>
+        <div class="sim-readout" data-page-node-id="c8ZerWhxmqXSJVlB2ldFfy">
+          <div class="ro" data-page-node-id="9wpFowNikrAfh3T0c1pjBc"><b id="roTr" data-page-node-id="zkeEhvxZlSeElRZumGnzzh">20</b><span data-page-node-id="l4oCOKD0amAzUnXgOtIpyU">TR 改造度</span></div>
+          <div class="ro" data-page-node-id="MygNd4Z16oWG1xtfNY8g9W"><b id="roGain" data-page-node-id="uZCzE0bAXIHUHgfyESPVNy">+0</b><span data-page-node-id="c3mfOi9PDkOasnewiBsoVx">已获得 TR</span></div>
+          <div class="ro" data-page-node-id="yPMG9CakxU34bSAEt6mTFR"><b id="roPct" data-page-node-id="PGQ7z3Eb4GkMIcIsbolk03">0%</b><span data-page-node-id="t2AuI04TGUOYzKg20O1T3V">改造进度</span></div>
+        </div>
+        <div class="sim-bar" data-page-node-id="TzHElW0mZvZEHfsBUH1yy5"><i id="simBarFill" data-page-node-id="5G9HksAfGJy16fBuXO0Jvg"></i></div>
+        <p class="muted" id="simStatus" style="text-align:center;min-height:44px" data-page-node-id="jysodHxSDuqVki8ZW4xWPE">火星仍在沉睡。把任意一根滑块往右推一点试试。</p>
+        <!-- 视觉上的 #simStatus 每帧都在变，直接给它 aria-live 会在拖动时刷屏。
+             所以单独挂一个隐藏状态区，用防抖只播报「停手之后」的结论。 -->
+        <p class="sr-only" id="simLive" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 玩家面板 ================= -->
+<section class="sec" id="board" data-page-node-id="l8x8tfbCXpJD9t5ByBfpx1">
+  <div class="wrap" data-page-node-id="QRz5vwOjrQw0HWDjwdwfHl">
+    <div class="sec-head reveal" data-page-node-id="aHPlfPVksVwmdEd9qQxrXQ">
+      <span class="eyebrow" data-page-node-id="29dGPcOrDvXEfcT429F6sH">Player board</span>
+      <h2 class="h2" data-page-node-id="CeIY4MS3J5RAQiQR0hNwj6">你的机器：产量与资源</h2>
+      <p class="lead" data-page-node-id="hhaAEg3aBfnUfEvN0ghpKF">每个玩家有一块面板，上面有 6 条<strong data-page-node-id="61i0Gc7lC7k6tC5rBxAP17">产量轨道</strong>。产量是「每世代固定产出多少」，资源是「手上现在有多少」。调整产量，然后点「结算生产阶段」，看看一回合能收到什么。</p>
+    </div>
+    <div class="board reveal" data-page-node-id="fZ9Tk6fGQUhdCliBnrMTLv">
+      <div data-page-node-id="chigf6U0PQD8QBDXKLPdKu">
+        <div class="board-panel" id="prodPanel" data-page-node-id="YX0G45MXRH5LbUZEidWe17"></div>
+        <div class="stock-grid" id="stockGrid" data-page-node-id="xXVCJWcAq9Lc7BOSPqhJIO"></div>
+      </div>
+      <div data-page-node-id="JxH9S9PVe77qQ8x35bV17S">
+        <div class="card" data-page-node-id="3wvxrtCxavu9LVHs3cxfHr">
+          <h3 class="h3" data-page-node-id="AgsAeruwD9K0hH6gGP4c9r">产量 vs 资源</h3>
+          <p class="muted" style="font-size:14px" data-page-node-id="8BZDzgIR3AWxdLXoXgWb7q">这是新手最容易搞混的一对概念。</p>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:11px" data-page-node-id="h7ioCUPcG3AOs6TpbZwzaD">
+            <div style="padding:12px 14px;background:var(--rust-soft);border-radius:var(--r-sm)" data-page-node-id="HRWmlRxDZNLoFdGJhfQGUV">
+              <b style="font-size:14px;color:var(--rust)" data-page-node-id="sm9S5vFcAl8B2AqM67IbFm">产量 Production</b>
+              <p class="muted" style="font-size:13px" data-page-node-id="IYZwstqiEZHP9PNPF51Hda">写在轨道上的永久能力。每世代生产阶段自动结算一次。改产量很难，但收益是长期的。</p>
+            </div>
+            <div style="padding:12px 14px;background:var(--teal-soft);border-radius:var(--r-sm)" data-page-node-id="oIUJ3BTeur1yIS4FU8Cemc">
+              <b style="font-size:14px;color:var(--teal)" data-page-node-id="gpzJ4c4zCUF9AirpiEEuxi">资源 Resources</b>
+              <p class="muted" style="font-size:13px" data-page-node-id="4zC0deGLWFGqXmA8UZvF2L">手上的库存，可以立刻花掉。用了就没了，但能马上换成卡牌、板块或参数。</p>
+            </div>
+          </div>
+          <div class="sim-actions" style="margin-top:16px" data-page-node-id="bnYanB3lQc1M8tanUiTRlG">
+            <button class="btn teal" id="btnProduce" data-page-node-id="x3vJnfYhgWNfkJrJyMxgGb">结算生产阶段</button>
+            <button class="btn ghost" id="btnGreenery" disabled data-page-node-id="2NG0UJNfXwLQe2AlhlPqif">用 8 植物换绿化</button>
+            <button class="btn ghost" id="btnHeat" disabled data-page-node-id="A0DJpQTr5CAANGwE35Twz4">用 8 热量升温</button>
+            <button class="btn ghost sm" id="btnResetBoard" data-page-node-id="fBqBx5Ylika1To0rqehAYg">重置面板</button>
+          </div>
+        </div>
+        <div class="log" id="prodLog" role="log" aria-live="polite" aria-label="生产结算日志" data-page-node-id="DnN9l2MYOShweeQjQnLmd6">面板已就绪。调整产量后点击「结算生产阶段」，这里会记录每一世代的结算过程。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 一个世代 ================= -->
+<section class="sec alt" id="generation" data-page-node-id="yqoFtFbD6l1Lv8hqx9aOsC">
+  <div class="wrap" data-page-node-id="9TJqgScimIaFFPG5hu1ixw">
+    <div class="sec-head reveal" data-page-node-id="3CxxAGX47DhzqZw94BpxLE">
+      <span class="eyebrow" data-page-node-id="Ftm3QGAbFESlmBrcoCp4wM">A generation</span>
+      <h2 class="h2" data-page-node-id="EfERihLlksUqplCpUsw42M">一个「世代」怎么过</h2>
+      <p class="lead" data-page-node-id="zUBu508MtfqLcU58nCQveh">游戏里的时间单位叫<strong data-page-node-id="QzvBMl7u1VnPo5MgKYulAn">世代（Generation）</strong>，一轮就是一代。每一代固定走四个阶段。点下面的卡片看每个阶段做什么。</p>
+    </div>
+    <div class="reveal" data-page-node-id="KVKsMvrm7wuVBXXnnfl8pL">
+      <div class="gen-steps" id="genSteps" data-page-node-id="pdX19XFSho68z0GM6R24lV"></div>
+      <div class="gen-detail" id="genDetail" data-page-node-id="4kHBmuAJGgKUdba4C78SsL"></div>
+    </div>
+    <div class="grid g2 reveal" style="margin-top:22px" data-page-node-id="s7Bu0aCKrS1IKgWBC7BBGq">
+      <div class="card" data-page-node-id="KL0yRoShwNcXEsYAqamDG5">
+        <h3 class="h3" data-page-node-id="Ur90FoL1WfFSWa8YTBMfR6">行动阶段能做什么？</h3>
+        <p class="muted" style="font-size:14px" data-page-node-id="3LCTDHWhxqWdnOIylR6YMk">轮到你时，可以做 <strong data-page-node-id="VLGFdBgCnJzpe2R4cJ2SQ7">1 个或 2 个</strong>行动（可以重复同一种），然后轮到下一位。选择「跳过」就退出本世代，本世代不能再行动。</p>
+        <ul style="margin:12px 0 0;padding-left:18px;color:var(--ink-2);font-size:14px;line-height:1.95" data-page-node-id="3z2smjZXwDhoaXLUpZzTCM">
+          <li data-page-node-id="qxjYnlucNE6bhKKdVpM9HR">从手牌打出 1 张卡（支付费用）</li>
+          <li data-page-node-id="BGTo0wiVrdjWi5uTTFS81v">使用 1 张蓝卡上的行动（每世代一次）</li>
+          <li data-page-node-id="GgeU3aSkF0hDnD9FawSatF">执行 1 个标准项目</li>
+          <li data-page-node-id="23ifrDnOaBPxB7YhEKMSiD">宣称 1 个里程碑（8 M€）</li>
+          <li data-page-node-id="PLLj9XuC6Ambq3K23D0ZeM">资助 1 个奖项（8 / 14 / 20 M€）</li>
+          <li data-page-node-id="BbX7BClFSWcP1GC7wm6w4F">把 8 植物换成 1 块绿化板块</li>
+          <li data-page-node-id="PMnMz97IaMBZaQlR0767Q5">把 8 热量换 1 级温度</li>
+          <li data-page-node-id="Pl2C23EwR0Y2KcpIbE3syh">卖掉手牌换钱</li>
+        </ul>
+      </div>
+      <div class="card" data-page-node-id="HEGf6AaFuLe9I2hjNEHSQE">
+        <h3 class="h3" data-page-node-id="3QJS4nkap5XFB0a5BkZ59k">生产阶段：三步走</h3>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px" data-page-node-id="gDI2nKULD5PAbR8oZyW1E9">
+          <div style="display:flex;gap:12px;align-items:flex-start" data-page-node-id="R3akNGnwmkc4syzqtfBLBP">
+            <span class="pico" style="background:#c1440e;flex:0 0 auto" data-page-node-id="l6cFwP0avoRgcpntF7xkEo">1</span>
+            <div data-page-node-id="qkvwB0EbG0vLrEGgD6lTry"><b style="font-size:14px" data-page-node-id="BPFPonqqCuT5StNSZG7dVC">所有能源变成热量</b><p class="muted" style="font-size:13px" data-page-node-id="uR9UT9RDro0rLpJIr6ODtu">能源是「过路资源」，存不住——它会在生产阶段全部转成热量。</p></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start" data-page-node-id="f9sEI15LJMaLeFYxhBcHMv">
+            <span class="pico" style="background:#0f766e;flex:0 0 auto" data-page-node-id="nnneqdwwn7UngV512ER3JV">2</span>
+            <div data-page-node-id="MGFG5C30LSXSh5DpjblXDV"><b style="font-size:14px" data-page-node-id="BGeM6DSswOkJq2Mkrp32gN">按产量收资源</b><p class="muted" style="font-size:13px" data-page-node-id="P2LPP0J7oGRbvKaU0G1DaC">M€ 的收入 = <strong data-page-node-id="Fj5OHXk2EgXcYHXjwZjpfd">当前 TR + M€ 产量</strong>。这是 TR 复利的直接体现。</p></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start" data-page-node-id="0FHghBMh5u3wvQwY4E1OpE">
+            <span class="pico" style="background:#6d4aa8;flex:0 0 auto" data-page-node-id="Ky2u1x2Znj9y24D4YwqVDJ">3</span>
+            <div data-page-node-id="j9vCI7k6Mu8J6el2PniNpx"><b style="font-size:14px" data-page-node-id="4qqRHu0fdh5xeR2UfwtlPH">收回行动标记</b><p class="muted" style="font-size:13px" data-page-node-id="onH0OyWLW4Wh2L7sXE99XH">蓝卡上用掉的标记收回，下世代又能再用一次。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 卡牌 ================= -->
+<section class="sec" id="cards" data-page-node-id="JlPMC54wLXtxyOHnnxbDJP">
+  <div class="wrap" data-page-node-id="OcP0AtGnE3gsMShrTHji3C">
+    <div class="sec-head reveal" data-page-node-id="NRTpJnm03SNXR1Wwrovsju">
+      <span class="eyebrow" data-page-node-id="COILaqceoRNtpjDWfIIznx">Card types</span>
+      <h2 class="h2" data-page-node-id="KkMs0qw4N15Nbkq4Cwk2hg">四种卡，四种脾气</h2>
+      <p class="lead" data-page-node-id="YA75kI7I71Dj3vZM1t0oQF">卡牌边框的颜色不是装饰，它决定了这张卡怎么用、怎么算分。点击卡片翻面看细节。</p>
+    </div>
+    <div class="flips reveal" id="flipGrid" data-page-node-id="iUVexnaBXRszU7W25TYg3k"></div>
+    <div class="card reveal" style="margin-top:20px" data-page-node-id="X3RaECPVhyLMweNJe2UJsO">
+      <h3 class="h3" data-page-node-id="C6zL0qAl3jHv0R12CtePRB">一张卡上你能读到什么</h3>
+      <div class="grid g3" style="margin-top:12px;gap:12px" data-page-node-id="XfuRVckwCkrpIJwT2wWlXE">
+        <div data-page-node-id="5UeZPrkN5IiBb4Fqe1IgKj"><b style="font-size:14px;color:var(--rust)" data-page-node-id="zFcGEwP0SRBQuMHMIuRrqk">标签 Tags</b><p class="muted" style="font-size:13px" data-page-node-id="ECLz89DQRt0tO0qZUlPw7j">卡牌左上角的小图标，决定它属于哪一类，会被别的卡加成。</p></div>
+        <div data-page-node-id="iuAoDbLkqCN4Ao4yhmPo76"><b style="font-size:14px;color:var(--rust)" data-page-node-id="YTn9FIfna6HTteyhnpnNvW">需求 Requirements</b><p class="muted" style="font-size:13px" data-page-node-id="kyXeRzIaaNXhfvMqM5DE2Y">比如「温度 ≥ −6°C」「氧气 ≥ 9%」。不满足就打不出来。</p></div>
+        <div data-page-node-id="HQjKwGK93FmSYrrc7gE3t7"><b style="font-size:14px;color:var(--rust)" data-page-node-id="3s48cmvlCKKtweIF7OFrlJ">费用 Cost</b><p class="muted" style="font-size:13px" data-page-node-id="KBLzFG3IFdlNMkQqPG6mcb">左上角数字，从手牌打出时支付。建筑标签可用钢铁抵扣，太空标签可用钛抵扣。</p></div>
+        <div data-page-node-id="i7zQPxtrlycsI7ZORIpDCu"><b style="font-size:14px;color:var(--rust)" data-page-node-id="t8j8rdh7SJf6AChIctMmjt">效果 Effects</b><p class="muted" style="font-size:13px" data-page-node-id="gUlBEJAc0Fdn3zc3D7NCrB">即时效果一次结算；蓝卡的持续效果一直有效，行动每世代可用一次。</p></div>
+        <div data-page-node-id="UgxifRy0Z0goK4SmxZR8mf"><b style="font-size:14px;color:var(--rust)" data-page-node-id="u27tOxWPxcBkJ9IiPcp9Iq">分数 VP</b><p class="muted" style="font-size:13px" data-page-node-id="AFARu7eQQiALvy6IHkLqMq">右下角的奖杯图标，终局直接加分。很多卡还有条件加分。</p></div>
+        <div data-page-node-id="TeqGKL1sB76TDuMpWD9H46"><b style="font-size:14px;color:var(--rust)" data-page-node-id="PLFHZ2wfAsGAFLxYMX3gRY">风味文本</b><p class="muted" style="font-size:13px" data-page-node-id="PRDJ9Cw5BiMmhDSVsflgc7">斜体的背景故事，纯叙事，没有规则作用。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 标签 ================= -->
+<section class="sec alt" id="tags" data-page-node-id="w66FM2YbltCwLZViqi0Uzi">
+  <div class="wrap" data-page-node-id="wbDzwWxkYh8J6EDjzWA4YZ">
+    <div class="sec-head reveal" data-page-node-id="UScQ9gKSflINuou7ywEGOB">
+      <span class="eyebrow" data-page-node-id="Jku3ZtGhJTtHFli2S7rCTn">Tags</span>
+      <h2 class="h2" data-page-node-id="TLvnZTnlKmB8pjhrrnFgGc">标签：卡牌之间的暗线</h2>
+      <p class="lead" data-page-node-id="itfJPKAWlmnlfqu27TG1kn">标签是《重塑火星》最有深度的系统之一。你场上的标签会互相加成，也会决定里程碑和奖项的归属。点一个标签看看它的用途。</p>
+    </div>
+    <div class="tagboard reveal" data-page-node-id="dvMVED3yucvdErEd4QhoCm">
+      <div data-page-node-id="0exJDOG6GnksVAep1RPt97">
+        <div class="tags" id="tagChips" data-page-node-id="Iroxoh29lhwNsysdm8TNEC"></div>
+        <div class="card" style="margin-top:16px" data-page-node-id="o4Ge5M9dNslDAjjQdiqNjA">
+          <h3 class="h3" style="font-size:15px" data-page-node-id="qZZQSuVf7XCmZAUCP1oCEz">支付方式的小秘密</h3>
+          <p class="muted" style="font-size:13.5px" data-page-node-id="qnomvASz4taNkbVvQzrnPa">钢铁（Fe）每个当 <strong data-page-node-id="nWGTcnt4FEJHKJhqqD4Dl7">2 M€</strong> 用，但只能付带<strong data-page-node-id="nrYkGSAddYZJHxp0o7L2JC">建筑标签</strong>的卡；钛（Ti）每个当 <strong data-page-node-id="Qz6AfocS3dDbj1vu6oyxeC">3 M€</strong> 用，但只能付带<strong data-page-node-id="tfuQ477yDC3SBpvYvZs1gT">太空标签</strong>的卡。钱不够时，这是最常用的救急手段。</p>
+        </div>
+      </div>
+      <div class="taginfo" id="tagInfo" data-page-node-id="r5ECRkv8ZDD1JPuqsWowE9"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 标准项目 ================= -->
+<section class="sec" id="standard" data-page-node-id="kRjlVV0x5IhxIcditF9hCG">
+  <div class="wrap" data-page-node-id="QrLSXFi1IHfp0GVpGOYedF">
+    <div class="sec-head reveal" data-page-node-id="m4Hecn83kUDtDEmIh441IX">
+      <span class="eyebrow" data-page-node-id="pJaZ8HYOI7XdQWrUh1BWTx">Standard projects</span>
+      <h2 class="h2" data-page-node-id="wOWVtaKsGTlPjUyqXJihkB">标准项目：没牌也能做事</h2>
+      <p class="lead" data-page-node-id="sJvBPpo6NLU5tQOeAEgcaQ">游戏板上印着 6 个标准项目。任何时候都可以花钱执行，不需要手牌——这是你「卡手」时的救命稻草。</p>
+    </div>
+    <div class="sp-grid reveal" id="spGrid" data-page-node-id="1FtGb0y6qqWIllHijUjLYJ"></div>
+    <div class="card reveal" style="margin-top:18px" data-page-node-id="CsHc71QO45wvKHXYqJFMWJ">
+      <p class="muted" style="font-size:14px" data-page-node-id="kvMgcGDsEiaV2kcmppCv6F"><strong data-page-node-id="N01aSqGbEfZMf5ZqpjNXsh">要点：</strong>标准项目没有分数收益（除了推参数带来的 TR），性价比通常低于卡牌。它的价值在于<strong data-page-node-id="odUhvHqmvRPbxAw6Wvn4kk">灵活</strong>——当你急需 1 度温度来触发某张卡，或者急需 1 格氧气抢在对手前面时，多花的钱是值得的。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 里程碑与奖项 ================= -->
+<section class="sec alt" id="awards" data-page-node-id="PRTpPISSqGc5xWZy62Efc5">
+  <div class="wrap" data-page-node-id="olIOE4HzAhW4XFhAaEB0kT">
+    <div class="sec-head reveal" data-page-node-id="2PAr6rl60IiVduQoDObEIW">
+      <span class="eyebrow" data-page-node-id="9XH9U2sxJ2Z542OKWJpFUA">Milestones &amp; Awards</span>
+      <h2 class="h2" data-page-node-id="mAXvZqSx27JTl8jaH5ejlN">里程碑与奖项：抢名次拿分</h2>
+      <p class="lead" data-page-node-id="7zb0kXIsEIzcfUY1jGrw0l">这是《重塑火星》里「抢」得最凶的部分。每局最多只能宣称 3 个里程碑、资助 3 个奖项——手快有，手慢无。不同地图的条目完全不同。</p>
+    </div>
+    <div class="reveal" data-page-node-id="Z2BvlrYDLFlQ0haJfzlSDj">
+      <div class="toggle" id="mapToggle" data-page-node-id="zjjDF3J2q6bFP79AzMdzo8"></div>
+      <div class="grid g2" style="margin-top:18px;align-items:start" data-page-node-id="YCANDnA8sq1i4YZeLLGQwv">
+        <div data-page-node-id="uiPBszDdJjyD97cVHBZK5C">
+          <h3 class="h3" style="margin-bottom:12px" data-page-node-id="hUX0vrilzVnmFkBJyqFszE">里程碑 Milestones <span class="muted" style="font-weight:600" data-page-node-id="l54fPoCKUTbdtkx5ifhi4C">每个 8 M€ · 5 分 · 每局最多 3 个</span></h3>
+          <div class="awlist" id="msList" style="grid-template-columns:1fr;margin-top:0" data-page-node-id="Pq1pLCTE3R7IL4M4qWOqpk"></div>
+        </div>
+        <div data-page-node-id="sXAHCet8oEgsRoAsWQmJJH">
+          <h3 class="h3" style="margin-bottom:12px" data-page-node-id="EEDSTNAyhlApbNYSQvks6g">奖项 Awards <span class="muted" style="font-weight:600" data-page-node-id="E9mgbbBiCwi7PkzWXnPCKB">8 / 14 / 20 M€ · 第一名 5 分 · 每局最多 3 个</span></h3>
+          <div class="awlist" id="awList" style="grid-template-columns:1fr;margin-top:0" data-page-node-id="d8Beum4aFc3LtCmVwfb7CG"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 计分器 ================= -->
+<section class="sec" id="scoring" data-page-node-id="AxCWFnnOV7fDgX7mL1oyCQ">
+  <div class="wrap" data-page-node-id="4cDh5Aq2pgVrZ921cB3aJG">
+    <div class="sec-head reveal" data-page-node-id="AjIOsrWnaNa2GXrUACpLVV">
+      <span class="eyebrow" data-page-node-id="bcWGNrznY8Me8bGJafxgc7">Final scoring</span>
+      <h2 class="h2" data-page-node-id="n5G5nNX8CCRxw4w6upZ7pg">终局计分器</h2>
+      <p class="lead" data-page-node-id="RC8O579c3tIA1iWckHE4TT">游戏结束时按固定顺序算分。改一改下面的数字，看看分数怎么攒起来的——你会发现 TR 永远是最大的一块。</p>
+    </div>
+    <div class="calc reveal" data-page-node-id="gdKPdMDCpnP6byTaZcRfgX">
+      <div class="calc-rows" id="calcRows" data-page-node-id="cJm4md4b9M7at32lcaWavk"></div>
+      <div class="total-box" data-page-node-id="GhR8FefT9uoGMLlaJThFw1">
+        <div class="lab" data-page-node-id="JLbpBgWIZkiHPvInAKrkUy">Total Victory Points</div>
+        <div class="big mono" id="calcTotal" data-page-node-id="B6tRaXHU3MIFWNAdmkvpse">20</div>
+        <div class="sub" data-page-node-id="AKhAxkrVBVBB20RbJ9FMSY">总胜利分 · 平局时 M€ 多者胜</div>
+        <div class="breakdown" id="calcBreakdown" data-page-node-id="EmVzorZntsBDC8DEiCo5Wt"></div>
+        <!-- 改一个输入框时，读屏会念输入框自己的新值，但不会念总分怎么变了。
+             这里只播报结论一句话，避免把 7 行明细全念一遍。 -->
+        <p class="sr-only" id="calcLive" role="status" aria-live="polite"></p>
+        <button class="btn ghost sm" id="btnCalcReset" style="margin-top:18px;background:rgba(255,255,255,.1);color:#ffd9b8;border-color:rgba(255,255,255,.2)" data-page-node-id="63LmxtAKenDs2VeZSrMEGn">重置为开局状态</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 新手上路 ================= -->
+<section class="sec alt" id="start" data-page-node-id="kYYU1piCrQCav8v8dZmYOz">
+  <div class="wrap" data-page-node-id="5QrxywNzxcP113OeGKpUyP">
+    <div class="sec-head reveal" data-page-node-id="RaAxBmMAxBh8shlSPlaIeE">
+      <span class="eyebrow" data-page-node-id="i6FIXhY9fwW7sIYRLgeGu1">Getting started</span>
+      <h2 class="h2" data-page-node-id="A0l3iXu2ggsUiBmbtTn5p9">新手上路：第一局这样打</h2>
+      <p class="lead" data-page-node-id="xTq6F2LXb48rtFi77jJd1q">《重塑火星》规则不算复杂，但第一次玩很容易「不知道自己在干嘛」。记住这八条，你会比同桌的人快一步。</p>
+    </div>
+    <div class="tips reveal" id="tipsGrid" data-page-node-id="Y5MHovjTDHZqvTTpsAe7e9"></div>
+    <div class="card reveal" style="margin-top:20px;background:var(--gold-soft);border-color:#ecd9b0" data-page-node-id="CvnNVQLC7jwAXS3CWJK7yv">
+      <h3 class="h3" data-page-node-id="xmErV5OHh6Os0YXFmMbOls">推荐的第一局配置</h3>
+      <div class="grid g3" style="margin-top:12px;gap:14px" data-page-node-id="aImgd8JjilUzKk4n7xi7EQ">
+        <div data-page-node-id="DIry1uoJgqq4Vhhm2BP2do"><b style="font-size:14px" data-page-node-id="RzHrlOYaRN37575fyUhtE4">地图：Tharsis</b><p class="muted" style="font-size:13px" data-page-node-id="4DU5Ls6rrajnsQ85xT7kP5">基础地图，布局最直观，里程碑和奖项都是最经典的那几项。</p></div>
+        <div data-page-node-id="eUswZ90sbxF6HfYRg3G5Qg"><b style="font-size:14px" data-page-node-id="hro7Y8eFlXC9j1KUeOEMUo">公司：新手公司</b><p class="muted" style="font-size:13px" data-page-node-id="t8wRrvyl8alLuFrOypeevc">无色公司卡，给你 42 M€ 和 10 张项目卡，没有任何特殊能力——先熟悉流程。</p></div>
+        <div data-page-node-id="ws8ppxlfAsrzAcKjqXuUvq"><b style="font-size:14px" data-page-node-id="Wh4h5HvMfXf9gYhdDgdpEx">人数：3 人</b><p class="muted" style="font-size:13px" data-page-node-id="oHTFAbE1KAVGkKQbl0oPP6">2 人偏零和，4–5 人等待时间长。3 人节奏最舒服。</p></div>
+        <div data-page-node-id="6EUXBHyWp1Fb6MQiTN3r5V"><b style="font-size:14px" data-page-node-id="BTd4k0YfyJB7hepxJ2yQTZ">不加扩展</b><p class="muted" style="font-size:13px" data-page-node-id="Ifd5eHWbZEjFJ6hUO4W0yy">先跑一遍基础版。熟练后再加 Prelude，它会让开局快很多。</p></div>
+        <div data-page-node-id="19NLGchw7wG9B4cxDaKRq6"><b style="font-size:14px" data-page-node-id="ZtphuIQNfO3TcZk5kWWOWK">变体：企业时代</b><p class="muted" style="font-size:13px" data-page-node-id="1ZWilPM0zbY4lwr2YQlNWd">可选。让所有人起始产量为 0，节奏更慢但更纯粹，适合老手。</p></div>
+        <div data-page-node-id="WN7icjKWnsLjEubOW9rJDw"><b style="font-size:14px" data-page-node-id="DvZfXFLuuSnNjBJNgP3svN">心态：别怕慢</b><p class="muted" style="font-size:13px" data-page-node-id="Ol0w3zym6roCMMJauUw208">第一局打到 2.5 小时很正常。第二局开始会快得多。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 扩展 ================= -->
+<section class="sec" id="expansions" data-page-node-id="Run0zpz7MAT3xgEqMxnTRp">
+  <div class="wrap" data-page-node-id="CIC5QDQKEAbwzrLtsQePJF">
+    <div class="sec-head reveal" data-page-node-id="eBfRC4lNiGo0JuAGkBnxFb">
+      <span class="eyebrow" data-page-node-id="v1mn8HCGJxixOkJVYOC4cP">Expansions</span>
+      <h2 class="h2" data-page-node-id="uGBymxITba3bFCVNQTNbiv">扩展包时间线</h2>
+      <p class="lead" data-page-node-id="mhLHSQPDvI0pLyMpOMOfDz">《重塑火星》有非常丰富的扩展体系。如果只加一个，几乎所有老玩家都会推荐 <strong data-page-node-id="GUWn33Z7zE7xHW2UbRBfOT">Prelude</strong>。</p>
+    </div>
+    <div class="timeline reveal" id="tlList" data-page-node-id="8Gd1zm8JFqVh2ujjvNUnTp"></div>
+  </div>
+</section>
+
+<!-- ================= 术语 ================= -->
+<section class="sec alt" id="glossary" data-page-node-id="5woq0eG4WgCWQ4uXrYMGmS">
+  <div class="wrap" data-page-node-id="MabFqHL5V06sg0SVUiqg8a">
+    <div class="sec-head reveal" data-page-node-id="BIdUVJGAALzYMBH4gw2CUG">
+      <span class="eyebrow" data-page-node-id="XfJJ6t0YEew1iCEHDrlQEb">Glossary</span>
+      <h2 class="h2" data-page-node-id="XTPHKaPZWC8l1rXcH3gLxs">常用术语速查</h2>
+      <p class="lead" data-page-node-id="SJqC2gJu6cpcEQlDsd5rVO">和同桌交流时你会反复听到这些词。点开看解释。</p>
+    </div>
+    <div class="reveal" id="glList" data-page-node-id="PNLfscGgVoAbcomLIAnVD4"></div>
+  </div>
+</section>
+
+<!-- ================= 测验 ================= -->
+<section class="sec" id="quiz" data-page-node-id="lC4nHwh5f6sbmzGhLDe3gn">
+  <div class="wrap" data-page-node-id="nBURSHoL8Y3p3nRGbA4S94">
+    <div class="sec-head reveal" data-page-node-id="l3QKHtivtx2AfEFpOhICei">
+      <span class="eyebrow" data-page-node-id="i78rhgEu4bHOm0b1XurI1b">Quiz</span>
+      <h2 class="h2" data-page-node-id="UTJgnyqt6690fmUeHfJMEX">小测验：你准备好了吗？</h2>
+      <p class="lead" data-page-node-id="nqmWDAEQrUo6jXShxqnWgL">六道题，覆盖上面所有关键规则。答完会告诉你错在哪里。</p>
+    </div>
+    <div class="quiz reveal" id="quizBox" data-page-node-id="HIbDgPMb3TojSussRRyksx"></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot" data-page-node-id="cVjUsGBbPetv2A5VmvEWDZ">
+  <div class="foot-in" data-page-node-id="RrqjuwGIhfsOhYKhMJ9Sd5">
+    <h3 data-page-node-id="IXhfVKGgg5NiCobFXVSipz">关于这份指南</h3>
+    <p data-page-node-id="0LznXo4rL7Xtnjj3rB0D6D">这是一份为新手准备的互动入门材料，用可视化和模拟器把《重塑火星》的规则讲清楚。内容基于基础版（Tharsis 地图）规则整理，扩展包部分做了简化说明。</p>
+    <div class="rule" data-page-node-id="Ow81Gp3HLGmGCj2aqAbl2B"></div>
+    <small data-page-node-id="mjjDmCAQjlvrhIR8oCwetL">
+      Terraforming Mars™ 是 Jacob Fryxelius 设计、FryxGames 出版的作品，中文版由游人码头代理。<br data-page-node-id="03D37OtvYzcm9DXzmHsaKD">
+      本站为粉丝制作的非官方学习资料，与版权方无隶属关系。游戏规则以官方说明书为准。
+    </small>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const el = (tag, cls, html) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ============================================================
+     1. 火星可视化
+     ============================================================ */
+  const OCEANS = [
+    [150, 252, 52, 30, -14], [268, 258, 44, 26, 10], [205, 306, 58, 22, 4],
+    [122, 196, 30, 40, 8], [300, 188, 28, 36, -8], [186, 146, 38, 20, 12],
+    [258, 214, 26, 30, 0], [152, 332, 34, 16, -6], [306, 300, 24, 22, 0]
+  ];
+  const VEG = [
+    [168, 232, 26, 18], [246, 246, 22, 15], [210, 286, 30, 14], [142, 214, 18, 14],
+    [280, 214, 16, 13], [196, 168, 20, 12], [262, 180, 15, 11], [172, 300, 20, 10],
+    [288, 268, 14, 11], [134, 258, 15, 10], [228, 150, 16, 10], [238, 310, 18, 9],
+    [196, 206, 14, 10], [300, 236, 12, 9]
+  ];
+  const CRATERS = [
+    [146, 168, 30, 22, -12], [268, 150, 22, 17, 8], [214, 250, 34, 24, 0],
+    [118, 236, 20, 15, 0], [300, 250, 26, 19, -6], [178, 306, 24, 17, 5],
+    [256, 300, 18, 14, 0], [318, 200, 15, 12, 0], [152, 268, 13, 10, 0],
+    [232, 190, 16, 12, 0], [206, 128, 14, 11, 0]
+  ];
+  const CLOUDS = [
+    [140, 176, 44, 11, -8], [270, 168, 38, 9, 10], [212, 232, 52, 12, -4],
+    [166, 288, 40, 10, 6], [292, 274, 32, 9, -10], [120, 226, 30, 8, 4]
+  ];
+  let uidSeq = 0;
+
+  function buildMars(svg) {
+    const u = "m" + (++uidSeq);
+    const NS = "http://www.w3.org/2000/svg";
+    const mk = (tag, attrs, parent) => {
+      const n = document.createElementNS(NS, tag);
+      for (const k in attrs) n.setAttribute(k, attrs[k]);
+      (parent || svg).appendChild(n);
+      return n;
+    };
+    const defs = mk("defs", {});
+    const addGrad = (id, stops, radial) => {
+      const g = mk(radial ? "radialGradient" : "linearGradient", radial ? { id, cx: "34%", cy: "28%", r: "78%" } : { id, x1: "0", y1: "0", x2: "0", y2: "1" }, defs);
+      stops.forEach(s => mk("stop", { offset: s[0], "stop-color": s[1], "stop-opacity": s[2] == null ? 1 : s[2] }, g));
+    };
+    addGrad(u + "base", [["0%", "#eba37c"], ["40%", "#cb6733"], ["100%", "#7a3011"]], true);
+    addGrad(u + "haze", [["62%", "#bfe3ff", 0], ["88%", "#cfe9ff", .42], ["100%", "#e6f4ff", .72]], true);
+    addGrad(u + "shade", [["0%", "rgba(0,0,0,0)"], ["100%", "rgba(60,20,0,.55)"]], true);
+    const clip = mk("clipPath", { id: u + "clip" });
+    mk("circle", { cx: 210, cy: 210, r: 150 }, clip);
+
+    // 外层大气光晕
+    const glow = mk("circle", { cx: 210, cy: 210, r: 158, fill: "none", stroke: "#7fd3f0", "stroke-width": 12, opacity: 0 });
+    const glow2 = mk("circle", { cx: 210, cy: 210, r: 150, fill: "none", stroke: "rgba(255,255,255,.5)", "stroke-width": 2 });
+    mk("circle", { cx: 210, cy: 210, r: 150, fill: "url(#" + u + "base)" });
+
+    const world = mk("g", { "clip-path": "url(#" + u + "clip)" });
+    // 地形陨石坑
+    const terr = mk("g", { fill: "rgba(90,40,10,.24)" }, world);
+    CRATERS.forEach(c => mk("ellipse", { cx: c[0], cy: c[1], rx: c[2], ry: c[3], transform: "rotate(" + c[4] + " " + c[0] + " " + c[1] + ")" }, terr));
+    const terr2 = mk("g", { fill: "rgba(255,225,200,.16)" }, world);
+    CRATERS.forEach(c => mk("ellipse", { cx: c[0] - 2, cy: c[1] - 2, rx: c[2] * .62, ry: c[3] * .62, transform: "rotate(" + c[4] + " " + c[0] + " " + c[1] + ")" }, terr2));
+
+    // 海洋。下面这些椭圆都带语义 class（ocean / veg / cloud / cap），
+    // 因为回归脚本要按分组采样不透明度——按 fill 颜色去认分组会在换色时静默失配。
+    const oceanG = mk("g", {}, world);
+    const oceanEls = OCEANS.map(o => mk("ellipse", {
+      class: "ocean",
+      cx: o[0], cy: o[1], rx: o[2], ry: o[3], fill: "#1f6fa8", opacity: 0,
+      transform: "rotate(" + o[4] + " " + o[0] + " " + o[1] + ")"
+    }, oceanG));
+    const oceanHi = OCEANS.map(o => mk("ellipse", {
+      class: "ocean-hi",
+      cx: o[0] - o[2] * .22, cy: o[1] - o[3] * .3, rx: o[2] * .46, ry: o[3] * .38, fill: "#7fc4e8", opacity: 0,
+      transform: "rotate(" + o[4] + " " + o[0] + " " + o[1] + ")"
+    }, oceanG));
+
+    // 植被。fill 引用 token 而不是抄字面量——实测 var() 在 SVG 表现属性里能正常解析。
+    const vegG = mk("g", {}, world);
+    const vegEls = VEG.map(v => mk("ellipse", { class: "veg", cx: v[0], cy: v[1], rx: v[2], ry: v[3], fill: "var(--green)", opacity: 0 }, vegG));
+
+    // 云
+    const cloudG = mk("g", { class: "clouds" }, world);
+    const cloudEls = CLOUDS.map(c => mk("ellipse", {
+      class: "cloud",
+      cx: c[0], cy: c[1], rx: c[2], ry: c[3], fill: "#ffffff", opacity: 0,
+      transform: "rotate(" + c[4] + " " + c[0] + " " + c[1] + ")"
+    }, cloudG));
+
+    // 极冠
+    const capN = mk("ellipse", { class: "cap", cx: 210, cy: 66, rx: 118, ry: 44, fill: "#f4f9fd" }, world);
+    const capS = mk("ellipse", { class: "cap", cx: 210, cy: 356, rx: 108, ry: 40, fill: "#eef6fc" }, world);
+
+    // 大气薄雾
+    const haze = mk("ellipse", { cx: 210, cy: 210, rx: 150, ry: 150, fill: "url(#" + u + "haze)", opacity: 0 }, world);
+    // 立体阴影
+    mk("circle", { cx: 258, cy: 262, r: 150, fill: "url(#" + u + "shade)", opacity: .5 }, world);
+
+    return function update(tempP, oxyP, ocnP) {
+      const oc = Math.round(ocnP * 9);
+      const vg = Math.round(oxyP * 14);
+      oceanEls.forEach((e, i) => e.setAttribute("opacity", i < oc ? (0.72 + 0.28 * ocnP).toFixed(3) : 0));
+      oceanHi.forEach((e, i) => e.setAttribute("opacity", i < oc ? 0.3 : 0));
+      vegEls.forEach((e, i) => e.setAttribute("opacity", i < vg ? (0.42 + 0.42 * oxyP).toFixed(3) : 0));
+      cloudEls.forEach((e, i) => e.setAttribute("opacity", (oxyP * 0.42 + tempP * 0.16).toFixed(3)));
+      const ice = 1 - tempP * 0.93;
+      capN.setAttribute("opacity", ice.toFixed(3));
+      capS.setAttribute("opacity", (ice * 0.94).toFixed(3));
+      capN.setAttribute("ry", (44 - tempP * 18).toFixed(1));
+      capS.setAttribute("ry", (40 - tempP * 16).toFixed(1));
+      haze.setAttribute("opacity", (oxyP * 0.55 + tempP * 0.12).toFixed(3));
+      glow.setAttribute("opacity", (oxyP * 0.3 + tempP * 0.1).toFixed(3));
+      glow2.setAttribute("opacity", 0.25 + oxyP * 0.4);
+    };
+  }
+
+  const heroSvg = $("#marsSvg");
+  const heroUpdate = buildMars(heroSvg);
+  heroUpdate(0, 0, 0);
+
+  /* ============================================================
+     2. 全球参数模拟器
+     ============================================================ */
+  const simSvg = $("#simMars");
+  const simUpdate = buildMars(simSvg);
+  const rngTemp = $("#rngTemp"), rngOxy = $("#rngOxy"), rngOcn = $("#rngOcn");
+  const valTemp = $("#valTemp"), valOxy = $("#valOxy"), valOcn = $("#valOcn");
+  const roTr = $("#roTr"), roGain = $("#roGain"), roPct = $("#roPct");
+  const simBarFill = $("#simBarFill"), simStatus = $("#simStatus"), paramNote = $("#paramNote");
+  const simLive = $("#simLive");
+  const marsCaption = $("#marsCaption");
+
+  const TEMP_LABELS = [];
+  for (let i = 0; i <= 19; i++) TEMP_LABELS.push(-30 + i * 2);
+
+  function paintRange(input) {
+    const p = (input.value - input.min) / (input.max - input.min) * 100;
+    input.style.setProperty("--pct", p.toFixed(1) + "%");
+  }
+
+  /* 滑块的可见读数（−30°C / 14% / 9 块）和它的原生值（0–19 / 0–14 / 0–9）不是一回事。
+     不给 aria-valuetext 的话，读屏只会念「温度 滑块 7」，用户根本不知道那代表 −16°C。 */
+  function syncRangeText() {
+    rngTemp.setAttribute("aria-valuetext", (TEMP_LABELS[+rngTemp.value] > 0 ? "+" : "") + TEMP_LABELS[+rngTemp.value] + " 摄氏度");
+    rngOxy.setAttribute("aria-valuetext", rngOxy.value + " %");
+    rngOcn.setAttribute("aria-valuetext", rngOcn.value + " 块海洋");
+  }
+
+  /* 拖动过程中 input 会连发，防抖 600ms 只在用户停手后播报一次结论。 */
+  let simLiveTimer = 0;
+  function announceSim(text) {
+    clearTimeout(simLiveTimer);
+    simLiveTimer = setTimeout(() => { simLive.textContent = text; }, 600);
+  }
+
+  function updateSim(fromUser) {
+    const t = +rngTemp.value, o = +rngOxy.value, c = +rngOcn.value;
+    paintRange(rngTemp); paintRange(rngOxy); paintRange(rngOcn);
+    syncRangeText();
+    valTemp.textContent = (TEMP_LABELS[t] > 0 ? "+" : "") + TEMP_LABELS[t];
+    valOxy.textContent = o;
+    valOcn.textContent = c;
+    const gain = t + o + c;
+    roTr.textContent = 20 + gain;
+    roGain.textContent = "+" + gain;
+    const pct = Math.round(gain / 42 * 100);
+    roPct.textContent = pct + "%";
+    simBarFill.style.width = pct + "%";
+    simUpdate(t / 19, o / 14, c / 9);
+    /* 首屏的火星也跟滑块联动：用户在顶部看到「当前进度」的活火星，行为有反馈感。
+       否则 hero 永远是初始的死星（之前 heroUpdate(0,0,0) 只调一次，后面再不动），
+       跟 sim 区的视觉直接割裂。 */
+    heroUpdate(t / 19, o / 14, c / 9);
+    /* 图片下方的说明也要跟着走。它原本是写死的「起始状态 · 平均温度 −30°C · 氧气 0% · 海洋 0」，
+       推完滑块后会和紧挨着的实时数值直接自相矛盾。 */
+    const tempTxt = (TEMP_LABELS[t] > 0 ? "+" : "") + TEMP_LABELS[t];
+    marsCaption.textContent = (gain === 0 ? "起始状态" : gain >= 42 ? "改造完成" : "改造中") +
+      " · 平均温度 " + tempTxt + "°C · 氧气 " + o + "% · 海洋 " + c;
+
+    if (gain === 0) {
+      simStatus.innerHTML = "火星仍在沉睡。把任意一根滑块往右推一点试试。";
+    } else if (gain >= 42) {
+      simStatus.innerHTML = "<strong style='color:var(--teal)'>改造完成！</strong>温度 +8°C、氧气 14%、9 块海洋全部达标——游戏在这一世代结束后结束，开始终局计分。";
+    } else {
+      const done = [];
+      if (t === 19) done.push("温度达标");
+      if (o === 14) done.push("氧气达标");
+      if (c === 9) done.push("海洋达标");
+      simStatus.innerHTML = "已推进 <strong>" + gain + "</strong> 格参数，TR 从 20 涨到 <strong>" + (20 + gain) + "</strong>。" +
+        (done.length ? " 其中 " + done.join("、") + "。" : "") +
+        " 还差 <strong>" + (42 - gain) + "</strong> 格就能完成改造。";
+    }
+    if (fromUser) paramNote.textContent = "TR 每涨 1 点，之后每个世代的 M€ 收入就多 1 点。这就是为什么老玩家总在抢参数。";
+    /* 视觉上 #simStatus 已经把结论写清楚了，但读屏读不到——它没有 aria-live。
+       这里把同一段结论（去掉标签）防抖送进隐藏状态区。 */
+    announceSim("已推进 " + gain + " 格参数，TR " + (20 + gain) + "，改造进度 " + pct + "%。" +
+      (gain >= 42 ? "改造完成。" : "还差 " + (42 - gain) + " 格。"));
+  }
+  [rngTemp, rngOxy, rngOcn].forEach(r => r.addEventListener("input", () => updateSim(true)));
+  $("#btnTerraform").addEventListener("click", () => {
+    rngTemp.value = 19; rngOxy.value = 14; rngOcn.value = 9; updateSim(true);
+  });
+  $("#btnResetParams").addEventListener("click", () => {
+    rngTemp.value = 0; rngOxy.value = 0; rngOcn.value = 0; updateSim(true);
+  });
+  updateSim(false);
+
+  /* ============================================================
+     3. 核心机制
+     ============================================================ */
+  const MECH = [
+    { i: "⚙", t: "引擎构筑", e: "Engine Building", d: "每张卡都在给你的改造机器加零件。前期投资产量，后期收益会指数级放大——这是整个游戏的灵魂。" },
+    { i: "🃏", t: "卡牌轮抽与手牌管理", e: "Card Drafting / Hand", d: "每世代抽 4 张，每张花 3 M€ 决定留不留。手牌没有上限，但钱永远不够，取舍就是策略。" },
+    { i: "🗺", t: "板块放置", e: "Tile Placement", d: "城市、绿化、海洋都要放在火星地图上抢位置。城市挨着绿化能加分，所以地图上的每一格都有讲究。" },
+    { i: "🏢", t: "可变玩家能力", e: "Variable Powers", d: "12 家公司各有一套完全不同的开局条件和特殊能力，决定你这局该走什么路线。" },
+    { i: "🔄", t: "资源转换链", e: "Resource Conversion", d: "能源 → 热量，植物 → 绿化，钢铁/钛 → 卡牌费用。把一种资源转成另一种，是效率的核心。" },
+    { i: "🌡", t: "全局参数竞速", e: "Shared Race", d: "温度、氧气、海洋是全桌共享的。别人推上去你也能受益，但 TR 分数只归推动的人——于是所有人都在抢。" },
+    { i: "📈", t: "TR 复利", e: "Terraform Rating", d: "TR 既是终局分数，又是每世代的 M€ 收入。涨 1 点 TR = 终局 +1 分，且之后每轮多 1 M€。双重收益。" },
+    { i: "🏆", t: "里程碑与奖项", e: "Milestones / Awards", d: "花钱抢先宣称里程碑（各 5 分），或资助奖项让全场比大小（第一名 5 分）。一局最多各 3 个，手快有手慢无。" }
+  ];
+  const mechGrid = $("#mechGrid");
+  MECH.forEach(m => {
+    mechGrid.appendChild(el("div", "mech-item",
+      '<div class="mech-ico">' + m.i + '</div>' +
+      '<span class="tag-en">' + m.e + '</span>' +
+      "<h3>" + m.t + "</h3><p>" + m.d + "</p>"));
+  });
+
+  /* ============================================================
+     4. 玩家面板模拟器
+     ============================================================ */
+  /* 颜色一律引用 token，不再抄字面量。
+     之前这里把 #b7791f 抄了一遍，结果 token 调深后这两处仍是旧值，
+     对比度依旧不达标——同一份配色散成两份实现必然漂移。 */
+  const RES = [
+    { k: "mc", n: "M€", s: "信用点 · 万能货币", c: "var(--gold)", ic: "M€" },
+    { k: "steel", n: "钢铁", s: "付建筑卡 · 每个抵 2 M€", c: "#6b7280", ic: "Fe" },
+    { k: "titan", n: "钛", s: "付太空卡 · 每个抵 3 M€", c: "#4a6f8a", ic: "Ti" },
+    { k: "plant", n: "植物", s: "8 个 → 1 块绿化板块", c: "var(--green)", ic: "植" },
+    { k: "energy", n: "能源", s: "下世代全部转成热量", c: "var(--purple)", ic: "电" },
+    { k: "heat", n: "热量", s: "8 点 → 温度 +1 级", c: "var(--rust)", ic: "热" }
+  ];
+  const TICKS = 12;
+  const board = { tr: 20, gen: 1, prod: {}, res: {} };
+  RES.forEach(r => { board.prod[r.k] = 1; board.res[r.k] = 0; });
+
+  const prodPanel = $("#prodPanel"), stockGrid = $("#stockGrid"), prodLog = $("#prodLog");
+  const rowRefs = {};
+
+  function buildBoard() {
+    prodPanel.innerHTML = "";
+    RES.forEach(r => {
+      const row = el("div", "prow");
+      const ico = el("span", "pico", r.ic);
+      ico.style.background = r.c;
+      const name = el("span", "pname", r.n + "<em>产量</em>");
+      const track = el("div", "track");
+      const ticks = [];
+      for (let i = 1; i <= TICKS; i++) {
+        const t = el("i", "tick" + (i % 5 === 0 ? " mile" : ""));
+        track.appendChild(t); ticks.push(t);
+      }
+      const val = el("span", "pval mono", "1");
+      const btns = el("div", "pbtns");
+      const minus = el("button", "", "−"), plus = el("button", "", "+");
+      minus.type = plus.type = "button";
+      minus.setAttribute("aria-label", r.n + " 产量 -1");
+      plus.setAttribute("aria-label", r.n + " 产量 +1");
+      btns.append(minus, plus);
+      row.append(ico, name, track, val, btns);
+      prodPanel.appendChild(row);
+      rowRefs[r.k] = { ticks, val };
+      minus.addEventListener("click", () => { board.prod[r.k] = clamp(board.prod[r.k] - 1, 0, TICKS); renderBoard(); });
+      plus.addEventListener("click", () => { board.prod[r.k] = clamp(board.prod[r.k] + 1, 0, TICKS); renderBoard(); });
+    });
+
+    stockGrid.innerHTML = "";
+    RES.forEach(r => {
+      const s = el("div", "stock");
+      s.innerHTML = '<b class="mono" data-k="' + r.k + '" style="color:' + r.c + '">0</b><span>' + r.n + " 库存</span>";
+      stockGrid.appendChild(s);
+    });
+  }
+
+  function renderBoard(popKeys) {
+    RES.forEach(r => {
+      const ref = rowRefs[r.k], v = board.prod[r.k];
+      ref.ticks.forEach((t, i) => t.classList.toggle("f", i < v));
+      ref.val.textContent = v;
+      if (popKeys && popKeys.indexOf(r.k) >= 0) {
+        ref.val.classList.remove("pop"); void ref.val.offsetWidth; ref.val.classList.add("pop");
+      }
+      const sb = stockGrid.querySelector('[data-k="' + r.k + '"]');
+      sb.textContent = board.res[r.k];
+      if (popKeys && popKeys.indexOf(r.k) >= 0) {
+        sb.classList.remove("pop"); void sb.offsetWidth; sb.classList.add("pop");
+      }
+    });
+    /* 置灰时把缺口直接写进按钮文案。
+       不能只靠 title —— 浏览器对 disabled 元素不弹出 tooltip，
+       光置灰又不给原因，用户只会觉得"点了没反应、不知道为什么"。 */
+    const gp = $("#btnGreenery"), hp = $("#btnHeat");
+    gp.disabled = board.res.plant < 8;
+    hp.disabled = board.res.heat < 8;
+    gp.textContent = gp.disabled ? "用 8 植物换绿化（还差 " + (8 - board.res.plant) + "）" : "用 8 植物换绿化";
+    hp.textContent = hp.disabled ? "用 8 热量升温（还差 " + (8 - board.res.heat) + "）" : "用 8 热量升温";
+  }
+
+  function log(html) {
+    prodLog.insertAdjacentHTML("afterbegin", "<div class='fade-up'>" + html + "</div>");
+    while (prodLog.children.length > 26) prodLog.removeChild(prodLog.lastChild);
+  }
+
+  $("#btnProduce").addEventListener("click", () => {
+    const conv = board.res.energy;
+    board.res.heat += conv;
+    board.res.energy = 0;
+    const income = board.tr + board.prod.mc;
+    board.res.mc += income;
+    const popped = ["mc", "heat"];
+    ["steel", "titan", "plant", "energy"].forEach(k => {
+      if (board.prod[k] > 0) { board.res[k] += board.prod[k]; popped.push(k); }
+    });
+    board.res.heat += board.prod.heat;
+    board.gen++;
+    log("<b>第 " + board.gen + " 世代 · 生产阶段</b><br>" +
+      "① 能源 " + conv + " 点 → 热量<br>" +
+      "② M€ 收入 = TR " + board.tr + " + 产量 " + board.prod.mc + " = <b>" + income + "</b><br>" +
+      "③ 按产量收取其余资源");
+    renderBoard(popped);
+  });
+
+  $("#btnGreenery").addEventListener("click", () => {
+    board.res.plant -= 8; board.tr += 1;
+    log("<span class='ok'>用 8 植物放置了 1 块绿化板块 → 氧气 +1，TR +1（现为 " + board.tr + "）</span>");
+    renderBoard(["plant"]);
+  });
+  $("#btnHeat").addEventListener("click", () => {
+    board.res.heat -= 8; board.tr += 1;
+    log("<span class='ok'>用 8 热量提升了 1 级温度 → TR +1（现为 " + board.tr + "）</span>");
+    renderBoard(["heat"]);
+  });
+  $("#btnResetBoard").addEventListener("click", () => {
+    board.tr = 20; board.gen = 1;
+    RES.forEach(r => { board.prod[r.k] = 1; board.res[r.k] = 0; });
+    prodLog.innerHTML = "面板已重置。每个玩家在标准游戏中起始产量各为 1，TR 为 20，资源库存为 0。";
+    renderBoard();
+  });
+  buildBoard(); renderBoard();
+
+  /* ============================================================
+     5. 世代流程
+     ============================================================ */
+  const GEN = [
+    {
+      n: "01", nm: "回合顺序", en: "Player Order",
+      lead: "调整谁先动。第一个行动的玩家往往能抢到最关键的里程碑或板块位置。",
+      items: [
+        "首位玩家标记顺时针移动一格，交给下一位玩家",
+        "世代标记向上移动一格，记录现在是第几世代",
+        "<strong>第 1 世代跳过此阶段</strong>"
+      ],
+      kv: ["谁先动谁占优", "顺位每世代轮换", "抢里程碑的关键"]
+    },
+    {
+      n: "02", nm: "研究阶段", en: "Research",
+      lead: "所有人补充手牌。这是你唯一的常规抽卡机会。",
+      items: [
+        "每名玩家抽 <strong>4 张</strong>项目卡",
+        "可以花 <strong>3 M€/张</strong> 买进手里，买几张都行（0–4）",
+        "不买的卡面朝下弃掉，之后再也拿不回来",
+        "手牌没有上限，可以一直攒着",
+        "<strong>第 1 世代跳过此阶段</strong>（开局已经发了 10 张）"
+      ],
+      kv: ["每世代抽 4 张", "3 M€ 一张", "手牌无上限"]
+    },
+    {
+      n: "03", nm: "行动阶段", en: "Action",
+      lead: "游戏的主体。玩家轮流做事，直到所有人跳过。",
+      items: [
+        "轮到你时，可以执行 <strong>1 个或 2 个</strong>行动，然后换下一位",
+        "行动可以自由组合，也可以重复同一个",
+        "选择不行动（跳过）就退出本世代，本世代不能再做事",
+        "所有人跳过之后，进入生产阶段"
+      ],
+      kv: ["每回合 1–2 个行动", "可重复", "跳过 = 退出本世代"]
+    },
+    {
+      n: "04", nm: "生产阶段", en: "Production",
+      lead: "收钱收资源。这是引擎回报你的时刻。",
+      items: [
+        "① 所有<strong>能源</strong>转成<strong>热量</strong>（能源存不住）",
+        "② 按产量收取资源：M€ = <strong>当前 TR + M€ 产量</strong>",
+        "③ 收回蓝卡行动上的玩家标记，下世代可再用",
+        "然后回到第 1 步，开始新的世代"
+      ],
+      kv: ["能源→热量", "M€ = TR + 产量", "标记回收"]
+    }
+  ];
+  const genSteps = $("#genSteps"), genDetail = $("#genDetail");
+  GEN.forEach((g, i) => {
+    const b = el("button", "gstep" + (i === 0 ? " on" : ""),
+      '<span class="num">' + g.n + '</span><span class="nm">' + g.nm + '</span><span class="en">' + g.en + "</span>");
+    b.type = "button";
+    b.addEventListener("click", () => {
+      $$(".gstep", genSteps).forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      renderGen(i);
+    });
+    genSteps.appendChild(b);
+  });
+  function renderGen(i) {
+    const g = GEN[i];
+    genDetail.innerHTML =
+      '<div class="fade-up"><h3 class="h3" style="font-size:21px">' + g.nm +
+      ' <span class="muted" style="font-weight:700;font-size:12.5px;letter-spacing:.1em">' + g.en.toUpperCase() + "</span></h3>" +
+      '<p class="muted" style="margin-top:8px;font-size:14.5px">' + g.lead + "</p>" +
+      "<ul>" + g.items.map(x => "<li>" + x + "</li>").join("") + "</ul>" +
+      '<div class="kv">' + g.kv.map(x => "<span>" + x + "</span>").join("") + "</div></div>";
+  }
+  renderGen(0);
+
+  /* ============================================================
+     6. 卡牌类型
+     ============================================================ */
+  const CARDS = [
+    {
+      c: "c-green", bg: "bg-green", t: "t-green", n: "自动化卡", en: "Automated · 绿色",
+      f: "打出后立刻结算效果，然后正面朝上放在桌上，不再有后续作用。",
+      b: "最踏实的一类卡。它的标签仍然算数——照样给别的卡加成，照样计入里程碑和奖项。产量提升大多来自绿卡。"
+    },
+    {
+      c: "c-blue", bg: "bg-blue", t: "t-blue", n: "主动卡", en: "Active · 蓝色",
+      f: "有持续效果，或者带一个「行动」。行动每世代可以用一次。",
+      b: "引擎的核心零件。比如「每当你打出一张太空卡，就获得 1 钛」。用它记得放一个玩家标记，生产阶段收回。"
+    },
+    {
+      c: "c-red", bg: "bg-red", t: "t-red", n: "事件卡", en: "Event · 红色",
+      f: "打出后立刻结算，然后面朝下收进你的个人牌堆，之后不再有效。",
+      b: "通常一次性给强力效果：直接降温、加氧、拿资源、打击对手。注意：事件卡的标签只在打出时算数，终局不计。"
+    },
+    {
+      c: "c-purple", bg: "bg-purple", t: "t-purple", n: "公司卡", en: "Corporation",
+      f: "开局时从 2 张里选 1 张。它给你起始资源，还有一项贯穿全局的特殊能力。",
+      b: "卡面上有条彩色竖带，说明它同时被视为绿卡 / 蓝卡 / 红卡。这决定它是否会被「减少绿卡费用」之类的效果影响。"
+    }
+  ];
+  const flipGrid = $("#flipGrid");
+  CARDS.forEach(cd => {
+    const f = el("div", "flip");
+    f.tabIndex = 0;
+    f.setAttribute("role", "button");
+    f.setAttribute("aria-label", cd.n + "，点击翻面");
+    f.innerHTML =
+      '<div class="flip-in">' +
+      '<div class="flip-face flip-front">' +
+      '<div><div class="flip-stripe ' + cd.c + '"></div>' +
+      '<span class="en">' + cd.en + "</span><h3>" + cd.n + "</h3><p>" + cd.f + "</p></div>" +
+      '<span class="flip-hint">点击翻面 ↻</span></div>' +
+      '<div class="flip-face flip-back ' + cd.bg + '">' +
+      "<div><h3 class=\"" + cd.t + "\">为什么重要</h3><p>" + cd.b + "</p></div>" +
+      '<span class="flip-hint">再点一次翻回 ↺</span></div></div>';
+    const toggle = () => f.classList.toggle("on");
+    f.addEventListener("click", toggle);
+    f.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    flipGrid.appendChild(f);
+  });
+
+  /* ============================================================
+     7. 标签
+     ============================================================ */
+  const TAGS = [
+    { n: "建筑", en: "Building", c: "#a1662f", d: "实体工程：矿场、工厂、城市基础设施。这是最「重」的一类标签。", u: ["可以用钢铁支付，每个钢铁抵 2 M€", "「建造者」里程碑需要场上 8 个建筑标签", "很多卡会因为建筑标签给你加分或减费"] },
+    { n: "太空", en: "Space", c: "#2b6cb0", d: "航天相关的技术：运输、轨道站、小行星开采。", u: ["可以用钛支付，每个钛抵 3 M€", "「太空男爵」奖项比拼太空标签数量", "木星卡通常也带太空标签"] },
+    { n: "科学", en: "Science", c: "var(--teal)", d: "科研机构与实验项目。单看没有直接收益，但加成极多。", u: ["「科学家」奖项比拼科学标签数量", "大量卡牌以「你有 N 个科学标签」为条件给分", "是中后期爆发的关键标签"] },
+    { n: "能源", en: "Power", c: "var(--purple)", d: "发电设施。能源资源是过路资源，下世代会全部变成热量。", u: ["「能源化」里程碑需要能源产量达到 6", "能源产量通常被用来换热量或供其他卡消耗", "部分卡要求消耗能源才能触发"] },
+    { n: "地球", en: "Earth", c: "var(--blue)", d: "来自地球的进口技术与人才。通常提供产量或分数。", u: ["很多地球标签卡会互相加成", "是「地球化」路线的常见支撑", "通常带分数收益"] },
+    { n: "木星", en: "Jovian", c: "var(--gold)", d: "木星系统相关的深空开发。数量不多，但每一张都很值钱。", u: ["「边境开拓者」里程碑需要 3 个木星标签", "木星标签卡通常自带 1 分以上", "是许多高分局的加分重点"] },
+    { n: "微生物", en: "Microbe", c: "#4d7c0f", d: "生物类标签的一种。卡上常常会积累微生物资源。", u: ["「生态学家」里程碑需要 4 个生物标签（植物/微生物/动物）", "微生物资源本身在终局可以换成分数", "是生物路线的核心"] },
+    { n: "植物", en: "Plant", c: "var(--green)", d: "生物类标签。植物资源攒够 8 个就能换成绿化板块。", u: ["「园丁」里程碑需要 3 块绿化板块", "「培育者」奖项比拼绿化板块数量", "直接推动氧气参数"] },
+    { n: "动物", en: "Animal", c: "#b45309", d: "生物类标签。动物卡通常收集动物资源，每只都值分。", u: ["动物资源在终局通常每只 1 分", "常与植物标签联动", "属于「生态学家」里程碑的计数范围"] },
+    { n: "城市", en: "City", c: "#7c3aed", d: "城市板块自带这个标签，代表人口中心。", u: ["「市长」里程碑需要 3 块城市板块", "城市每相邻一块绿化就多得 1 分", "放置城市会提升 M€ 产量"] },
+    { n: "事件", en: "Event", c: "#c0392b", d: "红卡自带的标签。它只在卡牌打出的那一刻生效。", u: ["终局不计入标签数量", "「传奇」里程碑需要打出 5 张事件卡", "「大亨」里程碑不计事件卡"] }
+  ];
+  const tagChips = $("#tagChips"), tagInfo = $("#tagInfo");
+  TAGS.forEach((t, i) => {
+    const b = el("button", "tagchip" + (i === 0 ? " on" : ""), '<i style="background:' + t.c + '"></i>' + t.n);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      $$(".tagchip", tagChips).forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      renderTag(i);
+    });
+    tagChips.appendChild(b);
+  });
+  function renderTag(i) {
+    const t = TAGS[i];
+    tagInfo.innerHTML =
+      '<div class="fade-up"><h3 style="color:' + t.c + '">' + t.n + ' 标签</h3>' +
+      '<div class="en">' + t.en + " Tag</div>" +
+      "<p>" + t.d + "</p>" +
+      '<div class="uses">' + t.u.map(x => "<div>" + x + "</div>").join("") + "</div></div>";
+  }
+  renderTag(0);
+
+  /* ============================================================
+     8. 标准项目
+     ============================================================ */
+  const SP = [
+    { n: "卖专利", c: "免费", d: "弃掉任意张手牌，每弃 1 张得 1 M€。手牌太满时的回血手段。", free: true },
+    { n: "发电厂", c: "11 M€", d: "能源产量 +1。适合为后续需要能源的卡做准备。" },
+    { n: "小行星", c: "14 M€", d: "温度 +1 级，TR +1。抢温度节奏时最常用。" },
+    { n: "含水层", c: "18 M€", d: "放置 1 块海洋板块，TR +1，并获得该格的放置奖励。" },
+    { n: "绿化", c: "23 M€", d: "放置 1 块绿化板块，氧气 +1，TR +1，并获得放置奖励。" },
+    { n: "城市", c: "25 M€", d: "放置 1 块城市板块，M€ 产量 +1，并获得放置奖励。" }
+  ];
+  const spGrid = $("#spGrid");
+  SP.forEach(s => {
+    spGrid.appendChild(el("div", "sp" + (s.free ? " free" : ""),
+      "<b>" + s.n + '</b><span class="cost">' + s.c + "</span><p>" + s.d + "</p>"));
+  });
+
+  /* ============================================================
+     9. 里程碑与奖项
+     ============================================================ */
+  const MAPS = {
+    "Tharsis": {
+      ms: [
+        ["改造者", "Terraformer", "TR 达到 35 或以上"],
+        ["市长", "Mayor", "拥有 3 块或更多城市板块"],
+        ["园丁", "Gardener", "拥有 3 块或更多绿化板块"],
+        ["建造者", "Builder", "场上共有 8 个或更多建筑标签"],
+        ["规划者", "Planner", "宣称时手牌达到 16 张或以上"]
+      ],
+      aw: [
+        ["地主", "Landlord", "场上板块数量最多"],
+        ["银行家", "Banker", "M€ 产量最高"],
+        ["科学家", "Scientist", "场上科学标签最多"],
+        ["热力学家", "Thermalist", "热量资源最多"],
+        ["矿工", "Miner", "钢铁 + 钛资源最多"]
+      ]
+    },
+    "Hellas": {
+      ms: [
+        ["多面手", "Diversifier", "场上有 8 种不同标签"],
+        ["战术家", "Tactician", "场上有 5 张带需求的卡"],
+        ["极地探险家", "Polar Explorer", "地图底部两行有 3 块板块"],
+        ["充能者", "Energizer", "能源产量达到 6"],
+        ["边境开拓者", "Rim Settler", "拥有 3 个木星标签"]
+      ],
+      aw: [
+        ["耕作者", "Cultivator", "绿化板块最多"],
+        ["巨头", "Magnate", "绿色卡最多"],
+        ["太空男爵", "Space Baron", "太空标签最多（不计事件卡）"],
+        ["古怪收藏家", "Excentric", "卡上资源最多"],
+        ["承包商", "Contractor", "建筑标签最多（不计事件卡）"]
+      ]
+    },
+    "Elysium": {
+      ms: [
+        ["通才", "Generalist", "六种产量都至少提升过 1 步"],
+        ["专才", "Specialist", "某一种资源产量达到 10"],
+        ["生态学家", "Ecologist", "拥有 4 个生物标签（植物/微生物/动物）"],
+        ["大亨", "Tycoon", "场上有 15 张项目卡（绿卡 + 蓝卡）"],
+        ["传奇", "Legend", "已打出 5 张事件卡"]
+      ],
+      aw: [
+        ["名人", "Celebrity", "费用 ≥ 20 M€ 的场上卡最多（不计事件）"],
+        ["工业家", "Industrialist", "钢铁 + 能源资源最多"],
+        ["沙漠定居者", "Desert Settler", "赤道以南（底部四行）板块最多"],
+        ["地产商", "Estate Dealer", "与海洋相邻的板块最多"],
+        ["慈善家", "Benefactor", "TR 最高（此奖项必须最先结算）"]
+      ]
+    }
+  };
+  const mapToggle = $("#mapToggle"), msList = $("#msList"), awList = $("#awList");
+  let curMap = "Tharsis";
+  Object.keys(MAPS).forEach(k => {
+    const b = el("button", k === curMap ? "on" : "", k);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      curMap = k;
+      $$("button", mapToggle).forEach(x => x.classList.toggle("on", x.textContent === k));
+      renderMap();
+    });
+    mapToggle.appendChild(b);
+  });
+  function renderMap() {
+    const m = MAPS[curMap];
+    msList.innerHTML = m.ms.map(x => '<div class="aw fade-up"><b>' + x[0] + '</b><span class="en">' + x[1] + "</span><p>" + x[2] + "</p></div>").join("");
+    awList.innerHTML = m.aw.map(x => '<div class="aw fade-up"><b>' + x[0] + '</b><span class="en">' + x[1] + "</span><p>" + x[2] + "</p></div>").join("");
+  }
+  renderMap();
+
+  /* ============================================================
+     10. 计分器
+     ============================================================ */
+  const CALC = [
+    { k: "tr", l: "TR 改造度", s: "游戏结束时的 TR 直接就是分数", v: 20, min: 0, max: 80, mult: 1 },
+    { k: "greenery", l: "绿化板块", s: "每块 1 分", v: 0, min: 0, max: 40, mult: 1 },
+    { k: "city", l: "城市板块", s: "每块 1 分", v: 0, min: 0, max: 30, mult: 1 },
+    { k: "adj", l: "城市相邻的绿化", s: "每相邻一块绿化 +1 分", v: 0, min: 0, max: 60, mult: 1 },
+    { k: "ms", l: "已宣称的里程碑", s: "每个 5 分，每局最多 3 个", v: 0, min: 0, max: 3, mult: 5 },
+    { k: "aw1", l: "奖项第一名", s: "每个 5 分，每局最多 3 个", v: 0, min: 0, max: 3, mult: 5 },
+    { k: "aw2", l: "奖项第二名", s: "每个 2 分（2 人局没有第二名）", v: 0, min: 0, max: 3, mult: 2 },
+    { k: "cardvp", l: "卡牌上的分数", s: "把你有分的卡上的 VP 加起来", v: 0, min: 0, max: 120, mult: 1 },
+    { k: "mc", l: "手上的 M€", s: "每 5 M€ 得 1 分（向下取整）", v: 0, min: 0, max: 500, mult: 0 }
+  ];
+  const calcRows = $("#calcRows");
+  const inputs = {};
+  CALC.forEach(r => {
+    const row = el("div", "crow");
+    const lab = el("label", "", r.l + "<small>" + r.s + "</small>");
+    const inp = el("input");
+    inp.type = "number"; inp.min = r.min; inp.max = r.max; inp.value = r.v; inp.step = 1;
+    inp.setAttribute("aria-label", r.l);
+    const pts = el("span", "pts mono", "");
+    row.append(lab, inp, pts);
+    calcRows.appendChild(row);
+    inputs[r.k] = { inp, pts, def: r };
+    inp.addEventListener("input", renderCalc);
+  });
+  function renderCalc() {
+    let total = 0;
+    const lines = [];
+    CALC.forEach(r => {
+      const raw = clamp(parseInt(inputs[r.k].inp.value, 10) || 0, r.min, r.max);
+      let p;
+      if (r.k === "mc") p = Math.floor(raw / 5);
+      else p = raw * r.mult;
+      inputs[r.k].pts.textContent = "+" + p;
+      total += p;
+      lines.push([r.l, p]);
+    });
+    $("#calcTotal").textContent = total;
+    $("#calcBreakdown").innerHTML = lines.map(l => "<div><span>" + l[0] + "</span><span>+" + l[1] + "</span></div>").join("");
+    $("#calcLive").textContent = "总胜利分 " + total + " 分。";
+  }
+  $("#btnCalcReset").addEventListener("click", () => {
+    CALC.forEach(r => { inputs[r.k].inp.value = r.v; });
+    renderCalc();
+  });
+  renderCalc();
+
+  /* ============================================================
+     11. 新手建议
+     ============================================================ */
+  const TIPS = [
+    ["先建产量，再收割", "前 4–5 个世代把钱花在提升产量上，之后每一轮的收入都会翻倍回报你。前期只顾着推参数的人，后期会没钱。"],
+    ["TR 是复利，别让给别人", "每 1 点 TR = 终局 1 分 + 之后每轮 1 M€。宁可多花 2 M€ 自己推参数，也别让对手拿走这 1 点。"],
+    ["钢铁和钛要花掉", "囤资源不会产生任何价值。钢铁抵建筑卡、钛抵太空卡，配合卡牌一起用掉才是正解。"],
+    ["8 是魔法数字", "8 个植物 = 1 块绿化（氧气 +1、TR +1）；8 点热量 = 温度 +1 级（TR +1）。攒到 8 立刻动手，别被人抢。"],
+    ["城市贴着绿化放", "城市每相邻一块绿化就多 1 分，而且不论绿化是谁的。自己铺绿化 + 自己建城市，是最稳的得分组合。"],
+    ["里程碑和奖项是白送的 5 分", "8 M€ 换 5 分非常划算，而且每局各只有 3 个名额。看到条件快达成了就赶紧宣称，晚了就没了。"],
+    ["看准别人在推什么", "全局参数是全桌共享的。如果对手在猛推温度，你就去补氧气和海洋——既得分又搭便车。"],
+    ["手牌不用急着打", "手牌没有上限，卡可以一直攒着。等条件满足了、或者等一个更好的时机再打出来，往往更划算。"]
+  ];
+  const tipsGrid = $("#tipsGrid");
+  TIPS.forEach((t, i) => {
+    tipsGrid.appendChild(el("div", "tip", '<span class="n">' + (i + 1) + "</span><div><h3>" + t[0] + "</h3><p>" + t[1] + "</p></div>"));
+  });
+
+  /* ============================================================
+     12. 扩展时间线
+     ============================================================ */
+  const TL = [
+    ["2016", "基础版 Terraforming Mars", "Jacob Fryxelius 设计，FryxGames 出版。Tharsis 地图，208 张项目卡与 12 家公司。一经推出便成为现代德式桌游的标杆。", true],
+    ["2017", "Hellas &amp; Elysium", "两张全新地图。Hellas 偏向板块与能源，Elysium 偏向卡牌与产量，附带各自专属的里程碑和奖项。"],
+    ["2017", "Venus Next", "加入金星改造轨道与浮空器资源，新增 49 张项目卡、5 家公司。让游戏从「改造火星」扩展到「改造整个内太阳系」。", true],
+    ["2018", "Prelude", "如果只买一个扩展，就买它。每人开局多打 2 张前奏卡，直接跳过热身期，让游戏提前 3–4 个世代进入精彩部分。"],
+    ["2019", "Colonies", "在太阳系各行星建立殖民地，产出新的资源类型。大幅扩展了资源管理的维度。"],
+    ["2019", "Turmoil", "引入地球政坛：政党、政策、代表。每世代的政治事件会改变全局规则，节奏更混乱也更有趣。"],
+    ["2021", "Ares Expedition", "独立可玩的卡牌版。把《重塑火星》的引擎构筑浓缩成纯卡牌游戏，30–45 分钟一局，是很好的入门跳板。"],
+    ["2023+", "Prelude 2 / 骰子版 等", "后续还推出了 Prelude 2、Terraforming Mars: The Dice Game 等衍生作品，把这个系列带向了更多形态。"]
+  ];
+  const tlList = $("#tlList");
+  TL.forEach(t => {
+    tlList.appendChild(el("div", "tl" + (t[3] ? " major" : ""),
+      '<span class="yr">' + t[0] + "</span><h3>" + t[1] + "</h3><p>" + t[2] + "</p>"));
+  });
+
+  /* ============================================================
+     13. 术语表
+     ============================================================ */
+  const GL = [
+    ["TR（改造度 / Terraform Rating）", "衡量你改造火星的贡献值。开局 20，最高 62（19 度温度 + 14 格氧气 + 9 块海洋 = 42 格）。它既是终局分数，也是每世代的 M€ 收入基数——这是全游戏最重要的数字。"],
+    ["世代（Generation）", "游戏的时间单位，一轮即一代。每代走完回合顺序、研究、行动、生产四个阶段。基础版一局通常 10–14 个世代。"],
+    ["产量（Production）", "写在玩家板轨道上的永久能力，每世代生产阶段自动结算。提升产量需要卡牌，但收益是长期的。"],
+    ["资源（Resources）", "手上的库存，包括 M€、钢铁、钛、植物、能源、热量。可以立刻花掉，用了就没了。"],
+    ["标签（Tag）", "卡牌左上角的小图标，决定卡牌类别。标签会互相加成，并决定里程碑与奖项的归属。"],
+    ["需求（Requirement）", "卡牌打出前必须满足的条件，例如「温度 ≥ −6°C」「氧气 ≥ 9%」「你有 2 个科学标签」。不满足就不能打。"],
+    ["标准项目（Standard Project）", "印在游戏板上的 6 个通用行动，随时可花钱执行，不需要手牌。价格偏高但非常灵活。"],
+    ["里程碑（Milestone）", "花 8 M€ 宣称，得 5 分。每局最多只能宣称 3 个，先到先得。条件各异，比如 TR ≥ 35、拥有 3 块城市。"],
+    ["奖项（Award）", "花钱资助（第一位 8 M€，第二位 14 M€，第三位 20 M€）。终局时比拼某项指标，第一名 5 分，第二名 2 分。每局最多 3 个。"],
+    ["企业时代（Corporate Era）", "官方变体。所有人起始产量为 0 而不是 1，游戏节奏更慢、更纯粹，适合熟悉规则之后使用。"],
+    ["板块放置奖励", "把海洋或绿化板块放到地图上带奖励的格子时，可以立刻领取该格的奖励（通常是资源或产量）。"]
+  ];
+  const glList = $("#glList");
+  GL.forEach(g => {
+    const d = el("details", "gl");
+    d.innerHTML = "<summary>" + g[0] + "</summary><p>" + g[1] + "</p>";
+    glList.appendChild(d);
+  });
+
+  /* ============================================================
+     14. 测验
+     ============================================================ */
+  const QUIZ = [
+    {
+      q: "游戏结束时，火星温度需要达到多少才算改造完成？",
+      o: ["−6°C", "0°C（冰点）", "+8°C", "+20°C"],
+      a: 2,
+      e: "温度需要从 −30°C 一路推到 <b>+8°C</b>，共 19 格。氧气要推到 14%，海洋要铺满 9 块——三项合计 42 格，也就是最多能拿到 42 点 TR。"
+    },
+    {
+      q: "关于 TR（改造度），下面哪个说法是正确的？",
+      o: ["TR 只在终局计分时有用", "TR 每涨 1 点得 5 分", "TR 只和温度有关", "TR 既是终局分数，也是每世代的收入基数"],
+      a: 3,
+      e: "这是《重塑火星》最重要的设计。<b>TR 既算终局分数，又是生产阶段 M€ 收入的基数</b>（M€ = TR + M€ 产量）。所以涨 TR 是双重收益，老玩家永远在抢。"
+    },
+    {
+      q: "生产阶段的第一个步骤是什么？",
+      o: ["所有能源转成热量", "每人抽 4 张卡", "支付卡牌费用", "移动首位玩家标记"],
+      a: 0,
+      e: "生产阶段固定三步：① <b>所有能源转成热量</b>（能源是过路资源，存不住）；② 按产量收资源；③ 收回蓝卡行动上的标记。抽卡属于研究阶段。"
+    },
+    {
+      q: "8 个植物资源可以做什么？",
+      o: ["换成 8 M€", "直接把温度提升 8 级", "抽 8 张卡", "放置 1 块绿化板块（氧气 +1，TR +1）"],
+      a: 3,
+      e: "8 个植物 = 1 块绿化板块，<b>氧气 +1、TR +1</b>，还能领取该格的放置奖励。同理，8 点热量可以换 1 级温度。记住这个魔法数字 8。"
+    },
+    {
+      q: "一局游戏中，最多可以宣称几个里程碑？",
+      o: ["1 个", "3 个", "5 个", "不限数量"],
+      a: 1,
+      e: "里程碑每人花 8 M€ 宣称，得 5 分，但<b>全桌每局最多只能宣称 3 个</b>——先到先得。奖项同理，也是每局最多资助 3 个。"
+    },
+    {
+      q: "城市板块的分数是怎么算的？",
+      o: ["每个城市 5 分", "每个城市 1 分，与绿化无关", "城市 1 分，另外每相邻一块绿化再 +1 分", "每个城市 3 分"],
+      a: 2,
+      e: "终局时<b>每块城市 1 分，城市每相邻一块绿化再 +1 分</b>（不论绿化是谁的）。绿化板块本身也各 1 分。所以「绿化 + 城市」的组合是最稳的得分方式。"
+    }
+  ];
+  const quizBox = $("#quizBox");
+  let qi = 0, qscore = 0, answered = false;
+
+  function renderQuiz() {
+    if (qi >= QUIZ.length) {
+      const pct = Math.round(qscore / QUIZ.length * 100);
+      let msg;
+      if (pct === 100) msg = "满分！你已经可以直接开局了，去教别人吧。";
+      else if (pct >= 80) msg = "非常扎实。剩下的细节在牌桌上两分钟就能补上。";
+      else if (pct >= 50) msg = "基本框架已经建立，把上面的模拟器再玩一遍会更稳。";
+      else msg = "别急，往上翻一翻「改造火星」和「一个世代」两节，再来一次。";
+      quizBox.innerHTML =
+        '<div class="qresult fade-up"><div class="score mono">' + qscore + " / " + QUIZ.length + "</div>" +
+        '<p class="msg">' + msg + "</p>" +
+        '<button class="btn" id="quizRestart" type="button">再来一次</button></div>';
+      $("#quizRestart").addEventListener("click", () => { qi = 0; qscore = 0; renderQuiz(); });
+      return;
+    }
+    const item = QUIZ[qi];
+    answered = false;
+    quizBox.innerHTML =
+      '<div class="qhead"><span class="qprog">第 ' + (qi + 1) + " / " + QUIZ.length + ' 题</span>' +
+      '<span class="qprog">当前得分 ' + qscore + "</span></div>" +
+      '<div class="qbar"><i style="width:' + (qi / QUIZ.length * 100) + '%"></i></div>' +
+      '<h3 class="qtext">' + item.q + "</h3>" +
+      '<div class="opts">' + item.o.map((o, i) =>
+        '<button class="opt" type="button" data-i="' + i + '"><span class="k">' + "ABCD"[i] + "</span><span>" + o + "</span></button>"
+      ).join("") + "</div>" +
+      '<div class="qexp" id="qexp"></div>';
+    $$(".opt", quizBox).forEach(b => {
+      b.addEventListener("click", () => {
+        if (answered) return;
+        answered = true;
+        const pick = +b.dataset.i;
+        const right = pick === item.a;
+        if (right) qscore++;
+        $$(".opt", quizBox).forEach(x => {
+          const xi = +x.dataset.i;
+          x.disabled = true;
+          if (xi === item.a) x.classList.add("right");
+          else if (xi === pick) x.classList.add("wrong");
+        });
+        const ex = $("#qexp");
+        ex.innerHTML = "<b>" + (right ? "答对了。" : "正确答案是 " + "ABCD"[item.a] + "。") + "</b> " + item.e;
+        ex.classList.add("show");
+        const nb = el("button", "btn", qi === QUIZ.length - 1 ? "看结果" : "下一题");
+        nb.type = "button";
+        nb.style.marginTop = "16px";
+        nb.addEventListener("click", () => { qi++; renderQuiz(); });
+        ex.appendChild(nb);
+        nb.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+    });
+  }
+  renderQuiz();
+
+  /* ============================================================
+     15. 入场动画 + 导航高亮
+     ============================================================ */
+  const reveals = $$(".reveal");
+  if (!("IntersectionObserver" in window)) {
+    reveals.forEach(n => n.classList.add("in"));
+  } else {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.04 });
+    reveals.forEach(n => io.observe(n));
+  }
+
+  const navLinks = $$("#navLinks a");
+  const linkMap = {};
+  navLinks.forEach(a => { linkMap[a.getAttribute("href").slice(1)] = a; });
+  const sections = $$("main section[id]");
+  function updateSpy() {
+    const line = window.scrollY + window.innerHeight * 0.28;
+    let cur = null;
+    for (let i = 0; i < sections.length; i++) {
+      const top = sections[i].getBoundingClientRect().top + window.scrollY;
+      if (top <= line) cur = sections[i]; else break;
+    }
+    navLinks.forEach(a => a.classList.remove("on"));
+    if (!cur) return;
+    const a = linkMap[cur.id];
+    if (!a) return;
+    a.classList.add("on");
+    const box = a.parentElement;
+    if (box && box.scrollWidth > box.clientWidth + 4) {
+      box.scrollTo({ left: Math.max(0, a.offsetLeft - box.clientWidth / 2 + a.offsetWidth / 2), behavior: "smooth" });
+    }
+  }
+  let spyTick = false;
+  window.addEventListener("scroll", () => {
+    if (spyTick) return;
+    spyTick = true;
+    requestAnimationFrame(() => { spyTick = false; updateSpy(); });
+  }, { passive: true });
+  window.addEventListener("resize", updateSpy);
+  updateSpy();
+
+  /* 调试出口：便于排查渲染问题 */
+  window.__tm = {
+    get sim() { return { temp: +rngTemp.value, oxy: +rngOxy.value, ocn: +rngOcn.value }; },
+    get board() { return { tr: board.tr, gen: board.gen, prod: Object.assign({}, board.prod), res: Object.assign({}, board.res) }; },
+    get quiz() { return { index: qi, score: qscore, total: QUIZ.length }; },
+    get calc() { return $("#calcTotal").textContent; },
+    terraform() { $("#btnTerraform").click(); },
+    produce() { $("#btnProduce").click(); }
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="FckHmZu7xRDGWVQSpNF9CY">
+<head data-page-node-id="aPU7SJB3WBLTn0FrmXAEDC">
+<meta charset="utf-8" data-page-node-id="Mev7cg2i7rwhOeOHV1eOMx">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="t5wfh8aKE6o8Da1ZsZOBGD">
+<title>重塑火星 · Web 版</title>
+<meta name="description" content="在浏览器里玩《重塑火星》：改造火星的温度、氧气与海洋，与 AI 公司争夺最高分。" data-page-node-id="AkQHMbDmxD0XlB4uFaYPGb">
+<link rel="stylesheet" href="css/style.css" data-page-node-id="7L8k9gGzHx4CviQrt71LBi">
+</head>
+<body data-page-node-id="uwGwZKjbKFcWSFzz64V5ip">
+
+<!-- ================= 开始界面 ================= -->
+<!-- role="main" 只加在两个互斥屏幕上：另一个带 hidden，不进无障碍树，
+     所以任何时刻都只有一个 main，既满足 landmark-one-main，又让内部内容都有地标归属。 -->
+<div id="startScreen" class="screen" role="main" data-page-node-id="vCREygTFBiVEqCKTEtWLql">
+  <div class="start-wrap" data-page-node-id="d8X0wBjchYxu2Xv5rYX1Wt">
+    <div class="start-visual" data-page-node-id="c1ISshjJ2ce0ghVTkzv7Lc">
+      <svg id="startMars" viewBox="0 0 420 420" aria-hidden="true" data-page-node-id="60MfK6RQTCv9huGFHu09eh"></svg>
+      <ul class="start-specs" data-page-node-id="Vu4g3PA1lGxX09DIIXaXq4">
+        <li data-page-node-id="AEHY1tyD5JiPzJjIHfJljb"><b id="spHex" data-page-node-id="MXbnb8kEOqfcGOpXaVEWuQ">61</b><span data-page-node-id="vsF5wGZKSETO4OREd6rQhd">格六角地图</span></li>
+        <li data-page-node-id="ivNxFj1FTq49u4qGU3uFSP"><b id="spCards" data-page-node-id="XjKTEeBl3p7rnTbUGEMB6Y">0</b><span data-page-node-id="udBzbB16aCooHyKTQpg6co">张项目卡</span></li>
+        <li data-page-node-id="FMiQLDN5lNoGJSNsnZZklC"><b id="spCorps" data-page-node-id="2DgF94hmQlDIWpIUFbJPg4">0</b><span data-page-node-id="gx6GwMoAqd9pWIH2owM1kR">家公司</span></li>
+      </ul>
+    </div>
+    <div class="start-main" data-page-node-id="tqn3nfahpuUICb72SGYw7W">
+      <span class="eyebrow" data-page-node-id="XfgL1FayBbWj5Kqf25vyEc">Terraforming Mars · Web Edition</span>
+      <h1 data-page-node-id="FgCRfsbF9GDPgENZfjo1QV">重塑火星</h1>
+      <p class="start-lead" data-page-node-id="3KVBC3niE8a9qDFU5HNnOL">
+        公元 2400 年，你是一家公司的 CEO。用项目卡改造这颗红色行星——把温度推到 +8°C、氧气拉到 14%、铺满 9 块海洋。
+        谁在这个过程中积累的分数最多，谁就赢得一切。
+      </p>
+
+      <div class="start-form" data-page-node-id="4CotoLS7BVbmzfKtWmKTY3">
+        <div class="field" data-page-node-id="04zqRUfHUhGvcMujbvZ9PV">
+          <label id="lblPlayers" data-page-node-id="fkXLOkCU459fo9etoO2i7S">对手数量</label>
+          <!-- class="on" 只是视觉选中态，读屏读不出来；用 aria-pressed 表达程序化选中态，
+               并用 role="group" + aria-labelledby 把三个按钮和它们的标签关联起来。 -->
+          <div class="seg" id="segPlayers" role="group" aria-labelledby="lblPlayers" data-page-node-id="TU9OHxLKYeEumNF5QUXJyc">
+            <button type="button" data-n="1" aria-pressed="false" data-page-node-id="VHqlQmILcSuA1zGgKRQUbQ">1 个对手</button>
+            <button type="button" data-n="2" class="on" aria-pressed="true" data-page-node-id="EjIYNSMvTYbpyNaSWuGb2t">2 个对手</button>
+            <button type="button" data-n="3" aria-pressed="false" data-page-node-id="KUHnR3Hth9gydWu3s7hoso">3 个对手</button>
+          </div>
+        </div>
+        <div class="field" data-page-node-id="9XapWun0cmqIJ43N7ciIAx">
+          <label id="lblSpeed" data-page-node-id="sMVkTucHs9I1x2YEFty6Ub">游戏节奏</label>
+          <div class="seg" id="segSpeed" role="group" aria-labelledby="lblSpeed" data-page-node-id="v8ldMhnqYG9PV4AY8ZfcLP">
+            <button type="button" data-s="1200" aria-pressed="false" data-page-node-id="aB1vIXV9Ox9tRn7M7lX70G">慢速（好看清）</button>
+            <button type="button" data-s="600" class="on" aria-pressed="true" data-page-node-id="q2Hws0H9Y1cS2EqGrRtWae">正常</button>
+            <button type="button" data-s="120" aria-pressed="false" data-page-node-id="1KIX4RhgTG7iY8TDsH2j4k">快速</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn big" id="btnStart" data-page-node-id="ivflRcTNSd7sAM6bGFmFYw">开始游戏</button>
+
+      <div class="start-rules" data-page-node-id="wSN9dVAQVLKr4o80IF9v4e">
+        <details open data-page-node-id="1HjCxyh4cDvGyucwOQuBAa">
+          <summary data-page-node-id="nYRgVEhFexuJ5vDmXaPchv">玩法速览（30 秒读完）</summary>
+          <ul data-page-node-id="Nl8Hw7QuhaiuSKIH4nGakG">
+            <li data-page-node-id="NooD80JubSGiaFPREGvgiQ"><b data-page-node-id="SmEf8G3ZGb1VqBPtgAF9Th">目标：</b>全桌一起把温度、氧气、海洋三项参数推满，同时攒下最多分数。</li>
+            <li data-page-node-id="NpCNUnYanEqicAMYoLWNhJ"><b data-page-node-id="YBtPV7icPAYjUe1J9QBY1D">一个世代 =</b> 研究（抽 4 张，每张 3 M€ 决定买不买）→ 行动（轮流做事）→ 生产（按产量收资源）。</li>
+            <li data-page-node-id="sco47HQviWQ15KDFFnF1oH"><b data-page-node-id="m7ZD5sO8MOw9RV9EPGgBER">TR 是复利：</b>每涨 1 点 TR，终局 +1 分，而且以后每世代多拿 1 M€。</li>
+            <li data-page-node-id="jNEORBaxUejllIuNfCEUX4"><b data-page-node-id="S0CcWW15kEWk6VUIy6Dwzs">8 是魔法数字：</b>8 植物换 1 块绿化（氧气 +1、TR +1）；8 热量升 1 级温度（TR +1）。</li>
+            <li data-page-node-id="fOHqmQANknYpz8tCmSDbDF"><b data-page-node-id="FCFylEL6hhEAMPkdhyoCvS">钢铁</b>只能付建筑卡（每个抵 2 M€），<b data-page-node-id="og0QmutvHnzjz6X3d6hP7Q">钛</b>只能付太空卡（每个抵 3 M€）。</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 游戏界面 ================= -->
+<div id="gameScreen" class="game" role="main" hidden data-page-node-id="thyG7BlHrOMV25LxRoSrNQ">
+  <!-- 对局界面原来一个 h1 都没有：开始界面的 h1 被 hidden 之后，整页就没有一级标题了
+       （axe: page-has-heading-one）。这个 h1 只给读屏用 —— 视觉上顶栏已经说明了局面。
+       注意：加了 h1 之后，下面两个区块标题必须从 h3 提到 h2，否则 h1→h3 是跳级
+       （axe: heading-order）。 -->
+  <h1 class="sr-only">重塑火星 · 对局</h1>
+  <!-- 这里不能用 <header>：它会被识别为 banner 地标，而 banner 不能嵌在 main 里
+       （axe: landmark-banner-is-top-level）。它本来也不是站点级页眉，只是对局 HUD，用 div 更准确。 -->
+  <div class="topbar" data-page-node-id="yTvArPf4QCN9nY8PTes7ef">
+    <div class="tb-left" data-page-node-id="r6QuHYMgbOG1r4bMJ6yF1w">
+      <div class="tb-badge" data-page-node-id="9jTAO0EeAWtIr5O87TSTle"><b id="tbGen" data-page-node-id="Tmcij6zzAgU9yNL4j7YJCS">1</b><span data-page-node-id="skXLjS490yHkNZG3bvzEuS">世代</span></div>
+      <div class="tb-phase" id="tbPhase" data-page-node-id="yCpXoKHfuzm4skvzrovH3n">行动阶段</div>
+    </div>
+    <div class="tb-params" id="tbParams" data-page-node-id="O2yrMD70n0UU60ssxlGY8C"></div>
+    <div class="tb-right" data-page-node-id="X5KUR3D12S6z68nqjvDBTC">
+      <div class="tb-progress" data-page-node-id="6SeGW9L4b2XkD7pU8Up0rp">
+        <div class="tbp-label" data-page-node-id="CB5iUH3r3a0U3dI5KWwIkr"><span data-page-node-id="K3ohBwC71yluEFXh1G4USw">改造进度</span><b id="tbPct" data-page-node-id="BEcTRaR63sRFakvt7gANAC">0%</b></div>
+        <div class="tbp-bar" data-page-node-id="mvjJmXBiHqpgGmB1XqQbPf"><i id="tbPctFill" data-page-node-id="cZ4mjmTINRERsDzA2lq8Xv"></i></div>
+      </div>
+      <button class="btn ghost sm" id="btnLogToggle" type="button" data-page-node-id="N0tPMAOR0BdwaFLaSQ0kAT">日志</button>
+    </div>
+  </div>
+
+  <!-- 两个 <aside> 是同类地标，必须各有名字，否则 axe 报 landmark-unique -->
+  <aside class="col-players" id="playersCol" aria-label="玩家列表" data-page-node-id="5jDMCYh2oiotcnAdgcQQpT"></aside>
+
+  <!-- <section> 只有带可访问名称才会成为 region 地标；不命名的话内部内容会落在所有地标之外（axe 的 region 规则） -->
+  <section class="col-board" aria-label="火星地图" data-page-node-id="b8wDAaT9jZxg8KHBhQyJ8W">
+    <div class="board-head" data-page-node-id="8bFALBrmRni5gzQ0qauZAn">
+      <span class="board-title" data-page-node-id="eyNNwsCDF1TfC5ji2D0WBr">塔尔西斯平原 · Tharsis</span>
+      <span class="board-hint" id="boardHint" aria-live="polite" data-page-node-id="elHKdLTH7h5Avy0P0et24P">点击地图上的格子放置板块</span>
+      <!-- 放置模式的取消出口。之前只能按 Esc 退出，手机没有 Esc 键，
+           玩家一点板块卡就被锁死在放置模式里（要么硬着头皮放下去，要么刷新页面）。 -->
+      <button class="btn ghost sm" id="btnCancelPlace" type="button" hidden>取消放置</button>
+    </div>
+    <div class="map-shell" data-page-node-id="vqX6Wv4KV3bdJcQ512eipK">
+      <svg id="mapSvg" role="group" aria-label="火星地图，放置模式下可用 Tab 选择格子、回车确认" data-page-node-id="HGrsHK1y4UuKMqgDq4Fqn8"></svg>
+      <div class="map-legend" id="mapLegend" data-page-node-id="TC9cXndqb0YZBT4i4XTDhR"></div>
+    </div>
+    <div class="board-foot" id="boardFoot" data-page-node-id="Pk8ZfWSCOiRsRWXbldxWIa"></div>
+  </section>
+
+  <aside class="col-side" aria-label="行动区" data-page-node-id="dHNLCfrUrDmOEEeaXvlReD">
+    <div class="turn-banner" id="turnBanner" aria-live="polite" data-page-node-id="TmCWWJ7gHBTmAOilmryNDt"></div>
+    <div class="side-block grow" data-page-node-id="LdTPSUB3Jf1ecA7SJctFf3">
+      <div class="side-head" data-page-node-id="gVZPBn7NJ1PzLCQ1EgU8he"><h2 data-page-node-id="B5Hc9Z8udFbK8oFAPzUnVm">行动</h2><span class="side-count" id="actionCount" data-page-node-id="mdXiXzgb1d6PwC1fGHONVk">本回合剩余 2 次</span></div>
+      <div class="action-area" id="actionArea" data-page-node-id="PmLfNn2HH3iFMNm7yArfCF"></div>
+    </div>
+  </aside>
+
+  <section class="handbar" aria-label="手牌" data-page-node-id="uEFDawPbke4vuwzDj9LUN9">
+    <div class="hand-head" data-page-node-id="gTgF1NJ9pWXmz3EDvneZ57">
+      <h2 data-page-node-id="QSZCf0EuQuTsmi7q85zhC1">手牌</h2>
+      <span class="side-count" id="handCount" data-page-node-id="E1kUki5ALOYt5DKayHh0pg">0 张</span>
+      <!-- 文案要和实际视觉一致：打不出的卡现在是「虚线边框 + 文字降一档」，
+           不再是把整张卡调成半透明（那样卡面文字会掉到 1.3~2.8:1 读不了）。 -->
+      <span class="hand-tip" data-page-node-id="FJkI4lEXR9nTklzCnXS07Q">点击卡片打出 · 虚线框的表示暂时打不出，鼠标悬停可看原因</span>
+    </div>
+    <div class="hand-area" id="handArea" data-page-node-id="el8P5EtuhGUisZIBXIWpja"></div>
+  </section>
+
+  <!-- 同理不能用 <footer>（contentinfo 地标不能嵌在 main 里）。它是一个浮层面板，用带名字的 region。 -->
+  <div class="logbar" id="logBar" role="region" aria-label="对局日志" data-page-node-id="oaCTYc10IsBON0LifsrPzv">
+    <div class="log-head" data-page-node-id="K1EeQVCD8LG1nXoJDzHX11"><b data-page-node-id="JjsQC8dhPFMqUlteaTaeE1">对局日志</b><button class="btn sm" id="btnRestart" type="button" data-page-node-id="RstXAPJoX4mHXkFFnPSYm0">再来一局</button><button class="x" id="btnLogClose" type="button" aria-label="关闭日志" data-page-node-id="ekXAPJoX4mHXkFFnPSYm0s"><span aria-hidden="true">×</span></button></div>
+    <div class="log-body" id="logBody" data-page-node-id="BgzAQPA2FUnM2JfidwCVKL"></div>
+  </div>
+</div>
+
+<!-- ================= 弹窗 / 提示 ================= -->
+<div class="modal" id="modal" hidden data-page-node-id="ve9uqUtyaDF8QjGpFaoZZD">
+  <div class="modal-box" id="modalBox" role="dialog" aria-modal="true" tabindex="-1" data-page-node-id="1IWA4LeC241aD5CGin1aTi"></div>
+</div>
+<!-- 操作失败/成功的提示必须能被读屏播报，否则键盘与读屏用户完全不知道点下去发生了什么 -->
+<div class="toast" id="toast" role="status" aria-live="polite" hidden data-page-node-id="JT6SzRMenrCjkOkYLwCIGB"></div>
+
+<script src="js/cards.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
