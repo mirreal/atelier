@@ -1,0 +1,3101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>利维坦 · 霍布斯 | 一部书的解剖</title>
+<meta name="description" content="托马斯·霍布斯《利维坦》(1651) 互动导读：自然状态模拟器、权利让渡、主权者的十二项权力、自由的边界、黑暗王国，以及这本书留下的争议。">
+<style>
+/* ============ 设计令牌 ============ */
+:root{
+  --paper:#faf7f1;
+  --paper2:#f2ebde;
+  --paper3:#e8ddca;
+  --ink:#1c1915;
+  --ink2:#4a433a;
+  --ink3:#7d7365;
+  --ink4:#a99d8b;
+  --line:#ded3bf;
+  --line2:#c9bda5;
+  --rust:#9c3a1c;
+  --rust2:#bd5730;
+  --rustbg:#f8eae3;
+  --brass:#8a6d2f;
+  --brassbg:#f5eedb;
+  --sea:#2b5654;
+  --seabg:#e2ecea;
+  --serif:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","SimSun",Georgia,"Times New Roman",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --pad:clamp(18px,4vw,40px);
+  --maxw:1120px;
+  --shadow:0 1px 2px rgba(70,54,30,.05),0 10px 30px -16px rgba(70,54,30,.22);
+  --shadow-sm:0 1px 2px rgba(70,54,30,.06),0 4px 12px -8px rgba(70,54,30,.18);
+  --r:4px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16.5px;line-height:1.78;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  background-image:
+    repeating-linear-gradient(115deg,rgba(120,96,60,.022) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(25deg,rgba(120,96,60,.016) 0 1px,transparent 1px 4px);
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+
+h1,h2,h3,h4{font-family:var(--serif);font-weight:600;line-height:1.28;margin:0;letter-spacing:.005em}
+p{margin:0 0 1em}
+a{color:var(--rust);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--rust2)}
+em{font-style:normal;color:var(--rust)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--rust);outline-offset:3px;border-radius:2px}
+
+.wrap{width:min(var(--maxw),100% - 2 * var(--pad));margin-inline:auto}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--paper);padding:10px 16px;z-index:999}
+.skip:focus{left:12px;top:12px}
+
+/* ============ 顶栏 ============ */
+.topbar{
+  position:fixed;inset:0 0 auto 0;z-index:60;
+  background:rgba(250,247,241,.86);backdrop-filter:saturate(1.4) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.tb-in{width:min(var(--maxw),100% - 2 * var(--pad));margin-inline:auto;height:52px;display:flex;align-items:center;gap:16px}
+.tb-brand{font-family:var(--serif);font-size:16px;color:var(--ink);text-decoration:none;display:flex;align-items:baseline;gap:7px;flex:0 0 auto;white-space:nowrap}
+.tb-brand b{font-weight:600}
+.tb-brand .mark{color:var(--rust);font-size:13px;transform:translateY(-1px)}
+.tb-brand em{font-size:11px;color:var(--ink3);font-family:var(--mono);letter-spacing:.06em}
+.tb-prog{flex:1 1 auto;height:2px;background:var(--line);position:relative;min-width:40px}
+.tb-prog i{position:absolute;inset:0 auto 0 0;width:0;background:var(--rust);transition:width .12s linear}
+.tb-menu{
+  flex:0 0 auto;background:none;border:1px solid var(--line2);border-radius:999px;
+  padding:5px 14px;font-size:13px;cursor:pointer;color:var(--ink2);white-space:nowrap;
+}
+.tb-menu:hover{border-color:var(--rust);color:var(--rust)}
+
+/* ============ 目录抽屉 ============ */
+dialog.drawer{
+  margin:0 0 0 auto;padding:0;border:0;border-left:1px solid var(--line2);
+  width:min(400px,88vw);max-width:100%;height:100%;max-height:100%;
+  background:var(--paper);color:var(--ink);box-shadow:-20px 0 60px -30px rgba(60,44,20,.5);
+}
+dialog.drawer::backdrop{background:rgba(40,32,18,.34);backdrop-filter:blur(2px)}
+.drawer-in{padding:22px var(--pad) 48px;height:100%;overflow:auto}
+.drawer-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.drawer-h span{font-family:var(--serif);font-size:19px}
+.drawer-x{background:none;border:1px solid var(--line2);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink2)}
+.drawer-x:hover{border-color:var(--rust);color:var(--rust)}
+.drawer-list{list-style:none;margin:0;padding:0;counter-reset:d}
+.drawer-list li{margin:0}
+.drawer-list a{
+  display:flex;gap:12px;align-items:baseline;padding:9px 8px;border-radius:var(--r);
+  color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line);
+}
+.drawer-list a:hover{background:var(--paper2);color:var(--ink)}
+.drawer-list .n{font-family:var(--mono);font-size:11px;color:var(--ink4);flex:0 0 34px;letter-spacing:.04em}
+.drawer-list .t{font-family:var(--serif);font-size:15.5px}
+.drawer-list .s{display:block;font-family:var(--sans);font-size:11.5px;color:var(--ink3);line-height:1.5;margin-top:2px}
+
+/* ============ 首屏 ============ */
+.hero{padding:96px 0 56px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent)}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,54px);align-items:start}
+@media (min-width:940px){.hero-grid{grid-template-columns:1fr 1.02fr}}
+.kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink3);text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:clamp(56px,11vw,104px);line-height:1;letter-spacing:.06em;margin-bottom:6px}
+.hero h1 .h1-en{
+  display:block;font-family:var(--mono);font-size:clamp(11px,1.6vw,13px);letter-spacing:.42em;
+  color:var(--ink4);margin-top:16px;font-weight:400;
+}
+.hero-sub{font-family:var(--serif);font-size:clamp(15px,2vw,18px);color:var(--ink2);margin:22px 0 0;max-width:26em}
+.hero-lead{font-size:16.5px;color:var(--ink2);margin-top:24px;max-width:30em}
+.hero-lead strong{color:var(--ink);font-weight:600}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;border-radius:999px;cursor:pointer;
+  padding:10px 20px;font-size:14.5px;text-decoration:none;border:1px solid var(--ink);
+  background:var(--ink);color:var(--paper);transition:transform .15s,background .15s;
+}
+.btn:hover{background:var(--rust);border-color:var(--rust);color:#fff;transform:translateY(-1px)}
+.btn--ghost{background:none;color:var(--ink2);border-color:var(--line2)}
+.btn--ghost:hover{background:var(--paper2);color:var(--ink);border-color:var(--ink3)}
+.btn--sm{padding:7px 14px;font-size:13px}
+
+.hero-art{position:relative}
+.frontis-wrap{
+  background:linear-gradient(180deg,var(--paper) 0%,var(--paper2) 100%);
+  border:1px solid var(--line);border-radius:6px;padding:clamp(10px,2vw,20px);
+  box-shadow:var(--shadow);
+}
+#frontis{display:block;width:100%;height:auto;max-width:100%}
+.fig-cap{
+  font-size:12.5px;color:var(--ink3);margin:14px 0 0;line-height:1.7;
+  border-top:1px solid var(--line);padding-top:12px;
+}
+.fig-cap b{color:var(--ink2);font-weight:600}
+.spread-ctl{margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.spread-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.spread-top .lbl{font-size:13.5px;color:var(--ink2);font-family:var(--serif)}
+.spread-top .val{font-family:var(--mono);font-size:11.5px;color:var(--ink3);letter-spacing:.06em}
+.spread-note{font-size:13px;color:var(--rust);min-height:1.6em;margin:10px 0 0;line-height:1.65}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:22px;background:none;cursor:pointer;display:block;
+}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line2);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--rust);
+  border:3px solid var(--paper);box-shadow:0 0 0 1px var(--rust);margin-top:-8px;
+}
+input[type=range]::-moz-range-track{height:3px;background:var(--line2);border-radius:2px}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--rust);border:3px solid var(--paper);box-shadow:0 0 0 1px var(--rust)}
+.spread-btns{display:flex;gap:8px;margin-top:10px}
+.spread-btns button{
+  flex:1 1 0;background:var(--paper2);border:1px solid var(--line2);border-radius:var(--r);
+  padding:7px 8px;font-size:13px;cursor:pointer;color:var(--ink2);
+}
+.spread-btns button:hover{border-color:var(--rust);color:var(--rust)}
+
+/* ============ 通用区块 ============ */
+.sec{padding:clamp(58px,9vw,120px) 0;position:relative}
+.sec + .sec{border-top:1px solid var(--line)}
+.sec--tint{background:var(--paper2)}
+.sec--dark{background:#171512;color:#e9e3d8;border-top:1px solid #2c2822}
+.sec--dark + .sec{border-top:1px solid #2c2822}
+.sec--dark .sec-n{color:#a8998a}
+.sec--dark .sec-sub{color:#8e8375}
+.sec--dark h2,.sec--dark h3{color:#f2ece1}
+.sec--dark .sec-lead{color:#c8bfb0}
+.sec--dark a{color:#d98a5f}
+.sec--dark .card,.sec--dark .panel{background:#201d19;border-color:#332e27;color:#ddd6c9}
+.sec-h{margin-bottom:clamp(28px,4vw,46px);max-width:56em}
+.sec-n{
+  display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  color:var(--rust);text-transform:uppercase;margin-bottom:12px;
+}
+.sec-h h2{font-size:clamp(27px,4.4vw,42px);letter-spacing:.02em}
+.sec-sub{font-family:var(--mono);font-size:12px;color:var(--ink4);letter-spacing:.1em;margin:12px 0 0}
+.sec-lead{font-size:17.5px;color:var(--ink2);margin-top:18px;max-width:44em}
+.sec-lead:last-child{margin-bottom:0}
+
+.prose{max-width:44em;font-size:16.5px}
+.prose p{margin-bottom:1.05em}
+.prose h3{font-size:20px;margin:2.2em 0 .7em}
+.prose h4{font-family:var(--sans);font-size:15.5px;font-weight:600;margin:1.8em 0 .5em;color:var(--ink)}
+.prose ul,.prose ol{margin:0 0 1.1em;padding-left:1.3em}
+.prose li{margin-bottom:.42em}
+.prose li::marker{color:var(--ink4)}
+.prose .drop::first-letter{
+  float:left;font-family:var(--serif);font-size:3.1em;line-height:.86;
+  padding:.06em .12em 0 0;color:var(--rust);
+}
+.sec--dark .prose .drop::first-letter{color:#d98a5f}
+
+/* 两栏 */
+.cols{display:grid;grid-template-columns:1fr;gap:clamp(22px,4vw,44px)}
+@media (min-width:880px){
+  .cols{grid-template-columns:1fr 1fr}
+  .cols--wide{grid-template-columns:1.15fr .85fr}
+  .cols--narrow{grid-template-columns:.85fr 1.15fr}
+}
+
+/* 卡片 */
+.card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:clamp(16px,2.4vw,24px);box-shadow:var(--shadow-sm);
+}
+.card h4{font-family:var(--serif);font-size:17px;margin:0 0 8px}
+.card p:last-child{margin-bottom:0}
+.card--rust{border-left:3px solid var(--rust)}
+.card--brass{border-left:3px solid var(--brass)}
+.card--sea{border-left:3px solid var(--sea)}
+.grid3{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:720px){.grid3{grid-template-columns:repeat(3,1fr)}}
+.grid2{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:720px){.grid2{grid-template-columns:repeat(2,1fr)}}
+
+/* 引文 */
+.quote{
+  margin:0;border-left:2px solid var(--rust);padding:2px 0 2px 20px;
+  font-family:var(--serif);font-size:17px;color:var(--ink);line-height:1.7;
+}
+.quote .en{
+  display:block;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink3);
+  margin-top:10px;letter-spacing:.005em;
+}
+.quote cite{display:block;font-family:var(--sans);font-size:12px;font-style:normal;color:var(--ink4);margin-top:9px;letter-spacing:.05em}
+.sec--dark .quote{border-left-color:#d98a5f;color:#f2ece1}
+.sec--dark .quote .en{color:#9a8f80}
+.sec--dark .quote cite{color:#7d7264}
+
+/* 提示条 */
+.note{
+  background:var(--brassbg);border:1px solid #e0d2ab;border-radius:var(--r);
+  padding:13px 16px;font-size:14px;color:#5f4d21;line-height:1.72;
+}
+.note b{color:#4a3c19}
+.note--rust{background:var(--rustbg);border-color:#ecd0c3;color:#7b3218}
+.note--rust b{color:#5f2712}
+.sec--dark .note{background:#242019;border-color:#3b342a;color:#cfc4b2}
+.sec--dark .note b{color:#f0e7d8}
+
+/* 工具条 */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.chip{
+  background:var(--paper);border:1px solid var(--line2);border-radius:999px;
+  padding:6px 14px;font-size:13px;cursor:pointer;color:var(--ink2);
+}
+.chip:hover{border-color:var(--rust);color:var(--rust)}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.sec--dark .chip{background:#201d19;border-color:#3b342a;color:#cfc4b2}
+.sec--dark .chip:hover{border-color:#d98a5f;color:#d98a5f}
+.sec--dark .chip[aria-pressed=true]{background:#e9e3d8;border-color:#e9e3d8;color:#171512}
+
+/* ============ 自然状态模拟器 ============ */
+.sim{
+  border:1px solid var(--line);border-radius:6px;background:var(--paper);
+  overflow:hidden;box-shadow:var(--shadow);
+}
+.sim-top{
+  display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  padding:13px 16px;border-bottom:1px solid var(--line);background:var(--paper2);
+}
+.sim-title{font-family:var(--serif);font-size:16px}
+.sim-title small{display:block;font-family:var(--sans);font-size:12px;color:var(--ink3);margin-top:2px}
+.sim-stage{position:relative;background:var(--paper2)}
+#simCanvas{display:block;width:100%;height:auto;touch-action:pan-y}
+.sim-legend{
+  position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:10px;
+  font-size:11.5px;color:var(--ink2);background:rgba(250,247,241,.9);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;backdrop-filter:blur(4px);
+}
+.sim-legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.18)}
+.sim-badge{
+  position:absolute;right:12px;top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+  background:rgba(28,25,21,.86);color:#f4efe4;padding:5px 12px;border-radius:999px;
+}
+.sim-body{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:860px){.sim-body{grid-template-columns:1fr 320px}}
+.sim-ctrl{padding:16px;border-top:1px solid var(--line)}
+@media (min-width:860px){.sim-ctrl{border-top:0;border-left:1px solid var(--line)}}
+.param{margin-bottom:15px}
+.param:last-child{margin-bottom:0}
+.param-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
+.param-h label{font-size:14px;font-weight:600}
+.param-h .v{font-family:var(--mono);font-size:12px;color:var(--rust);min-width:44px;text-align:right}
+.param-d{font-size:11.5px;color:var(--ink3);line-height:1.55;margin:0 0 5px}
+.sim-metrics{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);
+  border-top:1px solid var(--line);
+}
+@media (min-width:600px){.sim-metrics{grid-template-columns:repeat(4,1fr)}}
+.metric{background:var(--paper);padding:12px 14px}
+.metric .k{font-size:11.5px;color:var(--ink3);letter-spacing:.03em}
+.metric .n{font-family:var(--mono);font-size:22px;color:var(--ink);line-height:1.25;margin-top:3px}
+.metric .n small{font-size:11px;color:var(--ink4);font-family:var(--sans);margin-left:3px}
+.sim-verdict{
+  padding:14px 16px;border-top:1px solid var(--line);background:var(--paper2);
+  font-size:14.5px;line-height:1.72;color:var(--ink2);min-height:66px;
+}
+.sim-verdict b{color:var(--rust)}
+.sim-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap}
+
+/* ============ 权利让渡 ============ */
+.cov{display:grid;grid-template-columns:1fr;gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+@media (min-width:880px){.cov{grid-template-columns:1.1fr .9fr}}
+.cov-art{background:linear-gradient(180deg,var(--paper) 0%,var(--paper2) 100%);padding:14px}
+#covSvg{display:block;width:100%;height:auto}
+.cov-side{padding:clamp(16px,2.4vw,24px);border-top:1px solid var(--line)}
+@media (min-width:880px){.cov-side{border-top:0;border-left:1px solid var(--line)}}
+.cov-count{font-family:var(--mono);font-size:30px;color:var(--rust);line-height:1.1}
+.cov-count small{font-size:12px;color:var(--ink3);font-family:var(--sans);margin-left:6px}
+.cov-step{font-size:14.5px;color:var(--ink2);line-height:1.75;min-height:5.4em;margin:12px 0 0}
+.cov-step b{color:var(--ink)}
+.cov-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.person{cursor:pointer}
+.person:hover circle{stroke:var(--rust);stroke-width:2}
+
+/* ============ 十二权 ============ */
+.powers{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:640px){.powers{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1000px){.powers{grid-template-columns:repeat(3,1fr)}}
+.pw{
+  text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 15px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;
+  transition:border-color .16s,box-shadow .16s,transform .16s;
+}
+.pw:hover{border-color:var(--line2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.pw[aria-expanded=true]{border-color:var(--rust);box-shadow:var(--shadow-sm)}
+.pw .no{font-family:var(--mono);font-size:11px;color:var(--ink4);flex:0 0 20px;padding-top:3px}
+.pw .tx{flex:1 1 auto;min-width:0}
+.pw .tx b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;margin-bottom:3px}
+.pw .tx i{display:block;font-style:normal;font-size:12.5px;color:var(--ink3);line-height:1.6}
+.pw-detail{
+  grid-column:1/-1;background:var(--paper2);border:1px solid var(--line);border-left:3px solid var(--rust);
+  border-radius:var(--r);padding:15px 17px;font-size:14px;color:var(--ink2);line-height:1.78;
+}
+.pw-detail .en{display:block;font-family:var(--mono);font-size:12px;color:var(--ink3);margin-top:9px;line-height:1.7}
+.pw-detail[hidden]{display:none}
+
+/* ============ 论证链 ============ */
+.chain{list-style:none;margin:0;padding:0;counter-reset:c;display:grid;gap:8px}
+.chain li{counter-increment:c}
+.chain button{
+  width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--r);padding:12px 15px 12px 46px;position:relative;cursor:pointer;
+  font-size:15px;color:var(--ink2);transition:border-color .16s,background .16s;
+}
+.chain button::before{
+  content:counter(c,decimal-leading-zero);position:absolute;left:14px;top:13px;
+  font-family:var(--mono);font-size:11px;color:var(--ink4);letter-spacing:.04em;
+}
+.chain button:hover{border-color:var(--line2)}
+.chain button[aria-expanded=true]{border-color:var(--rust);background:var(--rustbg);color:var(--ink)}
+.chain .cd{padding:0 15px 0 46px;font-size:14px;color:var(--ink2);line-height:1.78}
+.chain .cd[hidden]{display:none}
+.chain .cd p{margin:.6em 0}
+.chain li:not(:last-child) .cd{margin-bottom:2px}
+
+/* ============ 对照表 ============ */
+.cmp{width:100%;border-collapse:collapse;font-size:14.5px}
+.cmp caption{text-align:left;font-size:13px;color:var(--ink3);padding-bottom:10px}
+.cmp th,.cmp td{border:1px solid var(--line);padding:11px 13px;text-align:left;vertical-align:top;line-height:1.68}
+.cmp thead th{background:var(--paper2);font-family:var(--serif);font-size:15px;font-weight:600}
+.cmp thead th:nth-child(2){color:var(--rust)}
+.cmp thead th:nth-child(3){color:var(--sea)}
+.cmp tbody th{background:var(--paper2);font-weight:600;font-size:13.5px;white-space:nowrap}
+.cmp tbody tr:nth-child(even) td{background:rgba(242,235,222,.5)}
+.cmp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp-scroll table{min-width:620px}
+
+/* ============ 自由的边界测试 ============ */
+.lb{border:1px solid var(--line);border-radius:6px;background:var(--paper);overflow:hidden;box-shadow:var(--shadow)}
+.lb-top{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--paper2)}
+.lb-top .p{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.lb-q{padding:clamp(16px,3vw,26px)}
+.lb-q h4{font-family:var(--serif);font-size:19px;line-height:1.5;margin:0 0 6px}
+.lb-q .ctx{font-size:13px;color:var(--ink3);margin-bottom:18px}
+.lb-opts{display:grid;gap:9px}
+@media (min-width:640px){.lb-opts{grid-template-columns:1fr 1fr}}
+.lb-opt{
+  background:var(--paper);border:1px solid var(--line2);border-radius:var(--r);
+  padding:13px 15px;cursor:pointer;text-align:left;font-size:14.5px;color:var(--ink2);
+  transition:border-color .16s,background .16s;
+}
+.lb-opt:hover:not(:disabled){border-color:var(--rust);color:var(--ink)}
+.lb-opt:disabled{cursor:default}
+.lb-opt .tag{display:block;font-family:var(--mono);font-size:11px;color:var(--ink4);margin-bottom:3px;letter-spacing:.06em}
+.lb-opt[data-pick="right"]{border-color:#4a7a44;background:#eef4ec}
+.lb-opt[data-pick="wrong"]{border-color:#b3452a;background:var(--rustbg)}
+.lb-opt[data-reveal="1"]{border-color:#4a7a44;background:#eef4ec;box-shadow:inset 0 0 0 1px #4a7a44}
+.lb-ans{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.lb-ans[hidden]{display:none}
+.lb-ans .vd{font-family:var(--serif);font-size:16px;margin-bottom:8px}
+.lb-ans .vd.ok{color:#3f6b3a}
+.lb-ans .vd.no{color:var(--rust)}
+.lb-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:13px 16px;border-top:1px solid var(--line);background:var(--paper2)}
+.lb-score{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--ink2)}
+
+/* ============ 测验 ============ */
+.quiz{border:1px solid var(--line);border-radius:6px;background:var(--paper);overflow:hidden;box-shadow:var(--shadow)}
+.quiz-h{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--paper2)}
+.quiz-h .p{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.qz{padding:clamp(16px,3vw,26px)}
+.qz .qq{font-family:var(--serif);font-size:18.5px;line-height:1.55;margin:0 0 16px}
+.qz .opts{display:grid;gap:9px}
+.qz .opt{
+  background:var(--paper);border:1px solid var(--line2);border-radius:var(--r);
+  padding:12px 15px;cursor:pointer;text-align:left;font-size:14.5px;color:var(--ink2);
+  display:flex;gap:11px;align-items:flex-start;transition:border-color .16s,background .16s;
+}
+.qz .opt:hover:not(:disabled){border-color:var(--rust);color:var(--ink)}
+.qz .opt:disabled{cursor:default}
+.qz .opt .k{font-family:var(--mono);font-size:12px;color:var(--ink4);flex:0 0 16px;padding-top:2px}
+.qz .opt.right{border-color:#4a7a44;background:#eef4ec}
+.qz .opt.wrong{border-color:#b3452a;background:var(--rustbg)}
+.qz .fb{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;font-size:14px;color:var(--ink2);line-height:1.75}
+.qz .fb[hidden]{display:none}
+.qz .fb b{color:var(--ink)}
+.quiz-res{padding:clamp(18px,3vw,28px);border-top:1px solid var(--line);background:var(--paper2)}
+.quiz-res[hidden]{display:none}
+.quiz-res .big{font-family:var(--mono);font-size:40px;color:var(--rust);line-height:1}
+.quiz-res .big small{font-size:15px;color:var(--ink3);font-family:var(--sans);margin-left:6px}
+.quiz-res p{font-size:14.5px;color:var(--ink2);margin:12px 0 0}
+
+/* ============ 术语表 ============ */
+.gl-tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.gl-search{
+  flex:1 1 220px;min-width:0;border:1px solid var(--line2);border-radius:999px;
+  padding:9px 16px;font-size:14.5px;background:var(--paper);color:var(--ink);
+}
+.gl-search::placeholder{color:var(--ink4)}
+.gl-list{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+@media (min-width:760px){.gl-list{grid-template-columns:1fr 1fr}}
+.gl-item{background:var(--paper);padding:15px 17px}
+.gl-item dt{font-family:var(--serif);font-size:16.5px;font-weight:600;margin-bottom:4px}
+.gl-item dt span{font-family:var(--mono);font-size:11.5px;color:var(--ink4);font-weight:400;margin-left:7px;letter-spacing:.03em}
+.gl-item dd{margin:0;font-size:14px;color:var(--ink2);line-height:1.72}
+.gl-empty{grid-column:1/-1;background:var(--paper);padding:24px;text-align:center;color:var(--ink3);font-size:14px}
+.gl-empty[hidden]{display:none}
+
+/* ============ 金句 ============ */
+.qs-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:820px){.qs-grid{grid-template-columns:1fr 1fr}}
+.qcard{
+  background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--brass);
+  border-radius:var(--r);padding:16px 18px;
+}
+.qcard .cn{font-family:var(--serif);font-size:16px;line-height:1.68;color:var(--ink)}
+.qcard .en{font-family:var(--mono);font-size:12px;color:var(--ink3);line-height:1.7;margin-top:10px;display:block}
+.qcard .src{font-size:11.5px;color:var(--ink4);margin-top:9px;letter-spacing:.05em}
+
+/* ============ 章节解剖条 ============ */
+.parts{display:grid;gap:10px}
+.parts-bar{display:flex;height:34px;border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;background:var(--paper)}
+.parts-bar button{
+  border:0;border-right:1px solid var(--paper);cursor:pointer;color:#fff;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;transition:filter .16s;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;
+}
+.parts-bar button:last-child{border-right:0}
+.parts-bar button:hover{filter:brightness(1.12)}
+.parts-bar button[aria-pressed=true]{box-shadow:inset 0 0 0 2px rgba(255,255,255,.75)}
+.parts-info{background:var(--paper2);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;font-size:14.5px;color:var(--ink2);line-height:1.75;min-height:6em}
+.parts-info b{color:var(--ink)}
+
+/* ============ 时间轴 ============ */
+.tl{list-style:none;margin:0;padding:0 0 0 26px;position:relative}
+.tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:var(--line2)}
+.tl li{position:relative;padding-bottom:20px}
+.tl li::before{
+  content:"";position:absolute;left:-24px;top:7px;width:9px;height:9px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--rust);
+}
+.tl .yr{font-family:var(--mono);font-size:12px;color:var(--rust);letter-spacing:.06em;display:block}
+.tl .tx{font-size:14.5px;color:var(--ink2);line-height:1.72}
+.tl .tx b{color:var(--ink)}
+
+/* ============ 页脚 ============ */
+.foot{border-top:1px solid var(--line);padding:44px 0 60px;background:var(--paper2);font-size:13.5px;color:var(--ink3)}
+.foot-grid{display:grid;grid-template-columns:1fr;gap:22px}
+@media (min-width:760px){.foot-grid{grid-template-columns:1.4fr 1fr 1fr}}
+.foot h4{font-family:var(--serif);font-size:15px;color:var(--ink);margin:0 0 10px}
+.foot ul{list-style:none;margin:0;padding:0}
+.foot li{margin-bottom:7px;line-height:1.6}
+.foot .tiny{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--ink4)}
+
+/* ============ 入场动画 ============ */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+
+/* 返回顶部 */
+.totop{
+  position:fixed;right:18px;bottom:18px;z-index:50;width:42px;height:42px;border-radius:50%;
+  background:var(--ink);color:var(--paper);border:0;cursor:pointer;font-size:15px;
+  opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;box-shadow:var(--shadow);
+}
+.totop.show{opacity:1;visibility:visible}
+.totop:hover{background:var(--rust)}
+
+/* ============ 版画 SVG ============ */
+#frontis text{font-family:var(--serif)}
+#frontis .eng{stroke:var(--ink);fill:none;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+#frontis .eng-f{fill:var(--ink)}
+#frontis .eng-p{fill:var(--paper)}
+#frontis .eng-2{stroke:var(--ink2);fill:none;stroke-width:.95;stroke-linecap:round}
+#frontis .fine{stroke:var(--ink3);fill:none;stroke-width:.7;stroke-linecap:round}
+#frontis .land{stroke:var(--ink2);fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round}
+#frontis .land-f{fill:var(--paper2);stroke:var(--ink2);stroke-width:1}
+#frontis .fig-g{fill:var(--ink);opacity:.92}
+.fig{transition:opacity .5s ease}
+.fig-in{transform:translate(calc(var(--spread,0) * var(--sx,0) * 1px),calc(var(--spread,0) * var(--sy,0) * 1px))}
+.form{opacity:calc(1 - var(--spread,0) * 1.55);transition:opacity .28s ease}
+.hand{opacity:calc(1 - var(--spread,0) * 1.2)}
+@media (prefers-reduced-motion:reduce){
+  .fig-in,.form,.hand{transition:none}
+}
+/* ============ 行为标签（善的相对性） ============ */
+.acts{list-style:none;margin:0;padding:0}
+.acts li{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.acts li:last-child{border-bottom:0}
+.acts .a-n{flex:1 1 auto;color:var(--ink2)}
+.acts .a-v{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;padding:2px 10px;border-radius:999px;letter-spacing:.04em;white-space:nowrap}
+.a-v.v-free{background:var(--paper3);color:var(--ink3)}
+.a-v.v-sin{background:var(--rustbg);color:var(--rust);border:1px solid #ecd0c3}
+.a-v.v-virtue{background:var(--brassbg);color:var(--brass);border:1px solid #e0d2ab}
+
+/* ============ 人造人的身体图 ============ */
+.bodymap{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+@media (min-width:560px){.bodymap{grid-template-columns:1fr 1fr}}
+.bodymap div{background:var(--paper);padding:10px 13px;font-size:13px;color:var(--ink3);line-height:1.55}
+.bodymap b{display:block;font-family:var(--serif);font-size:14.5px;color:var(--rust);font-weight:600;margin-bottom:1px}
+
+/* ============ 模拟器定位 ============ */
+.sim{position:relative}
+
+/* ============ 遮光实验 ============ */
+.slab{cursor:pointer;transition:transform .5s cubic-bezier(.2,.7,.3,1),opacity .5s}
+.slab[data-off="1"]{transform:translateY(-30px);opacity:.2}
+.slab rect{transition:stroke .25s,fill .25s}
+.slab:hover rect{stroke:#d98a5f}
+.slab text{pointer-events:none;user-select:none}
+#darkFolk circle,#darkFolk path{transition:fill .45s,opacity .45s}
+#darkLamps circle{transition:fill .4s,opacity .4s}
+
+/* ============ 打印 ============ */
+@media print{
+  .topbar,.totop,dialog.drawer,.sim,.spread-ctl,.lb,.quiz{display:none}
+  .reveal{opacity:1;transform:none}
+  .sec{padding:24px 0;break-inside:avoid}
+  body{font-size:11pt}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <div class="tb-in">
+    <a class="tb-brand" href="#hero"><span class="mark" aria-hidden="true">◐</span> <b>利维坦</b> <em>1651</em></a>
+    <div class="tb-prog" aria-hidden="true"><i id="progBar"></i></div>
+    <button class="tb-menu" id="btnMenu" aria-haspopup="dialog">目录</button>
+  </div>
+</header>
+
+<dialog class="drawer" id="drawer" aria-label="目录">
+  <div class="drawer-in">
+    <div class="drawer-h">
+      <span>目录</span>
+      <button class="drawer-x" id="btnClose">关闭</button>
+    </div>
+    <ol class="drawer-list" id="drawerList"></ol>
+  </div>
+</dialog>
+
+<main id="main">
+
+<!-- ================= 首屏 ================= -->
+<section class="hero" id="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-txt">
+      <p class="kicker">London · 1651 · Printed for Andrew Crooke</p>
+      <h1>利维坦<span class="h1-en">LEVIATHAN</span></h1>
+      <p class="hero-sub">或论教会国与世俗国的质料、形式与权力</p>
+      <p class="hero-lead">
+        一部在内战的炮声里写成的书。它只问一个问题：
+        <strong>如果没有一个共同权力让人人敬畏，人会活成什么样子？</strong>
+        霍布斯的回答让同代人惊骇，也让此后三百多年的政治思考无法绕开他。
+      </p>
+      <div class="hero-cta">
+        <a class="btn" href="#context">开始阅读</a>
+        <a class="btn btn--ghost" href="#sim">直接玩模拟器</a>
+      </div>
+      <p class="fig-cap" style="margin-top:34px;border-top:0;padding-top:0;max-width:34em">
+        全书 47 章，分四部：论人、论国家、论基督教国家、论黑暗王国。
+        页面按这个顺序走，你也可以随时打开右上角目录跳到任何一节。
+      </p>
+    </div>
+
+    <div class="hero-art">
+      <figure class="frontis-wrap" style="margin:0">
+        <svg id="frontis" viewBox="0 0 680 560" role="img" aria-labelledby="frontisTitle frontisDesc">
+          <title id="frontisTitle">《利维坦》卷首版画（摹写）</title>
+          <desc id="frontisDesc">一位戴王冠的巨人立于大地之上，他的身体由无数小人组成，右手持剑，左手持主教牧杖，脚下是城墙、教堂与城堡。拖动下方滑块，可以让这些小人散开或重新聚合成巨人。</desc>
+          <defs>
+            <symbol id="pwSym" viewBox="0 0 12 15">
+              <circle cx="6" cy="3" r="2.7"/>
+              <path d="M6 6.4c-2.5 0-4.3 1.5-4.6 3.7L1 15h10l-.4-4.9C10.3 7.9 8.5 6.4 6 6.4z"/>
+            </symbol>
+            <clipPath id="frontClip"><rect x="0" y="0" width="680" height="560"/></clipPath>
+          </defs>
+          <g clip-path="url(#frontClip)">
+
+            <!-- 天空底色 -->
+            <rect x="0" y="0" width="680" height="560" fill="var(--paper)"/>
+
+            <!-- ===== 兵器（先画，后由手臂覆盖握持处） ===== -->
+            <g id="weapons" class="form">
+              <!-- 剑：观者左侧 = 世俗权力 -->
+              <g>
+                <path class="eng-p" d="M130 280 L130 88 L136 62 L142 88 L142 280 Z"/>
+                <path class="eng" d="M130 280 L130 88 L136 62 L142 88 L142 280 Z"/>
+                <path class="eng" d="M118 280 L154 280 L154 293 L118 293 Z"/>
+                <path class="eng-p" d="M132 293 L140 293 L140 330 L132 330 Z"/>
+                <path class="eng" d="M132 293 L140 293 L140 330 L132 330 Z"/>
+                <circle class="eng-p" cx="136" cy="337" r="7.5"/>
+                <circle class="eng" cx="136" cy="337" r="7.5"/>
+                <path class="fine" d="M136 70 L136 276"/>
+              </g>
+              <!-- 牧杖：观者右侧 = 教会权力 -->
+              <g>
+                <path class="eng-p" d="M544 330 L544 170 C544 126 598 120 598 162 C598 190 572 198 562 176"/>
+                <path class="eng" d="M544 330 L544 170 C544 126 598 120 598 162 C598 190 572 198 562 176"/>
+                <path class="eng" d="M562 176 C556 164 559 153 567 149"/>
+                <circle class="eng-p" cx="598" cy="136" r="4.5"/>
+                <circle class="eng" cx="598" cy="136" r="4.5"/>
+                <path class="fine" d="M548 184 L548 330"/>
+              </g>
+            </g>
+
+            <!-- ===== 众人组成的身体（JS 生成） ===== -->
+            <g id="crowd"></g>
+
+            <!-- ===== 头与王冠 ===== -->
+            <g id="head" class="form">
+              <path class="eng-p" d="M304 104 L304 82 L318 95 L330 70 L342 95 L354 68 L366 95 L376 82 L376 104 Z"/>
+              <path class="eng" d="M304 104 L304 82 L318 95 L330 70 L342 95 L354 68 L366 95 L376 82 L376 104 Z"/>
+              <path class="eng-p" d="M301 104 L379 104 L379 120 L301 120 Z"/>
+              <path class="eng" d="M301 104 L379 104 L379 120 L301 120 Z"/>
+              <circle class="eng-f" cx="316" cy="112" r="2.8"/>
+              <circle class="eng-f" cx="340" cy="112" r="3.2"/>
+              <circle class="eng-f" cx="364" cy="112" r="2.8"/>
+              <ellipse class="eng-p" cx="340" cy="152" rx="36" ry="43"/>
+              <ellipse class="eng" cx="340" cy="152" rx="36" ry="43"/>
+              <path class="eng" d="M308 126 C299 150 302 174 314 190"/>
+              <path class="eng" d="M372 126 C381 150 378 174 366 190"/>
+              <path class="eng" d="M320 145 L337 143"/>
+              <path class="eng" d="M343 143 L360 145"/>
+              <path class="eng-2" d="M317 136 L338 133"/>
+              <path class="eng-2" d="M342 133 L363 136"/>
+              <path class="eng-2" d="M340 148 L340 165 M334 166 q 6 3 12 0"/>
+              <path class="eng" d="M320 171 q 10 -4 20 2 q 10 -6 20 -2"/>
+              <path class="eng-2" d="M313 175 C 319 197 361 197 367 175"/>
+              <path class="fine" d="M325 183 L323 191 M334 186 L333 194 M346 186 L347 194 M355 183 L357 191"/>
+            </g>
+
+            <!-- ===== 大地与城邦（前景，压住身体下缘） ===== -->
+            <g id="landscape" class="form">
+              <rect x="0" y="428" width="680" height="132" fill="var(--paper2)"/>
+              <path fill="var(--paper2)" d="M0 452 C 60 436 118 444 176 452 C 240 461 292 442 348 444 C 412 447 462 462 522 454 C 578 447 630 438 680 446 L680 560 L0 560 Z"/>
+              <path class="land" d="M0 448 C 60 432 118 440 176 448 C 240 457 292 438 348 440 C 412 443 462 458 522 450 C 578 443 630 434 680 442"/>
+              <path class="land" d="M0 468 C 70 456 132 466 196 472 C 268 479 322 464 388 466 C 456 468 520 480 586 472 C 626 467 656 462 680 464"/>
+
+              <!-- 左：城堡与火炮（世俗武力） -->
+              <g>
+                <path class="land-f" d="M18 526 L18 476 L31 476 L31 462 L44 462 L44 476 L57 476 L57 526 Z"/>
+                <path class="land-f" d="M74 526 L74 490 L84 490 L84 478 L94 478 L94 490 L104 490 L104 526 Z"/>
+                <rect class="land-f" x="26" y="498" width="9" height="12"/>
+                <rect class="land-f" x="81" y="504" width="8" height="11"/>
+                <path class="land" d="M31 462 L31 440 L53 448 L31 456"/>
+                <path class="land-f" d="M122 520 L164 520 L164 507 L122 507 Z"/>
+                <circle class="land-f" cx="129" cy="524" r="5.5"/>
+                <circle class="land-f" cx="158" cy="524" r="5.5"/>
+                <path class="land" d="M160 509 L180 501"/>
+              </g>
+
+              <!-- 中：城墙环绕的城邦 -->
+              <g>
+                <path class="land-f" d="M178 526 L178 494 L502 494 L502 526 Z"/>
+                <path class="land" d="M178 494 L502 494 M178 505 L502 505"/>
+                <g class="land">
+                  <path d="M184 494 L184 485 M194 494 L194 485 M204 494 L204 485 M214 494 L214 485 M224 494 L224 485 M234 494 L234 485 M244 494 L244 485 M254 494 L254 485 M264 494 L264 485 M274 494 L274 485 M284 494 L284 485 M294 494 L294 485 M304 494 L304 485 M314 494 L314 485 M324 494 L324 485 M334 494 L334 485 M344 494 L344 485 M354 494 L354 485 M364 494 L364 485 M374 494 L374 485 M384 494 L384 485 M394 494 L394 485 M404 494 L404 485 M414 494 L414 485 M424 494 L424 485 M434 494 L434 485 M444 494 L444 485 M454 494 L454 485 M464 494 L464 485 M474 494 L474 485 M484 494 L484 485 M494 494 L494 485"/>
+                </g>
+                <!-- 城门 -->
+                <path class="land" d="M244 526 L244 508 C244 499 258 499 258 508 L258 526"/>
+                <!-- 角楼 -->
+                <path class="land-f" d="M172 526 L172 462 L200 462 L200 526 Z"/>
+                <path class="land" d="M166 462 L206 462 L189 442 Z"/>
+                <path class="land-f" d="M480 526 L480 462 L508 462 L508 526 Z"/>
+                <path class="land" d="M474 462 L514 462 L497 442 Z"/>
+                <!-- 城内房屋 -->
+                <path class="land-f" d="M286 526 L286 506 L312 506 L312 526 Z"/>
+                <path class="land" d="M281 506 L317 506 L299 492 Z"/>
+                <path class="land-f" d="M378 526 L378 508 L404 508 L404 526 Z"/>
+                <path class="land" d="M373 508 L409 508 L391 494 Z"/>
+                <path class="land-f" d="M428 526 L428 504 L456 504 L456 526 Z"/>
+                <path class="land" d="M423 504 L461 504 L442 490 Z"/>
+                <!-- 教堂（城中最高） -->
+                <path class="land-f" d="M324 526 L324 464 L356 464 L356 526 Z"/>
+                <path class="land" d="M319 464 L361 464 L340 444 Z"/>
+                <path class="land-f" d="M335 444 L345 444 L345 428 L335 428 Z"/>
+                <path class="land" d="M340 428 L340 412 M332 419 L348 419"/>
+                <path class="land" d="M330 482 C330 473 350 473 350 482 L350 494 L330 494 Z"/>
+              </g>
+
+              <!-- 右：教堂与主教冠（教会权力） -->
+              <g>
+                <path class="land-f" d="M552 526 L552 470 L590 470 L590 526 Z"/>
+                <path class="land" d="M547 470 L595 470 L571 446 Z"/>
+                <path class="land" d="M571 446 L571 428 M563 434 L579 434"/>
+                <path class="land" d="M563 492 C563 481 581 481 581 492 L581 508 L563 508 Z"/>
+                <path class="land-f" d="M610 526 L610 490 L640 490 L640 526 Z"/>
+                <path class="land" d="M605 490 L645 490 L625 470 Z"/>
+                <path class="land" d="M616 484 L634 484 L625 464 Z"/>
+              </g>
+
+              <!-- 山丘与树 -->
+              <g>
+                <circle class="land-f" cx="120" cy="456" r="8"/>
+                <path class="land" d="M120 464 L120 474"/>
+                <circle class="land-f" cx="148" cy="450" r="6"/>
+                <path class="land" d="M148 456 L148 465"/>
+                <circle class="land-f" cx="538" cy="452" r="7"/>
+                <path class="land" d="M538 459 L538 469"/>
+                <circle class="land-f" cx="660" cy="458" r="7.5"/>
+                <path class="land" d="M660 465 L660 475"/>
+              </g>
+
+              <!-- 地面纹理 -->
+              <path class="land" d="M0 530 C 90 522 150 534 232 529 C 322 523 386 536 470 529 C 552 523 620 532 680 526"/>
+              <path class="land" d="M0 556 C 96 548 158 558 244 553 C 336 548 398 558 484 552 C 560 547 626 555 680 550"/>
+
+              <!-- 田野里的散人（JS 生成） -->
+              <g id="fieldFolk"></g>
+            </g>
+
+            <!-- ===== 顶端横幅：拉丁题词 ===== -->
+            <g id="banner" class="form">
+              <path class="eng-p" d="M56 10 L624 10 L624 58 L56 58 Z"/>
+              <path class="eng" d="M56 10 L624 10 L624 58 L56 58 Z"/>
+              <path class="fine" d="M62 15 L618 15 M62 53 L618 53"/>
+              <path class="eng-p" d="M40 34 L56 18 L56 50 Z M640 34 L624 18 L624 50 Z"/>
+              <path class="eng" d="M40 34 L56 18 L56 50 Z M640 34 L624 18 L624 50 Z"/>
+              <text x="340" y="31" text-anchor="middle" font-size="12.5" letter-spacing="1.6" fill="var(--ink)">NON EST POTESTAS SVPER TERRAM</text>
+              <text x="340" y="47" text-anchor="middle" font-size="11.5" letter-spacing="1.4" fill="var(--ink2)">QVÆ COMPARETVR EI</text>
+              <text x="618" y="70" text-anchor="end" font-size="9.5" letter-spacing=".6" fill="var(--ink4)">IOB 41:24</text>
+            </g>
+
+          </g>
+        </svg>
+        <figcaption class="fig-cap">
+          <b>卷首版画</b>（摹写）。原作由巴黎雕版师阿伯拉罕·博斯（Abraham Bosse）制作，据信与霍布斯本人反复商定。
+          巨人的身体由数百个仰望着他的小人组成——国家不是君主的私产，而是众人合成的一个人格。
+          他右手持<b>剑</b>（世俗权力），左手持<b>牧杖</b>（教会权力）；脚下左侧是城堡与火炮，右侧是教堂与主教冠。
+          上方题词出自《约伯记》41:24：<em>“世上没有可与它相比的权柄。”</em>
+        </figcaption>
+      </figure>
+
+      <div class="spread-ctl">
+        <div class="spread-top">
+          <label class="lbl" for="spread">拖动看这本书的核心意象</label>
+          <span class="val" id="spreadVal">100% 聚合</span>
+        </div>
+        <input type="range" id="spread" min="0" max="100" value="100" step="1"
+               aria-label="众人聚合成利维坦的程度" aria-describedby="spreadNote">
+        <p class="spread-note" id="spreadNote">众人合为一个人格：主权者。</p>
+        <div class="spread-btns">
+          <button type="button" data-spread="0">散开成众人</button>
+          <button type="button" data-spread="100">聚合成利维坦</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 缘起 ================= -->
+<section class="sec" id="context" data-nav="序" data-nav-t="缘起：被内战逼出来的问题" data-nav-s="1588–1651">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">序</span>
+      <h2>被内战逼出来的问题</h2>
+      <p class="sec-sub">Malmesbury → Oxford → Paris → London</p>
+    </header>
+
+    <div class="reveal" style="margin-bottom:38px">
+      <div class="parts">
+        <div class="parts-bar" id="partsBar" role="group" aria-label="全书结构，点击查看各部内容"></div>
+        <div class="parts-info" id="partsInfo"></div>
+      </div>
+    </div>
+
+    <div class="cols cols--wide">
+      <div class="prose reveal">
+        <p class="drop">
+          霍布斯一生几乎就是十七世纪英格兰的动荡本身。他生于 1588 年——西班牙无敌舰队逼近英吉利海峡的那一年。
+          他后来说，母亲因为恐惧而早产，所以他与恐惧是双胞胎。这话是他自己讲的，真假难考，
+          但它准确地道出了他思想的底色：<strong>政治的首要问题是恐惧，而不是荣耀。</strong>
+        </p>
+        <p>
+          他做了一辈子贵族家庭教师，与卡文迪什家族（后来封为德文郡伯爵）关系紧密，因此得以接近权力的内圈。
+          他早年译过修昔底德——那本讲城邦如何在内斗中自我毁灭的书，后来他才知道那其实是在讲英格兰。
+        </p>
+        <p>
+          1640 年，长期议会召开，他的政论小册子在议会里被点名，他当天就逃往巴黎。
+          两年后内战爆发。1649 年 1 月 30 日，查理一世在白厅被斩首——国会以人民的名义处死了国王。
+        </p>
+        <p>
+          这件事对霍布斯的冲击是决定性的。不是因为他不喜欢共和派，而是因为它暴露了一个更深的问题：
+          <strong>当主权被推翻、国家分裂成两半，谁有资格说什么是正义？</strong>
+          国会在审判国王时援引的是"人民的授权"；保皇党援引的是"君权神授"和"传统"。两套说法都自称是法律。
+          在霍布斯看来，当一个国家里同时存在两套自称正当的权威，它就不再是一个国家，而是一场内战。
+        </p>
+        <p>
+          1651 年，他在巴黎写完了《利维坦》，却在伦敦出版——不是献给流亡的查理二世。
+          献词里他把话说明白了：他谈论的<strong>不是任何具体的人，而是"权力所在的那个位置"本身</strong>。
+          不管谁坐上去，都必须坐得绝对。这份不讨好任何一方的姿态，让他同时被两边骂了一辈子。
+        </p>
+        <blockquote class="quote" style="margin:22px 0 0">
+          我不谈论那些人，而是在抽象层面谈论权力所在的位置——就像罗马卡比托利欧山上的那些鹅，
+          它们的叫声守护了山上的人，不是因为那些人是谁，而是因为他们在那里。
+          <span class="en">I speak not of the men, but, in the abstract, of the seat of power (like to those simple and unpartial creatures in the Roman Capitol, that with their noise defended those within it, not because they were they, but there).</span>
+          <cite>献词，致弗朗西斯·戈多尔芬（Francis Godolphin）</cite>
+        </blockquote>
+      </div>
+
+      <div class="reveal">
+        <ol class="tl">
+          <li><span class="yr">1588</span><span class="tx">生于威尔特郡马尔姆斯伯里。同年无敌舰队来袭。</span></li>
+          <li><span class="yr">1608</span><span class="tx">牛津毕业，任卡文迪什家族家庭教师，此后一生与这个家族纠缠。</span></li>
+          <li><span class="yr">1629</span><span class="tx">译出修昔底德《伯罗奔尼撒战争史》——城邦内战如何毁灭自身。</span></li>
+          <li><span class="yr">1640</span><span class="tx">长期议会召开，其政论小册子遭点名，逃亡巴黎。</span></li>
+          <li><span class="yr">1642</span><span class="tx"><b>英国内战爆发</b>。同年《论公民》在巴黎印行。</span></li>
+          <li><span class="yr">1649</span><span class="tx"><b>查理一世被处死</b>。以"人民的名义"处死国王，是全书的问题意识所在。</span></li>
+          <li><span class="yr">1651</span><span class="tx"><b>《利维坦》在伦敦出版</b>。四部四十七章。在伦敦而非巴黎出版，流亡的保王党把这看作对共和国的认可；而书里那句"没有剑的契约只是一纸空文"也不讨国会喜欢。</span></li>
+          <li><span class="yr">1660</span><span class="tx">王政复辟。霍布斯因"无神论"嫌疑被反复攻击，著作一度被查禁。</span></li>
+          <li><span class="yr">1679</span><span class="tx">去世，葬于德比郡。同年，他担心了几十年的另一场内战没有发生。</span></li>
+        </ol>
+        <div class="note" style="margin-top:20px">
+          <b>读法建议。</b>全书四部不是并列的四个话题，而是一条论证链：
+          第一部讲<em>人的材料是什么</em>，第二部讲<em>用什么方法把这些材料造成一个国家</em>，
+          第三、四部讲<em>什么东西会把它拆掉</em>——主要是教权与迷信。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 第一部 论人 ================= -->
+<section class="sec sec--tint" id="man" data-nav="第一部" data-nav-t="论人：一切皆运动" data-nav-s="Ch. 1–16">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">第一部 · Of Man</span>
+      <h2>论人：一切皆运动</h2>
+      <p class="sec-sub">Chapters 1–16 · 质料（Matter）</p>
+      <p class="sec-lead">
+        霍布斯要造一个国家，先得知道造它用什么材料。他的答案是：<strong>人是一台机器</strong>，
+        而国家的材料就是人的激情。这一部看起来像心理学，其实是在为后面的政治结论铺路——
+        如果善是相对的，那么秩序就不能建立在"共同的善"上，只能建立在"共同的恐惧"上。
+      </p>
+    </header>
+
+    <div class="grid3 reveal" style="margin-bottom:34px">
+      <div class="card card--rust">
+        <h4>感觉即运动</h4>
+        <p>外物压迫感官，压力向内传到心脏，心脏再向外反压——这个来回的运动就是"感觉"。
+        想象与记忆是感觉的残留，是正在衰减的运动。人身上没有什么是非物质的"灵魂活动"。</p>
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:0">Ch. 1–2、6</p>
+      </div>
+      <div class="card card--brass">
+        <h4>语言与理性</h4>
+        <p>语言是人胜过动物的东西：它把"影像"变成可以运算的"名词"。于是推理成了计算——
+        "推理不外是计算"，即加与减。但语言也带来了动物没有的病：把名词当成实物，
+        于是说出<em>无意义的语词</em>（insignificant speech），进而推出荒谬。</p>
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:0">Ch. 4–5</p>
+      </div>
+      <div class="card card--sea">
+        <h4>激情与权力</h4>
+        <p>欲望与厌恶是运动的两种方向。幸福不是欲望的满足，而是"欲望从一种对象推进到另一种对象"的持续过程——
+        所以霍布斯说，人有一种<em>永不停歇的、对权力的追求，至死方休</em>。</p>
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:0">Ch. 6、11</p>
+      </div>
+    </div>
+
+    <div class="cols cols--narrow" style="margin-bottom:34px">
+      <div class="reveal">
+        <blockquote class="quote">
+          人的权力（普遍地看）就是他现在所拥有的、用以获取某种未来可见之善的手段。
+          <span class="en">The POWER of a man, (to take it universally,) is his present means, to obtain some future apparent Good.</span>
+          <cite>Leviathan, Ch. X</cite>
+        </blockquote>
+        <blockquote class="quote" style="margin-top:24px">
+          我首先要指出，全人类共有的普遍倾向，是一种永不停歇的、对权力的欲望，一欲之后又一欲，至死方休。
+          <span class="en">I put for a generall inclination of all mankind, a perpetuall and restlesse desire of Power after power, that ceaseth onely in Death.</span>
+          <cite>Leviathan, Ch. XI</cite>
+        </blockquote>
+      </div>
+
+      <div class="reveal">
+        <div class="card">
+          <h4>善是相对的——试一下</h4>
+          <p style="font-size:14px;color:var(--ink3);margin-bottom:14px">
+            霍布斯说：任何成为某人欲望对象的东西，他就称之为"善"；成为他厌恶对象的东西，就称之为"恶"。
+            既然欲望因人而异，善恶就没有共同尺度。切换下面的视角，看同一批行为如何换了名字。
+          </p>
+          <div class="toolbar" role="group" aria-label="观察视角">
+            <button class="chip" data-view="nature" aria-pressed="true">自然状态中</button>
+            <button class="chip" data-view="civil" aria-pressed="false">有法律的社会中</button>
+          </div>
+          <ul class="acts" id="actsList"></ul>
+          <p class="note" id="actsNote" style="margin-top:14px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3 style="font-size:22px;margin-bottom:14px">宗教的自然种子</h3>
+      <div class="cols cols--narrow">
+        <div class="prose">
+          <p>
+            在第一部结尾，霍布斯做了一件在当时极其危险的事：他不用启示、不用教会权威，
+            而是像研究植物一样研究宗教的<strong>自然成因</strong>。他的结论是，宗教源于两样东西：
+            对不可见力量的恐惧，以及对自己所恐惧之物的原因的无知。
+          </p>
+          <p>
+            这个分析不带嘲讽。霍布斯认为宗教倾向是人性的自然产物，问题只在于：
+            它一旦与政治纠缠，就会变成可以被利用的力量。谁掌握了"人们该恐惧什么、该相信什么"，
+            谁就握住了另一半主权——这正是第三、四部要处理的事。
+          </p>
+        </div>
+        <blockquote class="quote">
+          对不可见之物的恐惧，是每个人心中那被他本人称为宗教之物的自然种子；而对它的崇拜或恐惧若与我们所行不同，则被称为迷信。
+          <span class="en">This Feare of things invisible, is the naturall Seed of that, which every one in himself calleth Religion; and in them that worship, or feare that Power otherwise than they do, Superstition.</span>
+          <cite>Leviathan, Ch. XI</cite>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 自然状态 ================= -->
+<section class="sec" id="nature" data-nav="第二部 · 一" data-nav-t="自然状态：一切人反对一切人的战争" data-nav-s="Ch. 13 · 附模拟器">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">第二部 · Of Common-wealth</span>
+      <h2>自然状态：一切人反对一切人的战争</h2>
+      <p class="sec-sub">Chapters 13–15 · 战争从哪里来</p>
+      <p class="sec-lead">
+        霍布斯的推理很短，但每一步都咬得很紧。他没有假设人天生邪恶，
+        他假设的只是：<strong>人在能力上大致平等，而平等的希望在稀缺面前必然变成敌意。</strong>
+      </p>
+    </header>
+
+    <div class="cols cols--narrow" style="margin-bottom:36px">
+      <div class="reveal">
+        <ol class="tl">
+          <li><span class="yr">第一步</span><span class="tx"><b>能力的平等。</b>即使有人更强、更聪明，差距也不足以让任何人免于被最弱的人杀死——"最弱的人有足够的力量杀死最强的人"，无论是靠密谋还是靠与他人联合。</span></li>
+          <li><span class="yr">第二步</span><span class="tx"><b>希望的平等。</b>能力平等 → 达成目标的希望平等 → 当两人欲求同一件不能共享的东西时，就成了敌人。</span></li>
+          <li><span class="yr">第三步</span><span class="tx"><b>猜疑与先发制人。</b>为了自保，最合理的做法是抢先征服对方，直到再没有力量能威胁自己。</span></li>
+          <li><span class="yr">第四步</span><span class="tx"><b>荣耀。</b>还有一部分人，以在征服中观赏自己的权力为乐，其追求远超安全所需。于是即便安分守己的人也无法只靠防守而长期生存。</span></li>
+          <li><span class="yr">结论</span><span class="tx"><b>战争状态。</b>不是指时时刻刻在打仗，而是指"在整段时间里，通过战斗来解决争端的意志已为人所知"——像坏天气不在某一两场雨，而在连日阴沉的倾向。</span></li>
+        </ol>
+      </div>
+
+      <div class="reveal">
+        <div class="card card--rust">
+          <h4>三种争吵的原因</h4>
+          <ul style="margin:0;padding-left:1.2em;font-size:14.5px">
+            <li><b>竞争</b>（Competition）——为<em>得利</em>而侵犯</li>
+            <li><b>猜疑</b>（Diffidence）——为<em>安全</em>而侵犯</li>
+            <li><b>荣耀</b>（Glory）——为<em>名声</em>而侵犯</li>
+          </ul>
+          <p style="font-size:13.5px;color:var(--ink3);margin:12px 0 0">
+            第三种最要命：为了一句话、一个微笑、一个不同的意见，就足以让人互相毁灭。
+          </p>
+        </div>
+        <blockquote class="quote" style="margin-top:20px">
+          在这种状况下，没有勤劳的位置，因为成果不确定；因而没有土地的耕作，没有航海，
+          没有海外商品的输入，没有宽敞的建筑，没有移动重物的器械，没有关于地表的知识，没有时间的计算，
+          没有技艺，没有文字，没有社会；最糟的是，<em>持续的恐惧与暴力死亡的危险</em>。
+          而人的生命，<em>孤独、贫困、卑污、残忍而短寿</em>。
+          <span class="en">…no Arts; no Letters; no Society; and which is worst of all, continuall feare, and danger of violent death; And the life of man, solitary, poore, nasty, brutish, and short.</span>
+          <cite>Leviathan, Ch. XIII</cite>
+        </blockquote>
+      </div>
+    </div>
+
+    <!-- 模拟器 -->
+    <div class="reveal">
+      <h3 style="font-size:22px;margin-bottom:6px">把这段推理跑一遍</h3>
+      <p style="font-size:14.5px;color:var(--ink3);max-width:44em;margin-bottom:18px">
+        下面是 48 个互不隶属的人，在同一片土地上活动。改变三个参数，看他们是滑向战争，还是长出秩序。
+      </p>
+
+      <div class="sim" id="simBox">
+        <div class="sim-top">
+          <div class="sim-title">
+            自然状态模拟器
+            <small>48 人 · 无共同权力 · 相遇即需选择</small>
+          </div>
+          <div class="toolbar" style="margin:0">
+            <button class="chip" data-preset="war" aria-pressed="false">预设：没有共同权力</button>
+            <button class="chip" data-preset="hobbes" aria-pressed="true">预设：霍布斯的解</button>
+          </div>
+        </div>
+
+        <div class="sim-body">
+          <div class="sim-stage">
+            <canvas id="simCanvas" role="img" aria-label="自然状态模拟画面：若干个体在土地上移动、结盟或冲突"></canvas>
+            <div class="sim-badge" id="simBadge">待机</div>
+            <div class="sim-legend">
+              <span><i class="dot" style="background:#a99d8b"></i>独立个体</span>
+              <span><i class="dot" style="background:#8a6d2f"></i>已缔约</span>
+              <span><i class="dot" style="background:#9c3a1c"></i>主权者</span>
+              <span><i class="dot" style="background:#c9bda5"></i>已死亡</span>
+            </div>
+          </div>
+
+          <div class="sim-ctrl">
+            <div class="param">
+              <div class="param-h"><label for="pFear">对暴力死亡的恐惧</label><span class="v" id="vFear">85</span></div>
+              <p class="param-d">霍布斯眼中唯一能把人推出战争的激情。恐惧越高，越愿意为安全放弃权利。</p>
+              <input type="range" id="pFear" min="0" max="100" value="85" step="1" aria-describedby="vFear">
+            </div>
+            <div class="param">
+              <div class="param-h"><label for="pGlory">荣耀欲</label><span class="v" id="vGlory">25</span></div>
+              <p class="param-d">"以观赏自己的权力为乐"。荣耀越高，越倾向用武力解决问题。</p>
+              <input type="range" id="pGlory" min="0" max="100" value="25" step="1" aria-describedby="vGlory">
+            </div>
+            <div class="param">
+              <div class="param-h"><label for="pReason">理性（预见与算计）</label><span class="v" id="vReason">80</span></div>
+              <p class="param-d">理性本身不提供目的，它只是算出达成目的的手段——包括算出"缔约比掠夺划算"。</p>
+              <input type="range" id="pReason" min="0" max="100" value="80" step="1" aria-describedby="vReason">
+            </div>
+            <div class="toolbar" style="margin:14px 0 0">
+              <button class="btn btn--sm" id="simRun">运行</button>
+              <button class="btn btn--sm btn--ghost" id="simStep">单步</button>
+              <button class="btn btn--sm btn--ghost" id="simReset">重置</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-metrics">
+          <div class="metric"><div class="k">存活</div><div class="n" id="mAlive">48<small>/48</small></div></div>
+          <div class="metric"><div class="k">已缔约</div><div class="n" id="mPact">0<small>人</small></div></div>
+          <div class="metric"><div class="k">最大联盟</div><div class="n" id="mBig">1<small>人</small></div></div>
+          <div class="metric"><div class="k">冲突次数</div><div class="n" id="mWar">0</div></div>
+        </div>
+        <div class="sim-verdict" id="simVerdict">调整参数后点「运行」，看这片土地上会长出什么。</div>
+        <div class="sim-live" role="status" aria-live="polite" id="simLive"></div>
+      </div>
+
+      <div class="note" style="margin-top:16px">
+        <b>这是一个示意模型，不是霍布斯的原文。</b>真实的霍布斯没有做仿真，也没有说人会自动"结盟成利维坦"。
+        这里把论证的<em>逻辑结构</em>做成了可以拨动的形式：恐惧与理性推人走向缔约，荣耀推人走向掠夺；
+        而当联盟大到足以让人敬畏时，加入它比对抗它更划算——于是众人合成一个权力。
+        霍布斯本人对这一步的表述是<em>授权与代表</em>，那是下一节的事。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 从契约到利维坦 ================= -->
+<section class="sec sec--tint" id="covenant" data-nav="第二部 · 二" data-nav-t="从契约到利维坦" data-nav-s="Ch. 14–17 · 附让渡互动">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">第二部 · 出口在哪</span>
+      <h2>从契约到利维坦</h2>
+      <p class="sec-sub">Chapters 14–17 · 自然法、权利让渡、授权</p>
+      <p class="sec-lead">
+        战争状态不是死局。霍布斯说，把人推出战争的力量有两股：
+        <strong>对暴力死亡的恐惧</strong>，以及<strong>理性所提示的和平条款</strong>——后者就是"自然法"。
+        自然法不是法律，它没有强制力，它只是一些由理性算出来的、通向和平的定理。
+      </p>
+    </header>
+
+    <div class="grid3 reveal" style="margin-bottom:38px">
+      <div class="card card--rust">
+        <h4>第一条 · 寻求和平</h4>
+        <p>只要有希望得到和平，每个人就应当努力寻求和平；得不到时，才可以寻求并利用战争的一切助力与便利。</p>
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:0">这是唯一的"目的"条款，其余都是手段。</p>
+      </div>
+      <div class="card card--rust">
+        <h4>第二条 · 互相让渡权利</h4>
+        <p>当别人也愿意这样做时，为了和平与自保，一个人应当放弃自己对一切事物的权利，
+        并且满足于拥有与别人同等的自由——这就是<em>契约</em>的形式。</p>
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:0">放弃权利，要么是单纯放弃，要么是转让给某人。</p>
+      </div>
+      <div class="card card--rust">
+        <h4>第三条 · 履行契约</h4>
+        <p>人应当履行所订立的契约。没有这一条，契约就是空的，所有人对一切事物的权利仍然保留，我们仍在战争状态里。</p>
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:0">霍布斯由此定义正义：<em>正义就是履行契约</em>，不义就是违约。</p>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-bottom:38px">
+      <h3 style="font-size:22px;margin-bottom:6px">让渡权利：动手试一次</h3>
+      <p style="font-size:14.5px;color:var(--ink3);max-width:46em;margin-bottom:18px">
+        点下面任意一个人，或者点「让渡一个人」。十二个人都让渡之后，会发生一件事——注意看谁被漏在了契约之外。
+      </p>
+
+      <div class="cov">
+        <div class="cov-art">
+          <svg id="covSvg" viewBox="0 0 560 458" role="img" aria-labelledby="covTitle covDesc">
+            <title id="covTitle">权利让渡示意</title>
+            <desc id="covDesc">十二个人围成弧形站在下方，各自把权利让渡给上方的主权者。主权者本人不在契约之内。</desc>
+            <g id="covRing"></g>
+            <g id="covLinks"></g>
+            <g id="covSov"></g>
+            <g id="covPeople"></g>
+          </svg>
+        </div>
+        <div class="cov-side">
+          <div class="cov-count"><span id="covCount">0</span><small>/ 12 人已让渡</small></div>
+          <p class="cov-step" id="covStep">
+            十二个人各自保有自己的判断权。此刻还没有"公共人格"，只有十二个私人的判断。
+          </p>
+          <div class="cov-acts">
+            <button class="btn btn--sm" id="covOne">让渡一个人</button>
+            <button class="btn btn--sm btn--ghost" id="covAll">全部让渡</button>
+            <button class="btn btn--sm btn--ghost" id="covReset">重来</button>
+            <button class="chip" id="covToggle" aria-pressed="false">看看谁受契约约束</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols cols--wide reveal">
+      <div class="prose">
+        <h3 style="margin-top:0">但契约本身没有力量</h3>
+        <p>
+          到这里，霍布斯抛出了全书最著名的一句话。自然法、契约、正义——这些词听起来很结实，
+          但在没有强制力的时候，它们约束不了任何人。因为一个人只要违约能带来好处，
+          他就有理由违约；而别人也知道他会这么想。
+        </p>
+        <p>
+          所以问题变成了：<strong>用什么方法才能让契约真的算数？</strong>
+          霍布斯的答案不是道德，而是权力。不是让人变好，而是让人<em>不敢</em>违约。
+        </p>
+        <h3>授权与代表</h3>
+        <p>
+          具体的做法，是把所有人的人格统一到一个人格上。方法不是"同意"，也不是"协调"——
+          霍布斯特别强调，这比同意更深一层：它是<em>所有人在同一个人身上的真实统一</em>。
+        </p>
+        <p>
+          每个人对每个人说：我把统治我自己的权利让给你所指定的那个人，
+          条件是你也把你的权利让给他，并以同样方式授权他的一切行为。
+          说这话的时候，他并不是在跟主权者做交易——他是在跟<strong>其他每一个人</strong>做交易。
+        </p>
+        <div class="note note--rust" style="margin-top:22px">
+          <b>这是全书最容易被误读的一点。</b>主权者不在契约之中。他不是缔约的一方，
+          因此他不能违约；他的一切行为都由臣民授权，因此他不能被臣民控告。
+          你刚才在互动里看到的那条虚线，就是这个结构。
+        </div>
+      </div>
+
+      <div>
+        <blockquote class="quote">
+          没有剑的契约，不过是一纸空文，完全没有力量保障一个人。
+          <span class="en">And Covenants, without the Sword, are but Words, and of no strength to secure a man at all.</span>
+          <cite>Leviathan, Ch. XVII</cite>
+        </blockquote>
+        <blockquote class="quote" style="margin-top:26px">
+          这就产生了那个伟大的<em>利维坦</em>，或者更虔敬地说，那个<em>有朽的神</em>；
+          我们在不朽的上帝之下，要归功于他，才有我们的和平与防卫。
+          <span class="en">This is the Generation of that great LEVIATHAN, or rather (to speake more reverently) of that Mortall God, to which wee owe under the Immortall God, our peace and defence.</span>
+          <cite>Leviathan, Ch. XVII</cite>
+        </blockquote>
+        <blockquote class="quote" style="margin-top:26px">
+          国家的定义是：<em>一个人格</em>——一大群人通过彼此间的相互信约，使自己每一个人都成为这个人的行为的授权者，
+          以便他能够按其认为适当的方式，使用他们全体的力量与手段，来谋求他们的和平与共同防卫。
+          <span class="en">One Person, of whose Acts a great Multitude, by mutuall Covenants one with another, have made themselves every one the Author, to the end he may use the strength and means of them all, as he shall think expedient, for their Peace and Common Defence.</span>
+          <cite>Leviathan, Ch. XVII</cite>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 主权者 ================= -->
+<section class="sec" id="sovereign" data-nav="第二部 · 三" data-nav-t="主权者：有朽的神" data-nav-s="Ch. 18–19, 24–29">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">第二部 · 权力的清单</span>
+      <h2>主权者：有朽的神</h2>
+      <p class="sec-sub">Chapters 18–19 · 十二项权利，不可分割</p>
+      <p class="sec-lead">
+        霍布斯给了主权者一份极其彻底的清单。这份清单让同代人把他当成暴政的辩护人，
+        但他自己的论证方向恰恰相反：<strong>主权者的权力不是从天上来的，是从每个人的授权里来的</strong>——
+        正因为如此，它才必须足够大，否则它就完不成它的任务。
+      </p>
+    </header>
+
+    <div class="reveal" style="margin-bottom:38px">
+      <p style="font-size:14.5px;color:var(--ink3);max-width:46em;margin-bottom:16px">
+        点开任意一项，看霍布斯的理由。十二项合起来构成他所说的"主权的本质"。
+      </p>
+      <div class="powers" id="powersGrid"></div>
+      <div class="note" style="margin-top:16px">
+        <b>为什么不能分？</b>霍布斯的论据很务实，不是逻辑的而是功能性的：
+        如果主权者能立法但不能执行，法律就是空话；如果能征税但不能用兵，军队就养不起；
+        如果能用兵但管不了学说，人们就会被"对鬼神的恐惧"吓得造反。
+        他甚至直接说：<em>自相分裂的王国必不能站立</em>，并拿英国内战当例证。
+      </div>
+    </div>
+
+    <div class="cols cols--narrow reveal" style="margin-bottom:38px">
+      <div>
+        <h3 style="font-size:22px;margin-bottom:12px">三种政体</h3>
+        <div class="card" style="margin-bottom:12px">
+          <h4>君主制</h4>
+          <p>霍布斯倾向于此。理由不是君主更高贵，而是<em>君主的私人利益与公共利益最一致</em>——
+          国家的财富就是他的财富。而在贵族制或民主制里，掌权者会在公共事务中夹带私利，
+          且议事需要多数、需要结党，反而更容易分裂。</p>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <h4>贵族制</h4>
+          <p>少数人组成的会议掌握主权。霍布斯认为它在主权属性上与君主制等价，只是"议事之弊"更多。</p>
+        </div>
+        <div class="card">
+          <h4>民主制</h4>
+          <p>全体会议掌握主权。霍布斯承认它是合法的政体形式——
+          <em>他反对的从来不是民主本身，而是"主权可以被分割或被质疑"这件事。</em></p>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:22px;margin-bottom:12px">国家是一个人</h3>
+        <p style="font-size:14.5px;color:var(--ink2);margin-bottom:14px">
+          全书的《引言》把国家说成一件人造品——"那个被称为<em>国家</em>的伟大利维坦，其实是一个<em>人造的人</em>"，
+          而主权是它的灵魂。于是身体的每个部分都有了对应的政治器官：
+        </p>
+        <div class="bodymap">
+          <div><b>主权</b>人造的灵魂</div>
+          <div><b>官吏与法官</b>人造的关节</div>
+          <div><b>赏与罚</b>神经</div>
+          <div><b>资产与财富</b>力量</div>
+          <div><b>人民的安全</b>事业</div>
+          <div><b>参议</b>记忆</div>
+          <div><b>公道与法律</b>人造的理性与意志</div>
+          <div><b>和睦</b>健康</div>
+          <div><b>动乱</b>疾病</div>
+          <div><b>内战</b>死亡</div>
+        </div>
+        <p style="font-size:13px;color:var(--ink3);margin-top:12px">
+          这套比喻不是修辞游戏。它决定了第二部后半部分的写法：Ch.24–28 依次讲营养、生殖、参议、
+          民约法、罪行与刑罚，Ch.29 专门讲<em>这个身体会得的病</em>。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 自由的边界 ================= -->
+<section class="sec sec--tint" id="liberty" data-nav="第二部 · 四" data-nav-t="自由：法律的沉默之处" data-nav-s="Ch. 21 · 附情境测试">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">第二部 · 代价是什么</span>
+      <h2>自由：法律的沉默之处</h2>
+      <p class="sec-sub">Chapters 21, 29 · 服从的边界与国家的病</p>
+      <p class="sec-lead">
+        绝对主权听起来像是自由的终结。但霍布斯专门写了一章来界定臣民的自由，
+        而这一章意外地成了全书最"自由主义"的部分。
+        他的定义很短：<strong>臣民的自由，只存在于主权者未加规定的那些事情上。</strong>
+      </p>
+    </header>
+
+    <div class="cols cols--narrow reveal" style="margin-bottom:36px">
+      <div>
+        <blockquote class="quote">
+          臣民自由的范围，仅在于主权者在规范他们的行为时所<em>未曾规定</em>的那些事情：
+          比如买卖、以及彼此间订立契约的自由；选择自己的住所、饮食、职业，并按自己认为合适的方式教养子女，诸如此类。
+          <span class="en">The Liberty of a Subject, lyeth therefore only in those things, which in regulating their actions, the Soveraign hath prætermitted: such as is the Liberty to buy, and sell, and otherwise contract with one another; to choose their own aboad, their own diet, their own trade of life, and institute their children as they themselves think fit; &amp; the like.</span>
+          <cite>Leviathan, Ch. XXI</cite>
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>
+          注意霍布斯的"自由"是什么意思：<strong>自由 = 没有外在阻碍</strong>，
+          不是"自治"，也不是"参与统治"。一个人被锁链锁住是不自由；
+          一个人被法律禁止做某事，也是不自由，但他是<em>自愿</em>走进这个限制的。
+        </p>
+        <p>
+          这不是文字游戏。它把自由从"谁来统治"转移到了"实际活动空间有多大"，
+          这也是为什么二十世纪的共和主义者（佩蒂特、斯金纳）要把霍布斯当作最主要的对手——
+          他们主张真正的自由不是"没人拦你"，而是"没人能任意支配你"。
+        </p>
+        <p>
+          但霍布斯确实划出了几条不能放弃的底线。这些底线不是道德要求，而是逻辑上不可能放弃的：
+          因为放弃它们就等于放弃自我保全，而自我保全是契约存在的<em>目的</em>本身。
+        </p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3 style="font-size:22px;margin-bottom:6px">情境测试：臣民有没有拒绝的自由？</h3>
+      <p style="font-size:14.5px;color:var(--ink3);max-width:46em;margin-bottom:18px">
+        霍布斯的答案常常出人意料。先自己判断，再点开看他怎么说——注意区分"有没有自由拒绝"和"拒绝了会不会被惩罚"，
+        这两件事在他那里是分开的。
+      </p>
+
+      <div class="lb" id="lbBox">
+        <div class="lb-top">
+          <span class="p" id="lbProg">第 1 / 7 题</span>
+          <div class="toolbar" style="margin:0">
+            <button class="chip" id="lbRestart">重做</button>
+          </div>
+        </div>
+        <div class="lb-q">
+          <h4 id="lbQ"></h4>
+          <p class="ctx" id="lbCtx"></p>
+          <div class="lb-opts" id="lbOpts"></div>
+          <div class="lb-ans" id="lbAns" hidden>
+            <p class="vd" id="lbVerdict"></p>
+            <div id="lbWhy"></div>
+          </div>
+        </div>
+        <div class="lb-foot">
+          <button class="btn btn--sm" id="lbNext">下一题</button>
+          <span class="lb-score" id="lbScore">答对 0 / 0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols cols--wide reveal" style="margin-top:44px">
+      <div class="prose">
+        <h3 style="margin-top:0">国家会得的病</h3>
+        <p>
+          第二部最后一章（Ch.29）是全书最像临床诊断的一章。霍布斯把国家比作身体，
+          然后逐条列出"趋向解体"的病因。值得注意的是：他列出的头号病因，
+          不是外敌，也不是暴君，而是<em>关于主权归属的混乱观念</em>。
+        </p>
+        <ul>
+          <li><b>主权不绝对</b>——臣民还保留着可以自行判断善恶的自由，于是"每个人都是自己的法官"。</li>
+          <li><b>良心自由与私人判断</b>——谁都可以援引自己的良心拒绝服从，法律就失去了统一性。</li>
+          <li><b>主权可分割</b>——把立法、行政、军权、财权分给不同的人，等于把人切成几块。</li>
+          <li><b>财权与军权分离</b>——能征税的人不掌兵，掌兵的人没钱，两头都会想夺权。</li>
+          <li><b>迷信与鬼怪之说</b>——"对鬼神的恐惧"被用来对抗法律，这是他在第三、四部要打的靶子。</li>
+          <li><b>党争与私党</b>——比国家还忠诚的小团体，是"体内的蛔虫"。</li>
+          <li><b>城市过大、征服过广</b>——头重脚轻，难以维持。</li>
+        </ul>
+        <p>
+          这份清单很像是在描述刚刚发生的事：一个被宗教争论撕开、被党争拖住、
+          被"谁才有最终权威"这个问题拖进内战的英格兰。
+        </p>
+      </div>
+      <div>
+        <blockquote class="quote">
+          臣民对主权者的服从义务，被理解为只延续到——并且不多于——他用以保护他们的权力延续之时。
+          因为人在没有别人能保护自己时、依自然有权保护自己，这种权利是不能靠任何信约放弃的。
+          <span class="en">The Obligation of Subjects to the Soveraign, is understood to last as long, and no longer, than the power lasteth, by which he is able to protect them.</span>
+          <cite>Leviathan, Ch. XXI</cite>
+        </blockquote>
+        <div class="note" style="margin-top:22px">
+          <b>这一条比看起来激进。</b>服从的理由是"保护"，那么保护一旦失效，服从的理由就消失了。
+          主权者战败、流亡、无力维持秩序的时候，臣民可以转投新的主权者——这不是背叛，是自然权利。
+          霍布斯自己在 1651 年把书献给共和国，逻辑上正是从这里来的。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 第三、四部 黑暗王国 ================= -->
+<section class="sec sec--dark" id="darkness" data-nav="第三、四部" data-nav-t="黑暗王国：光被遮住的地方" data-nav-s="Ch. 32–47">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">第三部 &amp; 第四部</span>
+      <h2>黑暗王国：光被遮住的地方</h2>
+      <p class="sec-sub">Chapters 32–47 · 教权、迷信与虚妄的哲学</p>
+      <p class="sec-lead">
+        全书后半部分——整整十六章——都在处理宗教。现代读者常把它当作可以跳过的神学枝节，
+        但对霍布斯来说，这里才是主战场。他的判断很直接：
+        <strong>把英格兰推进内战的主要燃料，不是野心，是神学争论。</strong>
+        要止住内战，就得先拆掉"教会可以对抗君主"这个观念。
+      </p>
+    </header>
+
+    <div class="cols cols--narrow reveal" style="margin-bottom:40px">
+      <div class="prose">
+        <h3 style="margin-top:0">圣经怎么说主权</h3>
+        <p>
+          霍布斯的做法很特别：他不否认真启示，而是<em>逐卷重读圣经</em>，然后论证圣经本身支持他的结论。
+          他给出的几条要点：
+        </p>
+        <ul>
+          <li>
+            <b>"上帝之国"在圣经里主要指现世的统治。</b>上帝通过一个具体的人——先是亚伯拉罕，后来是以色列的列王——
+            来统治一个具体的民族，而不是通过一个跨国的祭司集团。
+          </li>
+          <li>
+            <b>亚伯拉罕既掌世俗权力，也掌宗教权力。</b>在圣经的开端，这两者从来没有分开过；
+            把它们分开是后来的发明。
+          </li>
+          <li>
+            <b>基督的国"不属于这个世界"。</b>（《约翰福音》18:36）所以基督在现世没有留下一个拥有强制权力的代理人。
+          </li>
+          <li>
+            <b>圣经之所以是法律，是因为主权者把它定为法律。</b>哪些书属于正典、经文该如何解释，
+            最终由主权者裁定——不是由教会裁定。
+          </li>
+        </ul>
+        <p>
+          于是教皇对世俗君主主张废黜权、教士主张免于世俗司法，在霍布斯看来都是对主权的僭越。
+          他把这列为国家解体的首要原因。
+        </p>
+        <div class="note" style="margin-top:22px">
+          <b>他到底信不信？</b>这是学界吵了一百年的问题。一派（如 Martinich）认为他是真诚的基督徒，
+          只是主张一种极简的、服从国家的宗教；另一派（如施特劳斯早年的解读、Curley）认为他是个小心翼翼的无神论者，
+          用圣经的语言掩护自己的结论。这个张力本身，就是读第三部最有意思的地方。
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3 style="margin-top:0">黑暗王国是什么</h3>
+        <p>
+          第四部只有一个主题：一个比喻。霍布斯说，在"未来的上帝之国"之外，
+          还有一个由人建立起来的"黑暗王国"。
+        </p>
+        <p>
+          它不是地狱，也不是魔鬼的地盘。它是一群人——他称之为<em>欺骗者的联盟</em>（a confederacy of deceivers）——
+          为了在现世取得对人的支配，用晦暗而错误的学说，去熄灭人身上的两道光：
+          <strong>自然之光</strong>（理性）与<strong>福音之光</strong>（圣经）。
+        </p>
+        <p>遮住这两道光的东西，他分成四类：</p>
+        <ul>
+          <li><b>对圣经的曲解</b>（Ch. 44）——把经文解释成支持教权凌驾于王权之上。</li>
+          <li><b>魔鬼学与异教残余</b>（Ch. 45）——精灵、鬼怪、仙女。霍布斯说这是多神教的残渣：
+          《圣经》里的"魔鬼"原意更接近"毁谤者"或"精神失常者"，不是一个有实体的幽灵。</li>
+          <li><b>虚妄的哲学</b>（Ch. 46）——主要针对亚里士多德：本质、实体形式、脱离物体的"实质"。
+          在霍布斯看来这些是<em>无意义的语词</em>，是把名词当成了实物。</li>
+          <li><b>荒诞的传统</b>（Ch. 46）——幽灵、巫术、仙女的传说，以及把它们当作真实存在来谈论的习惯。</li>
+        </ul>
+        <p>
+          Ch. 47 收尾时，他问了一个很尖锐的问题：<em>谁从黑暗中获利？</em>
+          他的回答是：那些用恐惧和晦暗的学说换取服从的人。
+        </p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3 style="font-size:22px;margin-bottom:6px">遮光实验：点掉遮蔽物，看人们剩下什么</h3>
+      <p style="font-size:14.5px;color:#a89d8c;max-width:46em;margin-bottom:18px">
+        两道光：理性（自然之光）与圣经（福音之光）。点击中间的遮板把它们移开。
+        注意——只留下一道光的时候，人们并没有真的看清。
+      </p>
+
+      <div class="cov" style="background:#201d19;border-color:#332e27">
+        <div class="cov-art" style="background:#1b1815">
+          <svg id="darkSvg" viewBox="0 0 500 400" role="img" aria-labelledby="darkTitle darkDesc">
+            <title id="darkTitle">黑暗王国的遮光示意</title>
+            <desc id="darkDesc">两道光——自然之光与福音之光——从上方向下照，中间有四块遮板分别遮挡它们，下方是一群处在暗中的人。点击遮板可将其移开。</desc>
+            <rect x="0" y="0" width="680" height="400" fill="#1b1815"/>
+            <g id="darkRays"></g>
+            <g id="darkLamps"></g>
+            <g id="darkSlabs"></g>
+            <g id="darkFolk"></g>
+          </svg>
+        </div>
+        <div class="cov-side" style="border-color:#332e27">
+          <div class="cov-count" style="color:#d98a5f"><span id="darkLit">0</span><small style="color:#a89d8c">/ 2 道光可达</small></div>
+          <p class="cov-step" id="darkStep" style="color:#c8bfb0">
+            四块遮板都在原位：理性被"虚妄的哲学"挡住，圣经被三种东西挡住。人们只剩下一件事——对不可见力量的恐惧。
+          </p>
+          <div class="cov-acts">
+            <button class="btn btn--sm btn--ghost" id="darkReset" style="color:#e9e3d8;border-color:#4a433a">全部复位</button>
+            <button class="chip" id="darkAll" aria-pressed="false" style="background:#201d19;border-color:#3b342a;color:#cfc4b2">全部移开</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 余论 ================= -->
+<section class="sec" id="legacy" data-nav="余论" data-nav-t="争议与遗产" data-nav-s="1651 → 今天">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">余论</span>
+      <h2>一本让所有人都生气的书</h2>
+      <p class="sec-sub">Reception · Critique · Afterlife</p>
+      <p class="sec-lead">
+        《利维坦》出版后，霍布斯发现自己两边都不讨好。
+        保皇党恨他，因为他把王权建立在<strong>人民的授权</strong>上，而不是神授；
+        共和派和教会恨他，因为他主张主权者有权决定什么是真理。
+        一个同时被国王派和国会派骂的人，多半说中了什么。
+      </p>
+    </header>
+
+    <div class="reveal" style="margin-bottom:44px">
+      <h3 style="font-size:22px;margin-bottom:6px">把整本书缩成一条链</h3>
+      <p style="font-size:14.5px;color:var(--ink3);max-width:46em;margin-bottom:16px">
+        点开任意一步。这条链的每一步都依赖上一步——这就是为什么霍布斯很难被"部分接受"。
+      </p>
+      <ol class="chain" id="chainList"></ol>
+    </div>
+
+    <div class="reveal" style="margin-bottom:44px">
+      <h3 style="font-size:22px;margin-bottom:14px">霍布斯 vs 洛克：同一个起点，两个方向</h3>
+      <p style="font-size:14.5px;color:var(--ink3);max-width:46em;margin-bottom:16px">
+        两人都从"自然状态"和"社会契约"出发。四十年后，洛克用同样的词汇推出了几乎相反的结论。
+      </p>
+      <div class="cmp-scroll">
+        <table class="cmp">
+          <caption>两列的分歧点，几乎全部来自对"自然状态"的不同描述。</caption>
+          <thead>
+            <tr><th scope="col">争点</th><th scope="col">霍布斯（1651）</th><th scope="col">洛克（1689）</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">自然状态</th>
+              <td>战争状态。没有共同权力，人人自危。</td>
+              <td>自由但不安全。有自然法约束，人们大体上还是守规矩的。</td>
+            </tr>
+            <tr>
+              <th scope="row">自然法来源</th>
+              <td>由自我保全的理性推演出来的定理，没有强制力。</td>
+              <td>上帝赋予、理性可以认识的道德法则，对所有人有约束力。</td>
+            </tr>
+            <tr>
+              <th scope="row">财产权</th>
+              <td>由主权者授予。没有主权者，就没有"你的和我的"。</td>
+              <td>劳动创造的自然权利，先于政治社会存在，政府的主要职责是保护它。</td>
+            </tr>
+            <tr>
+              <th scope="row">契约结构</th>
+              <td>众人<em>彼此</em>缔约，把权利授予主权者。<b>主权者不在契约内。</b></td>
+              <td>人民与政府之间是一种<em>信托</em>。政府违约，人民可以撤换它。</td>
+            </tr>
+            <tr>
+              <th scope="row">主权</th>
+              <td>绝对、不可分割、不可反抗。</td>
+              <td>有限、可分割（立法权至上但受限制）、人民保留反抗权。</td>
+            </tr>
+            <tr>
+              <th scope="row">最高目的</th>
+              <td>安全。秩序优先于一切。</td>
+              <td>自由与财产。没有自由的秩序不值得要。</td>
+            </tr>
+            <tr>
+              <th scope="row">会得的病</th>
+              <td>主权被分割、被质疑 → 内战。</td>
+              <td>政府越权、侵害信托 → 暴政。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid2 reveal" style="margin-bottom:32px">
+      <div class="card card--rust">
+        <h4>批评一：自然状态是虚构的</h4>
+        <p>最持久的一条。人类学证据是双向的：有学者（Keeley、Pinker）认为前国家社会的暴力死亡率远高于现代，
+        霍布斯比卢梭更接近事实；也有学者（Boehm 等）指出狩猎采集群体普遍存在强有力的平等主义机制与分享规范，
+        并非"一切人对一切人"。更根本的质疑是：即便有过某种暴力常态，
+        它也不足以推出"人天生反社会"——霍布斯需要的是一个人性论，拿到的却是一个模型。</p>
+      </div>
+      <div class="card card--rust">
+        <h4>批评二：绝对主权不是秩序的必需品</h4>
+        <p>宪政、联邦制、司法独立、成文宪法——这些制度在霍布斯的框架里都属于"主权被分割"，
+        按他的诊断全是病。但它们在现实中维持了长期秩序。
+        反过来说，霍布斯的辩护者会指出：这些制度最终都要回答"谁说了算"，
+        而霍布斯只是拒绝用含糊的答案回避这个问题。</p>
+      </div>
+      <div class="card card--brass">
+        <h4>批评三：主权者不受约束，谁来纠正他</h4>
+        <p>这是契约结构本身带来的问题。既然主权者不在契约之内，他就不能违约；
+        既然他的行为由全体授权，就没有人能控告他。霍布斯对此的答案是"没有人"——
+        而这正是批评者认为最危险的地方。他的回应只有一句：替代方案不是更好的裁判，而是内战。</p>
+      </div>
+      <div class="card card--brass">
+        <h4>批评四：他把自由定义得太窄</h4>
+        <p>霍布斯的自由是"没有外在阻碍"。伯林在《两种自由概念》里把他列为消极自由的极端代表，
+        同时指出这种自由与"自治"毫无关系。晚近的共和主义者（佩蒂特、斯金纳）提出另一种自由：
+        <em>无支配</em>——真正的自由不是"没人拦你"，而是"没人能任意支配你"。
+        一个没有实际干涉、但随时可以干涉的主人，在他们看来同样是奴役。</p>
+      </div>
+    </div>
+
+    <div class="cols cols--narrow reveal">
+      <div class="prose">
+        <h3 style="margin-top:0">他留下的东西</h3>
+        <ul>
+          <li><b>社会契约论的传统。</b>洛克、卢梭都从他这里出发，然后各自走开。没有霍布斯的"授权"概念，
+          就没有后来"政治权威来自被统治者同意"这套语言。</li>
+          <li><b>国际关系中的无政府状态。</b>国家之上没有更高的权力，各国只能自助——
+          这个类比被反复用来描述国际政治。它也被批评：国家不像个人那样脆弱，也不像个人那样人人互害，
+          而且国家之间其实有大量制度化的合作。</li>
+          <li><b>施密特。</b>《政治的神学》开篇那句"主权者就是决定例外状态的人"直接承自霍布斯的决断论。
+          但施密特也批评霍布斯：他把最终决断让给了法律，于是利维坦变成了一台机器，最终"从内部"死去。</li>
+          <li><b>罗尔斯。</b>《万民法》里的"现实乌托邦"构想，明确摆在与"霍布斯式现实主义"的对照中：
+          能否在没有绝对主权者的条件下，实现一个秩序良好、长期稳定的社会？罗尔斯认为能，霍布斯认为不能。</li>
+          <li><b>当代的每一次紧急状态。</b>疫情、战争、恐袭、金融危机——每一次"为了安全而收缩自由"的辩论，
+          都会回到霍布斯的问题：谁来划定边界，谁来宣布例外，以及那个划边界的人由谁约束。</li>
+        </ul>
+        <p>
+          这大概就是这本书三百年不过时的原因。它没有给出让人满意的答案，
+          但它把问题提得无法回避：<strong>秩序是有代价的，而问题从来不是"要不要付"，
+          而是"付多少、由谁决定"。</strong>
+        </p>
+      </div>
+      <div>
+        <blockquote class="quote">
+          主权者就是决定例外状态的人。
+          <span class="en">Souverän ist, wer über den Ausnahmezustand entscheidet.</span>
+          <cite>卡尔·施密特《政治的神学》(1922)</cite>
+        </blockquote>
+        <blockquote class="quote" style="margin-top:26px">
+          在霍布斯那里，自由人就是"在其力量和智慧所能办到的事情上，不受阻碍地做他愿意做的事的人"。
+          但一个人被强制时，与一个人被支配时，处境并不相同。
+          <span class="en">Freedom as non-interference vs. freedom as non-domination.</span>
+          <cite>菲利普·佩蒂特《共和主义》的出发点</cite>
+        </blockquote>
+        <div class="note" style="margin-top:22px">
+          <b>一个诚实的提醒。</b>这一节里的每一条批评都可以反过来被辩护，而且都有人辩护过。
+          《利维坦》之所以仍然是活的文本，正因为它是可以被持续争论的，
+          而不是因为它已经被判定对或错。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 自测 ================= -->
+<section class="sec sec--tint" id="quiz" data-nav="附录 · 一" data-nav-t="自测：你真的读懂了论证吗" data-nav-s="8 题">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">附录 · 自测</span>
+      <h2>自测：你真的读懂了论证吗</h2>
+      <p class="sec-sub">8 questions · 每题都有解析</p>
+      <p class="sec-lead">
+        这些题不是考记忆，而是考<em>论证的走向</em>。很多选项都"听起来像霍布斯"，但走错了一步。
+      </p>
+    </header>
+
+    <div class="quiz reveal" id="quizBox">
+      <div class="quiz-h">
+        <span class="p" id="qzProg">第 1 / 8 题</span>
+        <span class="p" id="qzScore">得分 0 / 8</span>
+      </div>
+      <div class="qz">
+        <p class="qq" id="qzQ"></p>
+        <div class="opts" id="qzOpts"></div>
+        <div class="fb" id="qzFb" hidden></div>
+      </div>
+      <div class="quiz-res" id="qzRes" hidden></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 术语表 ================= -->
+<section class="sec" id="glossary" data-nav="附录 · 二" data-nav-t="术语表" data-nav-s="可搜索">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">附录 · 术语</span>
+      <h2>术语表</h2>
+      <p class="sec-sub">Glossary · 输入关键词筛选</p>
+    </header>
+    <div class="reveal">
+      <div class="gl-tools">
+        <input class="gl-search" id="glSearch" type="search" placeholder="搜索术语，例如：主权、授权、自然法…" aria-label="搜索术语">
+        <span class="p" id="glCount" style="font-family:var(--mono);font-size:12px;color:var(--ink3);align-self:center"></span>
+      </div>
+      <dl class="gl-list" id="glList"></dl>
+      <p class="gl-empty" id="glEmpty" hidden>没有匹配的术语。换个词试试。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 金句 ================= -->
+<section class="sec sec--tint" id="quotes" data-nav="附录 · 三" data-nav-t="原文摘录" data-nav-s="中英对照">
+  <div class="wrap">
+    <header class="sec-h reveal">
+      <span class="sec-n">附录 · 原文</span>
+      <h2>原文摘录</h2>
+      <p class="sec-sub">英文照录 1651 年初版拼写</p>
+      <p class="sec-lead">
+        霍布斯的英文写得极硬，几乎没有修饰。下面这些句子在四百年里被反复引用，
+        值得看一眼它们本来的样子。
+      </p>
+    </header>
+    <div class="qs-grid reveal" id="qsGrid"></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>关于这一页</h4>
+        <p style="margin:0">
+          一份《利维坦》的互动导读。英文引文一律照录 1651 年初版拼写（<span style="font-family:var(--mono);font-size:12px">u/v</span> 与
+          <span style="font-family:var(--mono);font-size:12px">i/j</span> 未现代化），中文为通行译法并作必要疏通。
+          页面上的模拟器与图表是帮助理解论证结构的示意工具，<em>不是霍布斯的原文，也不是历史重建</em>。
+        </p>
+      </div>
+      <div>
+        <h4>文本</h4>
+        <ul>
+          <li>《利维坦》，黎思复、黎廷弼译，商务印书馆</li>
+          <li>Leviathan, ed. Richard Tuck, Cambridge</li>
+          <li>Leviathan, ed. Noel Malcolm, Clarendon</li>
+          <li>初版影印：British Library / EEBO</li>
+        </ul>
+      </div>
+      <div>
+        <h4>研究</h4>
+        <ul>
+          <li>施特劳斯《霍布斯的政治哲学》</li>
+          <li>Quentin Skinner, <i>Hobbes and Republican Liberty</i></li>
+          <li>Richard Tuck, <i>Hobbes: A Very Short Introduction</i></li>
+          <li>A. P. Martinich, <i>Hobbes</i></li>
+        </ul>
+      </div>
+    </div>
+    <p class="tiny">
+      单文件网页，零外部依赖，离线可开。图像全部为内联 SVG 手绘摹写，不引用任何外部资源。
+    </p>
+  </div>
+</footer>
+
+<button class="totop" id="btnTop" aria-label="回到顶部">↑</button>
+
+<script>
+(function () {
+'use strict';
+var NS = 'http://www.w3.org/2000/svg';
+var $ = function (id) { return document.getElementById(id); };
+var all = function (sel, root) { return [].slice.call((root || document).querySelectorAll(sel)); };
+
+/* ---------- 确定性随机 ---------- */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function mk(tag, attrs, parent) {
+  var el = document.createElementNS(NS, tag);
+  if (attrs) for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) el.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+/* ============================================================
+   1. 目录 / 进度 / 入场
+   ============================================================ */
+var dlg = $('drawer'), btnMenu = $('btnMenu'), btnClose = $('btnClose');
+var SECTIONS = all('section[data-nav]');
+(function buildDrawer() {
+  var list = $('drawerList'); if (!list) return;
+  var frag = document.createDocumentFragment();
+  SECTIONS.forEach(function (s) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#' + s.id;
+    var n = document.createElement('span'); n.className = 'n'; n.textContent = s.dataset.nav || '';
+    var t = document.createElement('span'); t.className = 't'; t.textContent = s.dataset.navT || '';
+    var sub = document.createElement('span'); sub.className = 's'; sub.textContent = s.dataset.navS || '';
+    t.appendChild(sub);
+    a.appendChild(n); a.appendChild(t);
+    a.addEventListener('click', function () { if (dlg && dlg.open) dlg.close(); });
+    li.appendChild(a); frag.appendChild(li);
+  });
+  list.appendChild(frag);
+})();
+if (btnMenu && dlg) {
+  btnMenu.addEventListener('click', function () { if (!dlg.open) dlg.showModal(); });
+}
+if (btnClose && dlg) btnClose.addEventListener('click', function () { dlg.close(); });
+if (dlg) dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+var progBar = $('progBar'), btnTop = $('btnTop'), topbar = document.querySelector('.topbar');
+var REVEAL = { els: [], io: null, ticking: false };
+
+/* 兜底扫描：把已经进入视口的元素直接标为显示。
+   只用 IntersectionObserver 有个坑——它的回调是异步投递的，投递时读的是「此刻」的相交状态，
+   而不是元素进入视口那一刻的状态。程序化跳转（目录锚点）或快速滚动时，元素在回调投递前
+   就已离开视口，于是永远停在 opacity:0，整块内容空白。每次滚动补扫一遍即可根治。 */
+function revealSweep() {
+  var els = REVEAL.els;
+  if (!els.length) return;
+  var lim = window.innerHeight - 40, left = 0, hit = [], i, e, r;
+  for (i = 0; i < els.length; i++) {          // 先集中读，避免读写交替触发重排
+    e = els[i];
+    if (e.classList.contains('in')) continue;
+    r = e.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) continue;   // 祖先 display:none，跳过
+    if (r.top < lim) hit.push(e); else left++;
+  }
+  for (i = 0; i < hit.length; i++) {          // 再统一写
+    hit[i].classList.add('in');
+    if (REVEAL.io) REVEAL.io.unobserve(hit[i]);
+  }
+  if (left === 0) REVEAL.els = [];            // 全部入场，停止扫描
+}
+function revealSoon() {
+  if (REVEAL.ticking) return;
+  REVEAL.ticking = true;
+  requestAnimationFrame(function () { REVEAL.ticking = false; revealSweep(); });
+}
+function onScroll() {
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  var p = h > 0 ? clamp(window.scrollY / h, 0, 1) : 0;
+  if (progBar) progBar.style.width = (p * 100).toFixed(2) + '%';
+  if (btnTop) btnTop.classList.toggle('show', window.scrollY > 700);
+  revealSoon();
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+if (btnTop) btnTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+(function reveal() {
+  REVEAL.els = all('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    REVEAL.els.forEach(function (e) { e.classList.add('in'); });
+    REVEAL.els = []; return;
+  }
+  REVEAL.io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); REVEAL.io.unobserve(en.target); } });
+  }, { rootMargin: '0px 0px -40px 0px', threshold: 0 });
+  REVEAL.els.forEach(function (e) { REVEAL.io.observe(e); });
+  revealSweep();
+})();
+
+/* ============================================================
+   2. 卷首版画：众人合成的身体
+   ============================================================ */
+(function frontis() {
+  var svg = $('frontis'), crowd = $('crowd'), field = $('fieldFolk');
+  if (!svg || !crowd) return;
+  var R = mulberry32(1651), CX = 340;
+  // 躯干轮廓（多边形，顺时针）。人群由"落在多边形内"的格点生成，
+  // 因此轮廓是精确可控的，不需要 clipPath —— 散开时众人才能自由离开身体。
+  var TORSO = [
+    [340, 186], [372, 189], [400, 198], [422, 214], [436, 236], [444, 262], [448, 292],
+    [446, 322], [440, 354], [432, 386], [424, 418], [418, 450], [412, 478], [408, 508],
+    [272, 508], [268, 478], [262, 450], [256, 418], [248, 386], [240, 354], [234, 322],
+    [232, 292], [236, 262], [244, 236], [258, 214], [280, 198], [308, 189]
+  ];
+  // 双臂是斜向的矩形带，末端正好落在剑柄 / 牧杖握把上
+  var ARM_L = [[383, 215], [129, 285], [143, 335], [397, 265]];
+  var ARM_R = [[297, 215], [551, 285], [537, 335], [283, 265]];
+  function inPoly(px, py, poly) {
+    var inside = false;
+    for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+      if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  }
+  var pts = [], dx = 15, dy = 15, xx, yy;
+  // 扫描范围必须覆盖双臂末端（x≈129 / 551），否则手臂会被网格边界截断
+  for (yy = 180; yy <= 512; yy += dy) {
+    for (xx = CX - 220; xx <= CX + 220; xx += dx) {
+      var jx = xx + (R() - .5) * 6, jy = yy + (R() - .5) * 5;
+      if (inPoly(jx, jy, TORSO) || inPoly(jx, jy, ARM_L) || inPoly(jx, jy, ARM_R)) {
+        pts.push({ x: jx, y: jy });
+      }
+    }
+  }
+  var frag = document.createDocumentFragment();
+  pts.forEach(function (p) {
+    var g = mk('g', { 'class': 'fig', transform: 'translate(' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ')' });
+    var inner = mk('g', { 'class': 'fig-in' });
+    var tx = 40 + R() * 600, ty = 64 + R() * 440;
+    inner.style.setProperty('--sx', (tx - p.x).toFixed(1));
+    inner.style.setProperty('--sy', (ty - p.y).toFixed(1));
+    var u = mk('use', { href: '#pwSym', x: -6, y: -15, width: 12, height: 15, 'class': 'fig-g' });
+    u.style.opacity = (0.72 + R() * 0.28).toFixed(2);
+    inner.appendChild(u); g.appendChild(inner); frag.appendChild(g);
+  });
+  crowd.appendChild(frag);
+
+  if (field) {
+    [[64, 546], [150, 552], [236, 544], [318, 553], [402, 545], [486, 554], [572, 546], [648, 540]]
+      .forEach(function (q) {
+        var g = mk('g', { 'class': 'form', transform: 'translate(' + q[0] + ',' + q[1] + ') scale(.85)' });
+        mk('use', { href: '#pwSym', x: -6, y: -15, width: 12, height: 15, 'class': 'fig-g' }, g);
+        field.appendChild(g);
+      });
+  }
+
+  var rng = $('spread'), valEl = $('spreadVal'), noteEl = $('spreadNote');
+  function applySpread() {
+    if (!rng) return;
+    var v = +rng.value, s = 1 - v / 100;
+    svg.style.setProperty('--spread', s.toFixed(3));
+    if (valEl) valEl.textContent = v + '% 聚合';
+    if (noteEl) {
+      noteEl.textContent = v >= 70
+        ? '众人合为一个人格：主权者。'
+        : v <= 30
+          ? '众人散开：每个人只服从自己的判断——这就是自然状态。'
+          : '正在聚合：授权正在发生。';
+    }
+  }
+  if (rng) {
+    rng.addEventListener('input', applySpread);
+    all('[data-spread]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var target = +b.dataset.spread, from = +rng.value, t0 = performance.now(), dur = 900;
+        (function anim(now) {
+          var t = clamp((now - t0) / dur, 0, 1);
+          var e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+          rng.value = Math.round(from + (target - from) * e);
+          applySpread();
+          if (t < 1) requestAnimationFrame(anim);
+        })(performance.now());
+      });
+    });
+  }
+  applySpread();
+})();
+
+/* ============================================================
+   3. 善的相对性
+   ============================================================ */
+(function acts() {
+  var list = $('actsList'), note = $('actsNote');
+  if (!list) return;
+  var DATA = {
+    nature: {
+      note: '<b>在没有共同权力、因而也没有法律的地方，这些词还不存在。</b>霍布斯说：在这种状况下，没有什么是不义的；' +
+            '暴力与欺诈反而是两种"主要德性"。这不是因为他欣赏它们，而是因为"正义"这个概念本身需要法律才能成立。',
+      rows: [
+        ['杀死一个可能威胁你的人', '无所谓正义或非义', 'v-free'],
+        ['抢走别人储存的食物', '无所谓正义或非义', 'v-free'],
+        ['用欺骗取得他人的信任', '无所谓正义或非义', 'v-free'],
+        ['在对方动手之前先动手', '无所谓正义或非义', 'v-free'],
+        ['遵守与他人的约定', '无所谓正义或非义', 'v-free']
+      ]
+    },
+    civil: {
+      note: '<b>有了主权者与法律之后，同一批行为全都有了名字。</b>霍布斯由此定义正义：<em>正义就是履行契约</em>，' +
+            '不义就是违约。注意这个定义是纯形式的——它没有说哪些契约是好的，只说契约必须被履行。',
+      rows: [
+        ['杀死一个可能威胁你的人', '杀人罪', 'v-sin'],
+        ['抢走别人储存的食物', '盗窃', 'v-sin'],
+        ['用欺骗取得他人的信任', '欺诈', 'v-sin'],
+        ['在对方动手之前先动手', '伤害', 'v-sin'],
+        ['遵守与他人的约定', '正义', 'v-virtue']
+      ]
+    }
+  };
+  function render(view) {
+    var d = DATA[view] || DATA.nature;
+    list.innerHTML = d.rows.map(function (r) {
+      return '<li><span class="a-n">' + r[0] + '</span><span class="a-v ' + r[2] + '">' + r[1] + '</span></li>';
+    }).join('');
+    if (note) note.innerHTML = d.note;
+  }
+  all('[data-view]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      all('[data-view]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      render(b.dataset.view);
+    });
+  });
+  render('nature');
+})();
+
+/* ============================================================
+   4. 全书结构条
+   ============================================================ */
+(function parts() {
+  var bar = $('partsBar'), info = $('partsInfo');
+  if (!bar || !info) return;
+  var P = [
+    { n: '第一部 · 论人', r: 'Ch. 1–16', w: 16, c: '#9c3a1c',
+      d: '<b>质料。</b>感觉、想象、语言、理性、激情、权力、宗教。霍布斯把人的心理拆解成运动，为的是说明一件事：善恶没有共同尺度，所以秩序不能建立在"共同的善"上，只能建立在"共同的恐惧"上。' },
+    { n: '第二部 · 论国家', r: 'Ch. 17–31', w: 15, c: '#8a6d2f',
+      d: '<b>形式。</b>自然状态、自然法、社会契约、授权与代表、主权者的十二项权利、三种政体、臣民的自由、国家的解体。全书的重心，也是被引用最多的部分。' },
+    { n: '第三部 · 论基督教国家', r: 'Ch. 32–43', w: 12, c: '#2b5654',
+      d: '<b>与圣经的较量。</b>逐卷重读圣经，论证"上帝之国"不是教会的现世统治；圣经之所以是法律，是因为主权者把它定为法律。这一部最常被跳过，却是理解霍布斯的关键。' },
+    { n: '第四部 · 论黑暗王国', r: 'Ch. 44–47', w: 4, c: '#4a433c',
+      d: '<b>病因诊断。</b>曲解圣经、魔鬼学与异教残余、虚妄的哲学、荒诞的传统——合起来是一个"欺骗者的联盟"，用晦暗的学说熄灭人身上的自然之光与福音之光。' },
+    { n: '综述与结论', r: 'A Review and Conclusion', w: 1, c: '#a99d8b',
+      d: '<b>收尾。</b>回应读者可能的反驳，重申全书的核心：服从的理由是保护；保护一旦失效，服从的理由也就消失了。' }
+  ];
+  var frag = document.createDocumentFragment();
+  P.forEach(function (p, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.style.flex = p.w + ' 0 0';
+    b.style.background = p.c;
+    b.title = p.n + '（' + p.r + '）';
+    b.setAttribute('aria-pressed', String(i === 0));
+    b.innerHTML = '<span style="padding:0 6px;overflow:hidden;text-overflow:ellipsis">' +
+      (p.w >= 4 ? p.w + ' 章' : '') + '</span>';
+    b.addEventListener('click', function () {
+      all('button', bar).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      info.innerHTML = '<b style="font-family:var(--serif);font-size:17px">' + p.n +
+        '</b> <span style="font-family:var(--mono);font-size:11.5px;color:var(--ink3)">' + p.r + '</span><br>' + p.d;
+    });
+    frag.appendChild(b);
+  });
+  bar.appendChild(frag);
+  info.innerHTML = '<b style="font-family:var(--serif);font-size:17px">' + P[0].n +
+    '</b> <span style="font-family:var(--mono);font-size:11.5px;color:var(--ink3)">' + P[0].r + '</span><br>' + P[0].d;
+})();
+
+/* ============================================================
+   5. 自然状态模拟器
+   ============================================================ */
+var SIM = (function simulator() {
+  var canvas = $('simCanvas');
+  if (!canvas) return null;
+  var ctx = canvas.getContext('2d');
+  var W = 1000, H = 600, N = 48, SEED = 20260925;
+  var R = mulberry32(SEED);
+  var P = { fear: 85, glory: 25, reason: 80 };
+  var A = [], pacts = [], nextPact = 1, tick = 0, wars = 0, deaths = 0, covenants = 0;
+  var status = 'idle', running = false, raf = 0;
+
+  function init() {
+    R = mulberry32(SEED);
+    A = []; pacts = []; nextPact = 1; tick = 0; wars = 0; deaths = 0; covenants = 0;
+    status = 'idle'; running = false;
+    for (var i = 0; i < N; i++) {
+      A.push({
+        x: 60 + R() * (W - 120), y: 60 + R() * (H - 120),
+        vx: (R() - .5) * 2.4, vy: (R() - .5) * 2.4,
+        hp: 100, res: 10 + R() * 20, alive: true, pact: 0, pw: 10, cool: 0
+      });
+    }
+  }
+  function pactOf(id) { for (var i = 0; i < pacts.length; i++) if (pacts[i].id === id) return pacts[i]; return null; }
+  function joinPact(a, id) {
+    var p = pactOf(id); if (!p) return;
+    if (p.members.indexOf(a) < 0) p.members.push(a);
+    a.pact = id;
+  }
+  function leavePact(a) {
+    var p = pactOf(a.pact); if (!p) return;
+    var i = p.members.indexOf(a); if (i >= 0) p.members.splice(i, 1);
+    a.pact = 0;
+    if (p.members.length < 2) {
+      p.members.forEach(function (m) { m.pact = 0; });
+      pacts.splice(pacts.indexOf(p), 1);
+    }
+  }
+  function mergePacts(keep, drop) {
+    var pk = pactOf(keep), pd = pactOf(drop);
+    if (!pk || !pd || pk === pd) return;
+    pd.members.forEach(function (m) { m.pact = keep; pk.members.push(m); });
+    pacts.splice(pacts.indexOf(pd), 1);
+  }
+  function resolve(a, b) {
+    var f = P.fear / 100, g = P.glory / 100, r = P.reason / 100;
+    var pa = a.pact ? pactOf(a.pact) : null, pb = b.pact ? pactOf(b.pact) : null;
+    var awe = Math.max(pa ? Math.min(pa.members.length, 22) / 22 : 0, pb ? Math.min(pb.members.length, 22) / 22 : 0);
+    var pc = f * (0.22 + 0.78 * r) - 0.52 * g + 0.46 * awe;
+    pc = clamp(pc, 0, 1);
+    if (R() < pc) {
+      covenants++;
+      if (a.pact && b.pact) mergePacts(a.pact, b.pact);
+      else if (a.pact) joinPact(b, a.pact);
+      else if (b.pact) joinPact(a, b.pact);
+      else {
+        var id = nextPact++;
+        pacts.push({ id: id, members: [a, b], cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 });
+        a.pact = id; b.pact = id;
+      }
+    } else {
+      wars++;
+      var pw = Math.max(1, a.pw), qw = Math.max(1, b.pw);
+      var aWins = R() < pw / (pw + qw);
+      var win = aWins ? a : b, lose = aWins ? b : a;
+      lose.hp -= 20 + R() * 26;
+      win.res += 5 + lose.res * 0.06;
+      if (lose.hp <= 0) {
+        lose.alive = false; deaths++;
+        if (lose.pact) leavePact(lose);
+      } else if (!lose.pact && win.pact) {
+        var wp = pactOf(win.pact);
+        if (wp && wp.members.length >= 5 && R() < 0.5) joinPact(lose, win.pact);
+      }
+    }
+  }
+  function step() {
+    if (status !== 'idle' && status !== 'running') return;
+    status = 'running';
+    tick++;
+    var i, j, a;
+    // 最大联盟 —— 它的存在本身会吸引别人靠拢（霍布斯所说的"敬畏"）
+    var big = null;
+    for (i = 0; i < pacts.length; i++) if (!big || pacts[i].members.length > big.members.length) big = pacts[i];
+    var pull = big ? (P.fear / 100) * Math.min(1, big.members.length / 24) : 0;
+    for (i = 0; i < A.length; i++) {
+      a = A[i];
+      if (!a.alive) continue;
+      if (a.cool > 0) a.cool--;
+      if (a.pact) {
+        // 联盟成员向重心收拢，但保持一个与人数成正比的松散半径
+        var p = pactOf(a.pact);
+        if (p) {
+          var dx = p.cx - a.x, dy = p.cy - a.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
+          var rest = 18 + p.members.length * 1.6;
+          if (d > rest) { a.vx += dx / d * (d - rest) * 0.004; a.vy += dy / d * (d - rest) * 0.004; }
+        }
+      } else {
+        a.vx += (R() - .5) * 0.95; a.vy += (R() - .5) * 0.95;
+      }
+      if (pull > 0.02 && (!a.pact || a.pact !== big.id)) {
+        var bx = big.cx - a.x, by = big.cy - a.y, bd = Math.sqrt(bx * bx + by * by) || 1;
+        var bk = Math.min(bd, 260) * 0.0011 * pull;
+        a.vx += bx / bd * bk; a.vy += by / bd * bk;
+      }
+      a.vx *= 0.965; a.vy *= 0.965;
+      var sp = Math.sqrt(a.vx * a.vx + a.vy * a.vy), mx = 3.2;
+      if (sp > mx) { a.vx = a.vx / sp * mx; a.vy = a.vy / sp * mx; }
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < 30) { a.x = 30; a.vx = Math.abs(a.vx); }
+      if (a.x > W - 30) { a.x = W - 30; a.vx = -Math.abs(a.vx); }
+      if (a.y < 30) { a.y = 30; a.vy = Math.abs(a.vy); }
+      if (a.y > H - 30) { a.y = H - 30; a.vy = -Math.abs(a.vy); }
+      a.res += 0.06;
+    }
+    // 相遇
+    var R2 = 42 * 42;
+    for (i = 0; i < A.length; i++) {
+      if (!A[i].alive) continue;
+      for (j = i + 1; j < A.length; j++) {
+        if (!A[j].alive) continue;
+        if (A[i].cool > 0 || A[j].cool > 0) continue;
+        if (A[i].pact && A[i].pact === A[j].pact) continue;
+        var ddx = A[j].x - A[i].x, ddy = A[j].y - A[i].y;
+        if (ddx * ddx + ddy * ddy > R2) continue;
+        A[i].cool = 10; A[j].cool = 10;
+        resolve(A[i], A[j]);
+      }
+    }
+    // 联盟重心与力量
+    for (i = 0; i < pacts.length; i++) {
+      var pp = pacts[i], sx = 0, sy = 0, m = 0;
+      for (j = 0; j < pp.members.length; j++) if (pp.members[j].alive) { sx += pp.members[j].x; sy += pp.members[j].y; m++; }
+      if (m) { pp.cx = sx / m; pp.cy = sy / m; }
+    }
+    for (i = 0; i < A.length; i++) {
+      a = A[i];
+      var pz = a.pact ? pactOf(a.pact) : null;
+      a.pw = 8 + a.res * 0.32 + (pz ? pz.members.length * 0.95 : 0);
+    }
+    // 终局判定
+    var alive = 0, biggest = 0;
+    for (i = 0; i < A.length; i++) if (A[i].alive) alive++;
+    for (i = 0; i < pacts.length; i++) {
+      var cnt = 0;
+      for (j = 0; j < pacts[i].members.length; j++) if (pacts[i].members[j].alive) cnt++;
+      if (cnt > biggest) biggest = cnt;
+    }
+    if (alive >= 8 && biggest >= alive) status = 'leviathan';
+    else if (alive <= 14 || (tick >= 900 && biggest <= 2 && wars >= 60)) status = 'war';
+    else if (tick >= 1800) status = 'timeout';
+  }
+  function stats() {
+    var alive = 0, inPact = 0, biggest = 1;
+    for (var i = 0; i < A.length; i++) if (A[i].alive) alive++;
+    for (i = 0; i < pacts.length; i++) {
+      var cnt = 0;
+      for (var j = 0; j < pacts[i].members.length; j++) if (pacts[i].members[j].alive) cnt++;
+      inPact += cnt; if (cnt > biggest) biggest = cnt;
+    }
+    return { alive: alive, inPact: inPact, biggest: biggest, wars: wars, deaths: deaths, covenants: covenants, tick: tick };
+  }
+  function scale() { return canvas.width / W; }
+  function resize() {
+    var cw = canvas.clientWidth || canvas.parentNode.clientWidth || 640;
+    var ch = Math.round(clamp(cw * 0.6, 240, 430));
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.style.height = ch + 'px';
+    canvas.width = Math.max(1, Math.round(cw * dpr));
+    canvas.height = Math.max(1, Math.round(ch * dpr));
+    draw();
+  }
+  function draw() {
+    var s = scale();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(s, 0, 0, s, 0, 0);
+    ctx.fillStyle = '#f2ebde'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(120,96,60,.09)'; ctx.lineWidth = 1;
+    for (var gx = 100; gx < W; gx += 100) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+    for (var gy = 100; gy < H; gy += 100) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+    var i, j, k;
+    // 联盟
+    for (i = 0; i < pacts.length; i++) {
+      var p = pacts[i], mem = [];
+      for (j = 0; j < p.members.length; j++) if (p.members[j].alive) mem.push(p.members[j]);
+      if (mem.length < 2) continue;
+      var rad = 0;
+      for (j = 0; j < mem.length; j++) {
+        var d = Math.sqrt(Math.pow(mem[j].x - p.cx, 2) + Math.pow(mem[j].y - p.cy, 2));
+        if (d > rad) rad = d;
+      }
+      var big = mem.length >= 12;
+      ctx.beginPath(); ctx.arc(p.cx, p.cy, rad + 20, 0, Math.PI * 2);
+      ctx.fillStyle = big ? 'rgba(156,58,28,.07)' : 'rgba(138,109,47,.08)';
+      ctx.fill();
+      ctx.strokeStyle = big ? 'rgba(156,58,28,.42)' : 'rgba(138,109,47,.34)';
+      ctx.setLineDash([5, 5]); ctx.lineWidth = 1.4; ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = big ? 'rgba(156,58,28,.28)' : 'rgba(138,109,47,.22)';
+      ctx.lineWidth = 1;
+      for (j = 0; j < mem.length; j++) {
+        ctx.beginPath(); ctx.moveTo(mem[j].x, mem[j].y); ctx.lineTo(p.cx, p.cy); ctx.stroke();
+      }
+      if (big) {
+        ctx.fillStyle = '#9c3a1c';
+        ctx.beginPath();
+        ctx.moveTo(p.cx - 13, p.cy - rad - 26);
+        ctx.lineTo(p.cx - 13, p.cy - rad - 38);
+        ctx.lineTo(p.cx - 7, p.cy - rad - 32);
+        ctx.lineTo(p.cx, p.cy - rad - 42);
+        ctx.lineTo(p.cx + 7, p.cy - rad - 32);
+        ctx.lineTo(p.cx + 13, p.cy - rad - 38);
+        ctx.lineTo(p.cx + 13, p.cy - rad - 26);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+    // 死亡
+    for (i = 0; i < A.length; i++) {
+      if (A[i].alive) continue;
+      ctx.beginPath(); ctx.arc(A[i].x, A[i].y, 3.2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(201,189,165,.75)'; ctx.fill();
+    }
+    // 个体
+    for (i = 0; i < A.length; i++) {
+      var a = A[i]; if (!a.alive) continue;
+      var pz = a.pact ? pactOf(a.pact) : null;
+      var big2 = pz && pz.members.length >= 12;
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, big2 ? 8 : pz ? 6.6 : 5.4, 0, Math.PI * 2);
+      ctx.fillStyle = big2 ? '#9c3a1c' : pz ? '#8a6d2f' : '#a99d8b';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(28,25,21,.22)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
+  var lastStatus = '';
+  function verdict() {
+    var s = stats();
+    var f = P.fear, g = P.glory, r = P.reason;
+    if (status === 'leviathan') {
+      return '<b>出现了共同权力。</b>存活者已经全部并入同一个联盟——一个能让人敬畏的力量。' +
+        '霍布斯会说：他们并不是变好了，只是找到了一个比互相掠夺更划算的选项。代价是，从此刻起，' +
+        '他们的自由只剩法律没有规定的那一部分。';
+    }
+    if (status === 'war') {
+      return '<b>没有长出秩序。</b>存活者只剩下 ' + s.alive + ' 人，冲突 ' + s.wars + ' 次。' +
+        '这正是霍布斯描述的那幅图景：不是人变坏了，而是没有一个共同权力能让契约生效——' +
+        '每个人的理性都告诉他，先动手比守约更安全。';
+    }
+    if (status === 'timeout') {
+      return '<b>时间到了，秩序没有成形。</b>存活 ' + s.alive + ' 人，最大联盟 ' + s.biggest + ' 人，冲突 ' + s.wars + ' 次。' +
+        '缔约发生过 ' + s.covenants + ' 次，但没有稳定下来。';
+    }
+    if (status === 'idle' && tick === 0) return '调整参数后点「运行」，看这片土地上会长出什么。';
+    if (g >= 60 && f < 45) return '<b>荣耀压过了恐惧。</b>人们宁可一战也不肯低头——这是霍布斯列出的第三种争吵原因：为名声而战。它最难平息，因为它不需要任何实际利益。';
+    if (f >= 55 && r < 40) return '<b>怕死，但算不清账。</b>恐惧只带来了逃散，没有带来契约。霍布斯说，光有恐惧不够，还得有理性能算出"缔约比掠夺划算"。';
+    if (f >= 55 && r >= 60) return '<b>恐惧加算计。</b>他们开始发现缔约比掠夺划算——联盟正在长大。这就是霍布斯说的：把人推出战争的，是激情加理性。';
+    if (f < 40 && r < 40) return '<b>既不怕死，也算不清账。</b>每个人只服从自己当下的欲望，没有任何理由为明天约束今天。';
+    return '正在演化……';
+  }
+  function hud() {
+    var s = stats();
+    var e;
+    if ((e = $('mAlive'))) e.innerHTML = s.alive + '<small>/' + N + '</small>';
+    if ((e = $('mPact'))) e.innerHTML = s.inPact + '<small>人</small>';
+    if ((e = $('mBig'))) e.innerHTML = s.biggest + '<small>人</small>';
+    if ((e = $('mWar'))) e.textContent = s.wars;
+    if ((e = $('simBadge'))) {
+      e.textContent = status === 'leviathan' ? '共同权力'
+        : status === 'war' ? '战争'
+          : status === 'timeout' ? '未成形'
+            : running ? '运行中 ' + tick : '待机';
+    }
+    if ((e = $('simVerdict'))) e.innerHTML = verdict();
+    if (status !== lastStatus) {
+      var live = $('simLive');
+      if (live && status !== 'idle') {
+        var msg = status === 'leviathan' ? '模拟结束：出现了共同权力。'
+          : status === 'war' ? '模拟结束：没有形成秩序。'
+            : status === 'timeout' ? '模拟结束：秩序没有成形。' : '';
+        if (msg) setTimeout(function () { live.textContent = msg; }, 620);
+      }
+      lastStatus = status;
+    }
+  }
+  function loop() {
+    raf = 0;
+    if (running) { if (status === 'running' || status === 'idle') step(); else running = false; }
+    draw(); hud();
+    if (running) raf = requestAnimationFrame(loop);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+  function bind(id, key, out) {
+    var el = $(id); if (!el) return;
+    function upd() { P[key] = +el.value; var o = $(out); if (o) o.textContent = el.value; hud(); draw(); }
+    el.addEventListener('input', upd); upd();
+  }
+  bind('pFear', 'fear', 'vFear');
+  bind('pGlory', 'glory', 'vGlory');
+  bind('pReason', 'reason', 'vReason');
+  var bRun = $('simRun');
+  if (bRun) bRun.addEventListener('click', function () {
+    if (status !== 'idle' && status !== 'running') { init(); }
+    running = !running;
+    bRun.textContent = running ? '暂停' : '运行';
+    kick();
+  });
+  var bStep = $('simStep');
+  if (bStep) bStep.addEventListener('click', function () { step(); draw(); hud(); });
+  function reset() {
+    init(); running = false;
+    if (bRun) bRun.textContent = '运行';
+    draw(); hud();
+  }
+  var bReset = $('simReset');
+  if (bReset) bReset.addEventListener('click', reset);
+  all('[data-preset]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      all('[data-preset]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      var v = b.dataset.preset === 'hobbes' ? { fear: 85, glory: 25, reason: 80 } : { fear: 5, glory: 92, reason: 12 };
+      ['pFear|fear|vFear', 'pGlory|glory|vGlory', 'pReason|reason|vReason'].forEach(function (spec) {
+        var q = spec.split('|'), el = $(q[0]);
+        if (el) { el.value = v[q[1]]; var o = $(q[2]); if (o) o.textContent = el.value; }
+      });
+      P.fear = v.fear; P.glory = v.glory; P.reason = v.reason;
+      reset();
+    });
+  });
+  init(); resize();
+  window.addEventListener('resize', resize);
+  if ('ResizeObserver' in window && canvas.parentNode) {
+    new ResizeObserver(function () { resize(); }).observe(canvas.parentNode);
+  }
+  return {
+    get params() { return { fear: P.fear, glory: P.glory, reason: P.reason }; },
+    get status() { return status; },
+    get metrics() { return stats(); },
+    get agents() { return A; },
+    get pacts() { return pacts; },
+    step: step, reset: reset, draw: draw,
+    run: function (n) { for (var i = 0; i < n; i++) { if (status !== 'running' && status !== 'idle') break; step(); } draw(); hud(); },
+    setParams: function (o) {
+      if (o.fear != null) { P.fear = o.fear; var e1 = $('pFear'); if (e1) { e1.value = o.fear; $('vFear').textContent = o.fear; } }
+      if (o.glory != null) { P.glory = o.glory; var e2 = $('pGlory'); if (e2) { e2.value = o.glory; $('vGlory').textContent = o.glory; } }
+      if (o.reason != null) { P.reason = o.reason; var e3 = $('pReason'); if (e3) { e3.value = o.reason; $('vReason').textContent = o.reason; } }
+    }
+  };
+})();
+
+/* ============================================================
+   6. 权利让渡
+   ============================================================ */
+var COV = (function covenant() {
+  var svg = $('covSvg');
+  if (!svg) return null;
+  var gRing = $('covRing'), gLinks = $('covLinks'), gSov = $('covSov'), gPeople = $('covPeople');
+  var CX = 280, CY = 165, RR = 205, N = 12;
+  var people = [], done = 0, ringOn = false, sovDone = false;
+  var TARGET = { x: 280, y: 178 };
+
+  // 主权者
+  (function drawSov() {
+    var g = mk('g', {}, gSov);
+    mk('path', {
+      d: 'M256 58 L256 40 L266 48 L274 30 L282 48 L290 28 L298 48 L306 40 L306 58 Z',
+      fill: 'var(--paper)', stroke: 'var(--ink)', 'stroke-width': 1.5, 'stroke-linejoin': 'round'
+    }, g);
+    mk('circle', { cx: 281, cy: 76, r: 17, fill: 'var(--paper)', stroke: 'var(--ink)', 'stroke-width': 1.6 }, g);
+    mk('circle', { cx: 275, cy: 74, r: 1.8, fill: 'var(--ink)' }, g);
+    mk('circle', { cx: 287, cy: 74, r: 1.8, fill: 'var(--ink)' }, g);
+    mk('path', { d: 'M281 93 C258 93 244 108 240 132 L232 170 L330 170 L322 132 C318 108 304 93 281 93 Z',
+      fill: 'var(--paper)', stroke: 'var(--ink)', 'stroke-width': 1.6, 'stroke-linejoin': 'round' }, g);
+    mk('path', { d: 'M281 100 L281 170', stroke: 'var(--ink3)', 'stroke-width': .8, fill: 'none' }, g);
+    var halo = mk('circle', { cx: 281, cy: 108, r: 74, fill: 'none', stroke: 'var(--rust)',
+      'stroke-width': 2, opacity: 0, 'stroke-dasharray': '4 6' }, g);
+    g.setAttribute('id', 'sovGroup');
+    halo.setAttribute('id', 'sovHalo');
+  })();
+
+  // 众人
+  for (var i = 0; i < N; i++) {
+    var ang = (30 + i * (120 / (N - 1))) * Math.PI / 180;
+    var px = CX + RR * Math.cos(ang), py = CY + RR * Math.sin(ang);
+    var g2 = mk('g', { 'class': 'person', transform: 'translate(' + px.toFixed(1) + ',' + py.toFixed(1) + ')', tabindex: 0, role: 'button' });
+    g2.setAttribute('aria-label', '让渡第 ' + (i + 1) + ' 个人的权利');
+    mk('circle', { cx: 0, cy: -17, r: 7.5, fill: 'var(--paper)', stroke: 'var(--ink2)', 'stroke-width': 1.4 }, g2);
+    var body = mk('path', { d: 'M-12 0 C-12 -10 -6 -14 0 -14 C6 -14 12 -10 12 0 Z',
+      fill: 'var(--paper2)', stroke: 'var(--ink2)', 'stroke-width': 1.4 }, g2);
+    (function (idx, gEl, px2, py2, bodyEl) {
+      var fn = function () { transfer(idx); };
+      gEl.addEventListener('click', fn);
+      gEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } });
+      people.push({ g: gEl, body: bodyEl, x: px2, y: py2 });
+    })(i, g2, px, py, body);
+    gPeople.appendChild(g2);
+  }
+
+  function transfer(idx) {
+    var p = people[idx];
+    if (!p || p.on) return;
+    p.on = true;
+    p.body.setAttribute('fill', 'var(--brass)');
+    p.body.setAttribute('stroke', 'var(--brass)');
+    p.g.querySelector('circle').setAttribute('fill', 'var(--brassbg)');
+    var tx = TARGET.x, ty = TARGET.y;
+    var dx = tx - p.x, dy = ty - (p.y - 26), L = Math.sqrt(dx * dx + dy * dy);
+    var ux = dx / L, uy = dy / L;
+    var ex = tx - ux * 46, ey = ty - uy * 46;
+    var link = mk('g', {}, gLinks);
+    mk('path', { d: 'M' + p.x + ' ' + (p.y - 26) + ' L' + ex + ' ' + ey,
+      stroke: 'var(--rust)', 'stroke-width': 1.5, fill: 'none', opacity: .62 }, link);
+    var nx = -uy, ny = ux;
+    mk('path', { d: 'M' + ex + ' ' + ey + ' L' + (ex - ux * 10 + nx * 5) + ' ' + (ey - uy * 10 + ny * 5) +
+      ' L' + (ex - ux * 10 - nx * 5) + ' ' + (ey - uy * 10 - ny * 5) + ' Z',
+      fill: 'var(--rust)', opacity: .62 }, link);
+    done++;
+    if (done === N) ignite();
+    update();
+  }
+  function ignite() {
+    sovDone = true;
+    var halo = $('sovHalo');
+    if (halo) halo.setAttribute('opacity', '.85');
+    var g = $('sovGroup');
+    if (g) { g.querySelectorAll('path,circle').forEach(function (n) { n.setAttribute('stroke', 'var(--rust)'); }); }
+  }
+  function update() {
+    var c = $('covCount'); if (c) c.textContent = done;
+    var s = $('covStep'); if (!s) return;
+    if (done === 0) s.innerHTML = '十二个人各自保有自己的判断权。此刻还没有"公共人格"，只有十二个私人的判断。';
+    else if (done < N) s.innerHTML = '已经让渡 <b>' + done + '</b> 人。每个人都是在对<em>其他每一个人</em>说：我把统治自己的权利让给他，条件是你也这样。注意箭头指向谁。';
+    else s.innerHTML = '<b>一个人格形成了。</b>这十二个人的力量合成了一个权力。但请打开下面那个开关——看看谁<em>不在</em>契约里面。';
+  }
+  function toggleRing() {
+    ringOn = !ringOn;
+    gRing.innerHTML = '';
+    var btn = $('covToggle');
+    if (btn) btn.setAttribute('aria-pressed', String(ringOn));
+    if (ringOn) {
+      mk('ellipse', { cx: 280, cy: 320, rx: 252, ry: 96, fill: 'none', stroke: 'var(--brass)',
+        'stroke-width': 1.8, 'stroke-dasharray': '7 7' }, gRing);
+      var t1 = mk('text', { x: 280, y: 442, 'text-anchor': 'middle', 'font-size': 13,
+        fill: 'var(--brass)', 'font-family': 'var(--serif)' }, gRing);      t1.textContent = '契约在众人彼此之间';
+      mk('path', { d: 'M281 176 L281 208', stroke: 'var(--rust)', 'stroke-width': 1.4,
+        'stroke-dasharray': '3 4', fill: 'none' }, gRing);
+      var t2 = mk('text', { x: 281, y: 24, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--rust)' }, gRing);
+      t2.textContent = '主权者不在契约之内';
+      var s = $('covStep');
+      if (s) s.innerHTML = '<b>这就是关键结构。</b>契约是众人<em>彼此之间</em>订立的；主权者不是缔约的一方。' +
+        '因此他不会违约，也不能被控告——你只能控告一个跟你有契约关系的人。';
+    } else {
+      update();
+    }
+  }
+  var bOne = $('covOne'), bAll = $('covAll'), bReset = $('covReset'), bTog = $('covToggle');
+  if (bOne) bOne.addEventListener('click', function () {
+    for (var i = 0; i < people.length; i++) if (!people[i].on) { transfer(i); break; }
+  });
+  if (bAll) bAll.addEventListener('click', function () {
+    people.forEach(function (p, i) { if (!p.on) transfer(i); });
+  });
+  if (bReset) bReset.addEventListener('click', function () {
+    people.forEach(function (p) {
+      p.on = false;
+      p.body.setAttribute('fill', 'var(--paper2)');
+      p.body.setAttribute('stroke', 'var(--ink2)');
+      p.g.querySelector('circle').setAttribute('fill', 'var(--paper)');
+    });
+    gLinks.innerHTML = ''; gRing.innerHTML = ''; ringOn = false;
+    var halo = $('sovHalo'); if (halo) halo.setAttribute('opacity', '0');
+    var g = $('sovGroup');
+    if (g) g.querySelectorAll('path,circle').forEach(function (n) { n.setAttribute('stroke', 'var(--ink)'); });
+    var t = $('covToggle'); if (t) t.setAttribute('aria-pressed', 'false');
+    done = 0; sovDone = false; update();
+  });
+  if (bTog) bTog.addEventListener('click', toggleRing);
+  update();
+  return {
+    get count() { return done; },
+    transfer: transfer,
+    all: function () { people.forEach(function (p, i) { if (!p.on) transfer(i); }); },
+    reset: function () { if (bReset) bReset.click(); },
+    toggleRing: toggleRing,
+    get ringOn() { return ringOn; }
+  };
+})();
+
+/* ============================================================
+   7. 主权者的十二项权利
+   ============================================================ */
+(function powers() {
+  var grid = $('powersGrid');
+  if (!grid) return;
+  var P = [
+    ['政体不可变更', '臣民不能改变政府的形式', '一旦通过多数决把主权授予某人或某个会议，少数不同意的人也必须一并同意——否则就是回到多数人用武力压服少数人的状态。',
+      'The Subjects cannot change the forme of government.'],
+    ['主权不可让渡', '主权权力不能被放弃', '主权者不能把主权转让给别人，也不能把它交还给人民；他一旦这么做，就等于解散了国家。',
+      'Soveraigne Power cannot be forfeited.'],
+    ['设立不可抗议', '任何人不能正当地反对由多数宣布建立的主权者', '因为在订立契约之前，多数决的规则本身就已经被同意了。抗议等于说自己不受自己订立的契约约束。',
+      'No man can without injustice protest against the Institution of the Soveraigne declared by the major part.'],
+    ['不可控告', '臣民不能正当地控告主权者的行为', '因为每个人的行为都由主权者代表，控告他就等于控告自己；而且，一旦允许臣民起诉主权者，就等于承认有一个高于主权者的裁判者。',
+      'The Soveraigns Actions cannot be justly accused by the Subject.'],
+    ['不可惩罚', '主权者所做的一切，臣民均不得加以惩罚', '惩罚是主权者的权力。臣民若自行惩罚主权者，就是在行使一项从未授予自己的权力。',
+      'What soever the Soveraigne doth, is unpunishable by the Subject.'],
+    ['判定和平所需与学说', '主权者是判定何者有利于和平与防卫的裁判者，并有权判定何种学说适宜教授', '这一条最受争议。霍布斯的理由是：关于善恶、正误的意见之争，正是内战的燃料；如果没有人有权裁定哪些学说可以公开教授，争论就没有终点。',
+      'The Soveraigne is judge of what is necessary for the Peace and Defence of his Subjects. And Iudge of what Doctrines are fit to be taught them.'],
+    ['立法', '制定规则之权，使每个臣民知道什么是自己的', '在主权者立法之前，不存在"你的和我的"——所有权是法律的产物，不是自然的产物。这一条直接把洛克堵死了。',
+      'The Right of making Rules, whereby the Subjects may every man know what is so his owne.'],
+    ['司法', '一切司法裁判与争议裁决之权', '争议必须有一个终审者。如果终审者缺位，争议就只能靠武力解决。',
+      'To him also belongeth the Right of all Judicature and decision of Controversies.'],
+    ['宣战与媾和', '按其认为最善的方式宣战与媾和之权', '对外只有一个意志，国家才能作为一个整体行动。',
+      'And of making War, and Peace, as he shall think best.'],
+    ['任免官吏', '选任一切参议、大臣与官吏之权', '包括平时与战时的官员。人事权是执行权的前提。',
+      'And of choosing all Counsellours, and Ministers; both of Peace, and Warre.'],
+    ['赏与罚', '奖赏与惩罚之权（在无前定法律衡量时应任意裁量）', '这是让法律真正落地的力量。没有赏罚，法律只是文字。',
+      'And of Rewarding, and Punishing, and that (where no former Law hath determined the measure of it) arbitrary.'],
+    ['荣衔与位次', '授予荣衔、规定位次之权', '荣誉的分配同样属于主权。霍布斯很清楚：人对"被看重"的渴望，是荣耀这种战争起因的燃料；谁能分配荣誉，谁就握住了这股燃料。',
+      'And of Honour and Order.']
+  ];
+  var frag = document.createDocumentFragment();
+  var detail = document.createElement('div');
+  detail.className = 'pw-detail'; detail.hidden = true;
+  P.forEach(function (p, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pw';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', 'pwDetail');
+    b.innerHTML = '<span class="no">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span>' +
+      '<span class="tx"><b>' + p[0] + '</b><i>' + p[1] + '</i></span>';
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('aria-expanded') === 'true';
+      all('.pw', grid).forEach(function (x) { x.setAttribute('aria-expanded', 'false'); });
+      if (open) { detail.hidden = true; return; }
+      b.setAttribute('aria-expanded', 'true');
+      detail.innerHTML = '<b style="font-family:var(--serif);font-size:16px;color:var(--ink)">' + p[0] +
+        '</b><p style="margin:8px 0 0">' + p[2] + '</p>' +
+        '<span class="en">' + p[3] + '</span>';
+      detail.hidden = false;
+      b.parentNode.appendChild(detail);
+    });
+    frag.appendChild(b);
+  });
+  detail.id = 'pwDetail';
+  grid.appendChild(frag);
+  grid.appendChild(detail);
+  detail.hidden = true;
+})();
+
+/* ============================================================
+   8. 自由的边界测试
+   ============================================================ */
+var LB = (function liberty() {
+  var box = $('lbBox');
+  if (!box) return null;
+  var Q = [
+    { q: '主权者向你征收一笔你认为过重的赋税。', ctx: '你所在的国家没有代议机关，也没有否决税案的渠道。',
+      a: 1, v: '必须服从。',
+      why: '课税权是主权的核心权利之一（Ch. 18 第 11、12 条一线）。霍布斯的逻辑很直接：没有财权，军权和司法权都无法运转。' +
+        '他认为主权者应当善用税负、量入为出，但这是<em>职责</em>问题，不是<em>权限</em>问题——臣民没有拒绝的<em>权利</em>。',
+      en: 'And of Rewarding, and Punishing… And of Honour and Order.' },
+    { q: '主权者命令你自杀。', ctx: '理由是你犯下了重罪，或者需要你以死来平息某种政治危机。',
+      a: 0, v: '有自由拒绝。',
+      why: '霍布斯说得很干脆：我授权他杀我，不等于我承诺在他命令时杀死自己。"说\'你愿意就杀我吧\'是一回事，说\'我要杀死自己\'是另一回事。"' +
+        '放弃自我保全是逻辑上不可能的事，因为自我保全正是契约存在的目的。',
+      en: 'No man is bound by the words themselves, either to kill himselfe, or any other man.' },
+    { q: '你被征召去参加一场你认为不义的战争。', ctx: '你的国家是侵略方，但法律要求你服役。',
+      a: 1, v: '必须服从。',
+      why: '这是霍布斯划界的地方，也是最容易被误解的一条。他确实说过臣民有"拒绝执行危险或不名誉的职务"的自由，' +
+        '但紧接着补了一个条件：<em>当拒绝服从会使主权被设立的目的落空时，就没有拒绝的自由</em>。' +
+        '国防恰恰是这个目的本身。至于战争正义与否——那是主权者的判断，不是你的。',
+      en: 'When therefore our refusall to obey, frustrates the End for which the Soveraignty was ordained; then there is no Liberty to refuse: otherwise there is.' },
+    { q: '主权者已经战败流亡，无力再保护你，但仍然要求你效忠。', ctx: '新的政权已经建立并维持着秩序。',
+      a: 0, v: '有自由拒绝。',
+      why: '服从的理由是保护。保护一旦消失，服从的理由就消失了——这不是背叛，而是自然权利的回归。' +
+        '霍布斯自己 1651 年把《利维坦》献给刚处死国王的共和国，逻辑上正是从这里来的。',
+      en: 'The Obligation of Subjects to the Soveraign, is understood to last as long, and no longer, than the power lasteth, by which he is able to protect them.' },
+    { q: '主权者就一桩罪行审问你，要求你自证其罪。', ctx: '他没有给你任何赦免的保证。',
+      a: 0, v: '有自由拒绝。',
+      why: '没有人能被契约约束去控告自己。但注意那个括号——<em>在没有赦免保证的情况下</em>。' +
+        '如果主权者先承诺赦免，情况就不同了：那时拒绝作证就变成了单纯的抗命。',
+      en: 'If a man be interrogated by the Soveraign, or his Authority, concerning a crime done by himselfe, he is not bound (without assurance of Pardon) to confesse it.' },
+    { q: '主权者规定了一种法定宗教，命令你在公开场合按此宣认。', ctx: '你内心并不相信。',
+      a: 1, v: '必须服从。',
+      why: '霍布斯把"内心的信仰"和"口头的宣认"严格分开。内心的信仰不能被命令产生，所以主权者管不到它；' +
+        '但<em>公开的宣认是一种服从的外在标记</em>，属于主权者可以规定的范围。这一条是他整个政教方案的地基。',
+      en: 'Profession with the tongue is but an externall thing, and no more than any other gesture whereby we signifie our obedience.' },
+    { q: '主权者命令你不许抵抗正在攻击你的人，任其伤害你。', ctx: '没有任何正当程序，也没有任何豁免。',
+      a: 0, v: '有自由拒绝。',
+      why: '这是 Ch. 21 原文里逐字列出的情形之一：不得抵抗攻击自己的人、不得放弃食物与医药。' +
+        '霍布斯的措辞是"<em>这个人仍有不服从的自由</em>"。同时他也很清楚：主权者仍然有权因此惩罚你——' +
+        '自由与惩罚并存，在他看来并不矛盾。',
+      en: 'If the Soveraign command a man… not to resist those that assault him; or to abstain from the use of food, ayre, medicine… yet hath that man the Liberty to disobey.' },
+    { q: '法院作出了对你不利的判决，你认为它明显不公。', ctx: '法院是主权者授权设立的，程序本身没有瑕疵。',
+      a: 1, v: '必须服从。',
+      why: '争议必须有一个终审者，否则就只能靠武力解决——这正是霍布斯要避免的局面。' +
+        '你可以认为判决错了，但你没有权利拒绝承认它的效力，因为拒绝就等于把自己置于裁判者之上。' +
+        '霍布斯的补救办法不是上诉到更高的权威，而是要求主权者本身<em>依公道与自然法来立法和任命法官</em>。',
+      en: 'To him also belongeth the Right of all Judicature and decision of Controversies.' }
+  ];
+  var idx = 0, score = 0, answered = 0, picked = [];
+  var OPTS = ['有自由拒绝', '必须服从'];
+  function render() {
+    var q = Q[idx];
+    var pe = $('lbProg'); if (pe) pe.textContent = '第 ' + (idx + 1) + ' / ' + Q.length + ' 题';
+    var qe = $('lbQ'); if (qe) qe.textContent = q.q;
+    var ce = $('lbCtx'); if (ce) ce.textContent = q.ctx;
+    var oe = $('lbOpts');
+    oe.innerHTML = OPTS.map(function (t, i) {
+      return '<button type="button" class="lb-opt" data-i="' + i + '"><span class="tag">' +
+        (i === 0 ? 'A' : 'B') + '</span>' + t + '</button>';
+    }).join('');
+    all('.lb-opt', oe).forEach(function (b) {
+      b.addEventListener('click', function () { answer(+b.dataset.i); });
+    });
+    var ae = $('lbAns'); if (ae) ae.hidden = true;
+    var ne = $('lbNext');
+    if (ne) ne.textContent = idx === Q.length - 1 ? '看结果' : '下一题';
+    updateScore();
+  }
+  function answer(i) {
+    var q = Q[idx];
+    var oe = $('lbOpts');
+    var btns = all('.lb-opt', oe);
+    btns.forEach(function (b) { b.disabled = true; });
+    var ok = i === q.a;
+    btns[i].setAttribute('data-pick', ok ? 'right' : 'wrong');
+    if (!ok) btns[q.a].setAttribute('data-reveal', '1');
+    answered++; if (ok) score++;
+    picked[idx] = { picked: i, correct: q.a, ok: ok };
+    var ae = $('lbAns');
+    ae.hidden = false;
+    var ve = $('lbVerdict');
+    ve.className = 'vd ' + (ok ? 'ok' : 'no');
+    ve.textContent = (ok ? '✓ 你的判断和霍布斯一致：' : '✗ 霍布斯的答案是：') + q.v;
+    $('lbWhy').innerHTML = '<p style="margin:0 0 10px">' + q.why + '</p>' +
+      '<span class="en" style="display:block;font-family:var(--mono);font-size:12px;color:var(--ink3);line-height:1.7">' + q.en + '</span>';
+    updateScore();
+  }
+  function updateScore() {
+    var e = $('lbScore'); if (e) e.textContent = '答对 ' + score + ' / ' + answered;
+  }
+  function next() {
+    if (idx < Q.length - 1) { idx++; render(); return; }
+    var ae = $('lbAns'); if (ae) ae.hidden = true;
+    var qe = $('lbQ');
+    if (qe) qe.textContent = '做完了。';
+    var ce = $('lbCtx');
+    if (ce) ce.textContent = '答对 ' + score + ' / ' + Q.length + '。';
+    var oe = $('lbOpts'); oe.innerHTML = '';
+    var ne = $('lbNext'); if (ne) ne.textContent = '重做';
+    ne.dataset.done = '1';
+    var msg = score >= 7 ? '<b>你已经抓住了霍布斯划界的方式。</b>关键不在于"该不该服从"，而在于把"有没有自由拒绝"和"拒绝了会不会被惩罚"当成两件事。'
+      : score >= 5 ? '<b>方向对了，但边界还需要再摸一遍。</b>回到 Ch. 21 的那句话：权利能否转让，取决于它能不能被转让而不违背契约的目的。'
+        : '<b>这些题几乎每一道都有陷阱。</b>建议回头看一眼第二部第四节里 Ch. 21 的原文——霍布斯的判断标准始终是同一把尺子：这项权利能不能被转让而不使自我保全落空。';
+    var d = document.createElement('div');
+    d.className = 'note'; d.style.marginTop = '16px'; d.innerHTML = msg;
+    var box2 = $('lbBox');
+    var old = box2.querySelector('.lb-result'); if (old) old.remove();
+    d.classList.add('lb-result');
+    box2.appendChild(d);
+  }
+  var bn = $('lbNext');
+  if (bn) bn.addEventListener('click', function () {
+    if (bn.dataset.done === '1') { idx = 0; score = 0; answered = 0; picked = []; bn.dataset.done = ''; render(); return; }
+    if (picked[idx]) next();
+  });
+  var br = $('lbRestart');
+  if (br) br.addEventListener('click', function () {
+    idx = 0; score = 0; answered = 0; picked = [];
+    if (bn) { bn.dataset.done = ''; bn.textContent = '下一题'; }
+    var old = $('lbBox').querySelector('.lb-result'); if (old) old.remove();
+    render();
+  });
+  render();
+  return {
+    get total() { return Q.length; },
+    get answers() { return Q.map(function (q) { return q.a; }); },
+    get state() { return { idx: idx, score: score, answered: answered }; },
+    pick: function (i) { var b = all('.lb-opt', $('lbOpts'))[i]; if (b && !b.disabled) b.click(); return this.state; },
+    next: function () { if (bn) bn.click(); }
+  };
+})();
+
+/* ============================================================
+   9. 遮光实验
+   ============================================================ */
+(function darkness() {
+  var svg = $('darkSvg');
+  if (!svg) return;
+  var gRays = $('darkRays'), gLamps = $('darkLamps'), gSlabs = $('darkSlabs'), gFolk = $('darkFolk');
+  var LAMPS = [{ x: 130, c: '#dfae63', n: '自然之光', s: '理性' }, { x: 370, c: '#ece2cf', n: '福音之光', s: '圣经' }];
+  var SLABS = [
+    { x: 26, y: 128, w: 200, h: 48, label: '虚妄的哲学', sub: '把"本质"当成实物', light: 0 },
+    { x: 274, y: 100, w: 200, h: 48, label: '曲解圣经', sub: '把经文读成教权至上', light: 1 },
+    { x: 274, y: 158, w: 200, h: 48, label: '荒诞的传统', sub: '仙女、巫术、幽灵', light: 1 },
+    { x: 274, y: 216, w: 200, h: 48, label: '魔鬼学', sub: '异教多神论的残渣', light: 1 }
+  ];
+  var off = [false, false, false, false];
+  var defs = mk('defs', {}, svg);
+  svg.insertBefore(defs, svg.firstChild);
+  defs.innerHTML =
+    '<linearGradient id="rg0" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#dfae63" stop-opacity=".40"/>' +
+    '<stop offset="1" stop-color="#dfae63" stop-opacity="0"/></linearGradient>' +
+    '<linearGradient id="rg1" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#ece2cf" stop-opacity=".38"/>' +
+    '<stop offset="1" stop-color="#ece2cf" stop-opacity="0"/></linearGradient>';
+  var rayEls = [], lampEls = [], slabEls = [], folkEls = [];
+  LAMPS.forEach(function (L, i) {
+    var cone = mk('polygon', {
+      points: (L.x - 12) + ',86 ' + (L.x - 132) + ',334 ' + (L.x + 132) + ',334',
+      fill: 'url(#rg' + i + ')', id: 'ray' + i
+    }, gRays);
+    rayEls.push(cone);
+    var g = mk('g', {}, gLamps);
+    mk('circle', { cx: L.x, cy: 58, r: 30, fill: L.c, opacity: .14 }, g);
+    mk('circle', { cx: L.x, cy: 58, r: 18, fill: L.c, opacity: .9 }, g);
+    mk('circle', { cx: L.x, cy: 58, r: 8, fill: '#1b1815', opacity: .35 }, g);
+    // 名称与副题合为一行，避免与遮板文字在垂直方向挤在一起
+    var t = mk('text', { x: L.x, y: 18, 'text-anchor': 'middle', 'font-size': 13, fill: L.c }, g);
+    t.textContent = L.n + ' · ' + L.s;
+    lampEls.push(g);
+  });
+  SLABS.forEach(function (S, i) {
+    var g = mk('g', { 'class': 'slab', tabindex: 0, role: 'button' }, gSlabs);
+    g.setAttribute('aria-label', '遮板：' + S.label);
+    mk('rect', { x: S.x, y: S.y, width: S.w, height: S.h, rx: 3, fill: '#26221c', stroke: '#4a433a', 'stroke-width': 1.4 }, g);
+    for (var hx = S.x + 8; hx < S.x + S.w - 6; hx += 9) {
+      mk('path', { d: 'M' + hx + ' ' + (S.y + 4) + ' L' + (hx + 5) + ' ' + (S.y + S.h - 4),
+        stroke: '#3a342c', 'stroke-width': 1 }, g);
+    }
+    var t = mk('text', { x: S.x + S.w / 2, y: S.y + 19, 'text-anchor': 'middle', 'font-size': 13.5, fill: '#e9e3d8' }, g);
+    t.textContent = S.label;
+    var t2 = mk('text', { x: S.x + S.w / 2, y: S.y + 37, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#9a8f80' }, g);
+    t2.textContent = S.sub;
+    (function (k) {
+      var fn = function () { off[k] = !off[k]; refresh(); };
+      g.addEventListener('click', fn);
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } });
+    })(i);
+    slabEls.push(g);
+  });
+  for (var i = 0; i < 16; i++) {
+    var x = 24 + i * (452 / 15), y = 356;
+    var g2 = mk('g', { transform: 'translate(' + x.toFixed(1) + ',' + y + ')' }, gFolk);
+    var head = mk('circle', { cx: 0, cy: -18, r: 7.5, fill: '#4a443c' }, g2);
+    var body = mk('path', { d: 'M-12 0 C-12 -11 -6 -15 0 -15 C6 -15 12 -11 12 0 Z', fill: '#4a443c' }, g2);
+    folkEls.push({ x: x, head: head, body: body });
+  }
+  function lum(x) {
+    // off[i] === true 表示第 i 块遮板已被移开，对应的光才能照下来
+    var w0 = off[0] ? Math.exp(-Math.pow((x - 130) / 112, 2)) : 0;
+    var w1 = (off[1] || off[2] || off[3]) ? Math.exp(-Math.pow((x - 370) / 112, 2)) : 0;
+    return clamp(0.13 + 0.87 * Math.min(1, w0 + w1), 0, 1);
+  }
+  function col(lit) {
+    var a = [74, 68, 60], b = [240, 231, 216], t = clamp(lit, 0, 1);
+    return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * t) + ',' +
+      Math.round(a[1] + (b[1] - a[1]) * t) + ',' + Math.round(a[2] + (b[2] - a[2]) * t) + ')';
+  }
+  function refresh() {
+    slabEls.forEach(function (g, i) { g.setAttribute('data-off', off[i] ? '1' : '0'); });
+    var l0 = off[0], l1 = off[1] || off[2] || off[3];
+    rayEls[0].setAttribute('opacity', l0 ? '1' : '.07');
+    rayEls[1].setAttribute('opacity', l1 ? '1' : '.07');
+    lampEls[0].querySelectorAll('circle').forEach(function (c, i) { if (i < 2) c.setAttribute('opacity', l0 ? (i === 0 ? '.14' : '.9') : '.08'); });
+    lampEls[1].querySelectorAll('circle').forEach(function (c, i) { if (i < 2) c.setAttribute('opacity', l1 ? (i === 0 ? '.14' : '.9') : '.08'); });
+    folkEls.forEach(function (f) {
+      var c = col(lum(f.x));
+      f.head.setAttribute('fill', c); f.body.setAttribute('fill', c);
+    });
+    var n = (l0 ? 1 : 0) + (l1 ? 1 : 0);
+    var le = $('darkLit'); if (le) le.textContent = n;
+    var se = $('darkStep');
+    if (se) {
+      if (n === 2) se.innerHTML = '<b>两道光都可达。</b>理性与圣经同时照进来——这是霍布斯认为唯一可能的状态。' +
+        '但注意它需要先拆掉全部四块遮板，其中三块挡的都是同一道光：这说明在他眼里，对圣经的争夺比哲学的谬误更危险。';
+      else if (n === 1 && l0) se.innerHTML = '<b>只剩理性。</b>人能算清利害，却不知道为何要守约——' +
+        '霍布斯会说，这样的秩序没有根。他的自然法需要两道光的配合：理性给出条款，而它之所以有分量，还需要别的东西。';
+      else if (n === 1) se.innerHTML = '<b>只剩圣经，而且是由别人解释的圣经。</b>这正是他所说的黑暗：' +
+        '不是没有光，而是<em>光被垄断了</em>。谁垄断解释权，谁就在事实上掌握了主权。';
+      else se.innerHTML = '<b>两道光都被遮住。</b>人们只剩下对不可见力量的恐惧，任人摆布。' +
+        '这就是黑暗王国——不是魔鬼的地盘，而是一群人靠晦暗的学说取得的支配。';
+    }
+  }
+  var br = $('darkReset');
+  if (br) br.addEventListener('click', function () { off = [false, false, false, false]; var b = $('darkAll'); if (b) b.setAttribute('aria-pressed', 'false'); refresh(); });
+  var ba = $('darkAll');
+  if (ba) ba.addEventListener('click', function () {
+    // off[i] === true 表示"已移开"。全开时再点应收起，否则全部移开。
+    var next = !off.every(function (v) { return v; });
+    off = [next, next, next, next];
+    ba.setAttribute('aria-pressed', String(next));
+    refresh();
+  });
+  refresh();
+})();
+
+/* ============================================================
+   10. 论证链
+   ============================================================ */
+(function chain() {
+  var list = $('chainList');
+  if (!list) return;
+  var C = [
+    ['人是一台机器', '感觉、想象、思想都是运动。人身上没有非物质的"灵魂活动"可以脱离身体起作用。'],
+    ['激情驱动人，而善是相对的', '任何成为某人欲望对象的东西，他就称之为"善"。既然欲望因人而异，善恶就没有共同尺度——所以秩序不能建立在"共同的善"上。'],
+    ['能力平等 → 希望的平等', '即使最弱的人也有足够的力量杀死最强的人。因此没有人能凭自己的能力获得安全。'],
+    ['稀缺把平等变成敌意', '当两人欲求同一件不能共享的东西时，他们就成了敌人。这不是因为人坏，是因为处境如此。'],
+    ['三种争吵的原因：竞争、猜疑、荣耀', '为得利、为安全、为名声。第三种最难平息，因为它不需要任何实际利益——一句话、一个微笑就够了。'],
+    ['自然状态 = 战争状态', '不是时时在打仗，而是"通过战斗解决争端的意志已为人所知"。在这种状态下，没有产业、没有艺术、没有社会，"人的生命孤独、贫困、卑污、残忍而短寿"。'],
+    ['战争状态下没有正义', '没有共同权力就没有法律，没有法律就无所谓不义。暴力和欺诈反而是"两种主要德性"。'],
+    ['对暴力死亡的恐惧 + 理性', '这两股力量把人推出战争：恐惧提供动机，理性提供条款。'],
+    ['自然法：寻求和平，互相让渡权利', '理性算出来的和平条款。第二条就是契约的形式：为了自保，放弃自己对一切事物的权利。'],
+    ['但契约没有剑就是空话', '一个人只要违约能得利，就有理由违约；别人也知道他会这么想。所以需要一个共同权力。'],
+    ['授权与代表 → 利维坦', '每个人对每个人说：我把统治自己的权利让给你指定的那个人。众人合成一个人格，这就是那个"有朽的神"。'],
+    ['主权者不在契约之内 → 不可控告、不可分割', '因此他不会违约，也不能被惩罚。而且这份权力不能分割——分掉任何一块，其他部分都会失效。'],
+    ['代价：自由只剩法律沉默之处', '臣民保留的自由，只存在于主权者未加规定的事情上。此外还有几条逻辑上无法转让的底线：自我保全。'],
+    ['危险：主权被质疑 → 国家的病 → 内战', '头号病因不是暴君，而是关于主权归属的混乱观念。这正好是他刚刚亲历的那场战争。']
+  ];
+  var frag = document.createDocumentFragment();
+  C.forEach(function (c, i) {
+    var li = document.createElement('li');
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-expanded', 'false');
+    b.innerHTML = '<b style="font-family:var(--serif);font-size:15.5px;color:var(--ink)">' + c[0] + '</b>';
+    var d = document.createElement('div');
+    d.className = 'cd'; d.hidden = true;
+    d.innerHTML = '<p>' + c[1] + '</p>';
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('aria-expanded') === 'true';
+      b.setAttribute('aria-expanded', String(!open));
+      d.hidden = open;
+    });
+    li.appendChild(b); li.appendChild(d); frag.appendChild(li);
+  });
+  list.appendChild(frag);
+})();
+
+/* ============================================================
+   11. 自测
+   ============================================================ */
+var QUIZ = (function quiz() {
+  var box = $('quizBox');
+  if (!box) return null;
+  var Q = [
+    { q: '霍布斯所说的"自然状态"，最准确的描述是哪一项？',
+      o: ['一种人人自由、和平共处的原始社会',
+          '没有共同权力使人敬畏时，人人为敌的状态——但并不意味着时时都在打仗',
+          '上帝之下、由自然法统治的道德秩序',
+          '一种只在远古存在过、如今已经消失的历史阶段'],
+      a: 1,
+      f: '霍布斯明确说，战争不在于战斗本身，而在于"整段时间里通过战斗解决争端的意志已为人所知"——就像坏天气不在某一两场雨。' +
+         '他也承认这种状态"也许从未在全世界普遍存在"，但它描述的是没有共同权力时的必然倾向，并且在内战中和国家之间仍然可见。' },
+    { q: '在自然状态中，为什么"正义"没有位置？',
+      o: ['因为人天生就是自私的', '因为自然法还没有被颁布', '因为没有人愿意遵守规则',
+          '因为没有共同权力就没有法律，没有法律就无所谓不义'],
+      a: 3,
+      f: '霍布斯的论证是法学的，不是心理学的：Where there is no common Power, there is no Law: where no Law, no Injustice。' +
+         '他甚至说，正义与不义"不是身体或心灵的机能"——如果它们是，那么一个独自活在世上的人也可以有正义，但这个词只有在社会中才有意义。' },
+    { q: '主权者为什么不能被臣民控告或惩罚？',
+      o: ['因为他是全体臣民授权的，每个人的行为都由他代表，控告他就等于控告自己',
+          '因为他掌握着军队', '因为他是上帝任命的', '因为他从不出错'],
+      a: 0,
+      f: '这是"授权"结构的直接推论，也是霍布斯与神授王权论的根本区别：主权者的豁免不是因为神圣，而是因为他是所有人的代理人。' +
+         '霍布斯还补了一条更务实的理由——一旦允许臣民起诉主权者，就等于承认存在一个高于主权者的裁判者，而那正是内战的起点。' },
+    { q: '"没有剑的契约不过是一纸空文"这句话在论证中起什么作用？',
+      o: ['说明人性本恶', '说明法律比道德更重要',
+          '说明契约要生效必须有一个共同权力作后盾，因此需要建立主权', '说明战争无法避免'],
+      a: 2,
+      f: '这句话是全书论证的转折点：从"自然法"转到"主权"。霍布斯并不是不相信道德，而是认为道德需要权力来兜底。' +
+         '注意他刚说完这句话就承认：自然法"只要人们有遵守的意愿、并且能安全地遵守，每个人就都会遵守"——问题恰恰出在"能安全地遵守"这个条件上。' },
+    { q: '霍布斯所说的"臣民的自由"，指的是什么？',
+      o: ['参与制定法律的权利', '法律未加规定之处，按自己的判断行事的空间',
+          '反抗暴政的权利', '不受任何外在约束的内心自由'],
+      a: 1,
+      f: '原文：The Liberty of a Subject, lyeth therefore only in those things, which in regulating their actions, the Soveraign hath prætermitted。' +
+         '注意霍布斯的"自由"是"没有外在阻碍"，不是"自治"。他明确嘲讽那些把自由理解为"免于法律"的人——那等于要求人人都可以支配他人的生命。' },
+    { q: '下面哪一项是臣民即使面对主权者的命令也保留的自由？',
+      o: ['拒绝缴纳赋税', '拒绝在公开场合宣认法定宗教',
+          '拒绝服从法院的判决', '拒绝自我控告、拒绝自杀、拒绝放弃抵抗攻击自己的人'],
+      a: 3,
+      f: '这些是逻辑上不能转让的权利：放弃它们就等于放弃自我保全，而自我保全是契约存在的目的。' +
+         '注意霍布斯同时说：臣民有拒绝的自由，主权者也有惩罚的权利，两者并不矛盾——自由说的是"你能不能做"，不是"做了会不会被罚"。' },
+    { q: '霍布斯为什么反对把主权分割成立法、行政、司法几部分？',
+      o: ['因为他支持君主专制', '因为分权在技术上效率太低',
+          '因为分割后的每一部分都完不成自己的功能，而且会互相争夺最高地位，结果是国家解体',
+          '因为只有一个人才能理解复杂的法律'],
+      a: 2,
+      f: '他的理由是功能性的，不是偏好性的。他举的例子很具体：若转让军权而保留司法权，司法权就无用；' +
+         '若让渡征税权，军权就无用；若放弃对学说的管辖，人们会被"对鬼神的恐惧"吓入叛乱。' +
+         '他引"自相分裂的王国必不能站立"，并直接拿英国内战当例证。' },
+    { q: '第三、四部用了十六章谈宗教，霍布斯的真实关切是什么？',
+      o: ['神学争论是内战的主要燃料，"教会可以对抗君主"这个观念必须被拆掉',
+          '他想证明上帝并不存在', '他想建立一套自己的教会制度',
+          '他只是在回应当时的神学争论，与政治无关'],
+      a: 0,
+      f: '他在第四部结尾说得直白：黑暗王国是一群"欺骗者"为了在现世取得支配而经营的。' +
+         '对霍布斯来说，谁能最终解释圣经，谁就在事实上掌握了一半主权——而一个主权被两套权威同时主张的国家，已经在内战里了。' }
+  ];
+  var idx = 0, score = 0, done = false;
+  function render() {
+    var q = Q[idx];
+    var pe = $('qzProg'); if (pe) pe.textContent = '第 ' + (idx + 1) + ' / ' + Q.length + ' 题';
+    var se = $('qzScore'); if (se) se.textContent = '得分 ' + score + ' / ' + Q.length;
+    var qe = $('qzQ'); if (qe) qe.textContent = q.q;
+    var oe = $('qzOpts');
+    oe.innerHTML = q.o.map(function (t, i) {
+      return '<button type="button" class="opt" data-i="' + i + '"><span class="k">' +
+        'ABCD'[i] + '</span><span>' + t + '</span></button>';
+    }).join('');
+    all('.opt', oe).forEach(function (b) {
+      b.addEventListener('click', function () { pick(+b.dataset.i); });
+    });
+    var fe = $('qzFb'); if (fe) fe.hidden = true;
+  }
+  function pick(i) {
+    if (done) return;
+    var q = Q[idx];
+    var btns = all('.opt', $('qzOpts'));
+    btns.forEach(function (b) { b.disabled = true; });
+    var ok = i === q.a;
+    btns[i].classList.add(ok ? 'right' : 'wrong');
+    if (!ok) btns[q.a].classList.add('right');
+    if (ok) score++;
+    var fe = $('qzFb');
+    fe.hidden = false;
+    fe.innerHTML = '<p style="margin:0 0 8px"><b>' + (ok ? '✓ 正确。' : '✗ 正确答案是 ' + 'ABCD'[q.a] + '。') + '</b></p>' +
+      '<p style="margin:0">' + q.f + '</p>';
+    var se = $('qzScore'); if (se) se.textContent = '得分 ' + score + ' / ' + Q.length;
+    setTimeout(function () {
+      if (idx < Q.length - 1) { idx++; render(); }
+      else { finish(); }
+    }, 1400);
+  }
+  function finish() {
+    done = true;
+    var oe = $('qzOpts'); oe.innerHTML = '';
+    var qe = $('qzQ'); qe.textContent = '';
+    var fe = $('qzFb'); fe.hidden = true;
+    var pe = $('qzProg'); pe.textContent = '完成';
+    var res = $('qzRes');
+    res.hidden = false;
+    var lvl = score >= 7 ? '读得很细' : score >= 5 ? '抓住了主干' : score >= 3 ? '需要再走一遍论证' : '建议从第二部重新开始';
+    var msg = score >= 7
+      ? '你已经能分辨"听起来像霍布斯"和"真的是霍布斯的论证"了。这套推理最难的地方在于每一步都环环相扣——你显然是顺着链条走的，而不是背结论。'
+      : score >= 5
+        ? '主干抓住了，但有几个地方掉进了"常识答案"的陷阱。建议重点回看：自然状态为什么不是历史描述，以及主权者为什么不在契约之内。'
+        : score >= 3
+          ? '有几处把霍布斯的结论和他的理由弄混了。他的结论往往看起来很极端，但理由通常很朴素——回到第二步"能力的平等"，后面很多都是它的推论。'
+          : '别急，这本书的论证是一条链，中间断一环后面就全乱了。建议按顺序从「自然状态」一节重新走一遍，特别留意每一步依赖上一步的方式。';
+    res.innerHTML = '<div class="big">' + score + '<small>/ ' + Q.length + ' 题</small></div>' +
+      '<p><b>' + lvl + '。</b>' + msg + '</p>' +
+      '<p style="color:var(--ink3);font-size:13px">想再来一次？刷新页面即可重做。</p>';
+  }
+  render();
+  return {
+    get total() { return Q.length; },
+    get answers() { return Q.map(function (q) { return q.a; }); },
+    get state() { return { idx: idx, score: score, done: done }; },
+    pick: function (i) { var b = all('.opt', $('qzOpts'))[i]; if (b && !b.disabled) b.click(); },
+    get feedback() { var f = $('qzFb'); return f && !f.hidden ? f.textContent : ''; }
+  };
+})();
+
+/* ============================================================
+   12. 术语表
+   ============================================================ */
+(function glossary() {
+  var list = $('glList'), input = $('glSearch'), empty = $('glEmpty'), cnt = $('glCount');
+  if (!list) return;
+  var G = [
+    ['自然状态', 'State of Nature', '没有共同权力使人敬畏时，人们所处的相互敌对的状况。霍布斯强调它不是一段历史时期，而是"没有共同权力时会怎样"的分析模型——在内战中和国家之间都能看到它的影子。'],
+    ['自然权利', 'Right of Nature / Jus Naturale', '每个人为了保全自己的生命，可以按自己的判断使用自己力量的自由。霍布斯特意把"权利"（自由去做或不做）与"法律"（被约束去做或不做）严格对立起来。'],
+    ['自然法', 'Law of Nature / Lex Naturalis', '由理性发现的、通向自我保全与和平的定理。它没有强制力，只是"如果想过得好，就该这么做"。霍布斯在 Ch. 14–15 一共列出十九条。'],
+    ['激情', 'Passions', '欲望、厌恶、恐惧、希望、荣耀等内在运动。霍布斯认为它们是政治的第一动力——国家不是靠道德维系的，而是靠激情之间的平衡。'],
+    ['权力', 'Power', '一个人现在所拥有的、用以获取某种未来可见之善的手段。它是一个关系性概念：权力只有相对于他人的权力才有意义，因此必然产生竞争。'],
+    ['契约', 'Covenant / Contract', '互相转让权利的约定。霍布斯区分"转让"（transfer）与"契约"（covenant）：契约是双方约定在将来某一时刻履行。'],
+    ['授权', 'Authorisation', '把自己行为的权利交给另一个人，使他的行为被视为你自己的行为。这是霍布斯整个代表理论的核心词。'],
+    ['代表', 'Representation', '一个人或一个会议以他人的名义行事。霍布斯的名言：使人格成为"一"的，是代表者的统一性，而不是被代表者的统一性。'],
+    ['主权者', 'Sovereign', '承担公共人格的那个人或那个会议。他不在契约之内，因此不会违约，也不能被臣民控告或惩罚。'],
+    ['利维坦', 'Leviathan', '《约伯记》中的海兽。霍布斯借它来命名那个由众人合成的国家人格——"有朽的神"。'],
+    ['有朽的神', 'Mortall God', '霍布斯对国家的最著名称呼。它暗示国家的权威是至高无上的（神），但又是人造的、会死的（有朽）。'],
+    ['按约建立的国家', 'Common-wealth by Institution', '人们彼此缔约、自愿服从一个主权者而形成的国家。与之相对的是"以武力建立的国家"。'],
+    ['以武力建立的国家', 'Common-wealth by Acquisition', '通过战争征服或父权支配形成的国家。霍布斯认为两者的主权属性完全相同，差别只在建立方式——因此服从的理由也一样：为了保命。'],
+    ['法律的沉默', 'Silence of the Law', '霍布斯对臣民自由的界定：凡是法律未加规定的事情，臣民就有按自己判断行事的自由，例如买卖、择居、择业、教养子女。'],
+    ['黑暗王国', 'Kingdome of Darknesse', '第四部的主题。它不是地狱，而是一个"欺骗者的联盟"：用晦暗而错误的学说熄灭人身上的自然之光与福音之光，以在现世取得对人的支配。'],
+    ['虚妄的哲学', 'Vain Philosophy', '霍布斯对经院化亚里士多德主义的称呼。核心指控是：把"本质""实体形式"这类名词当成可以脱离物体存在的实物，于是说出无意义的语词。'],
+    ['民约法', 'Civil Law', '主权者制定并用以区分是非的法律。霍布斯主张：民约法与自然法内容一致，但只有民约法有强制力，因此也只有它能在现实中约束人。'],
+    ['国家的解体', 'Dissolution of a Common-wealth', 'Ch. 29 的主题。霍布斯把国家比作身体，列出让它"生病"的原因——头号病因不是暴君，而是关于主权归属的混乱观念。']
+  ];
+  function render(kw) {
+    var k = (kw || '').trim().toLowerCase();
+    var rows = G.filter(function (g) {
+      if (!k) return true;
+      return (g[0] + g[1] + g[2]).toLowerCase().indexOf(k) >= 0;
+    });
+    list.innerHTML = rows.map(function (g) {
+      return '<div class="gl-item"><dt>' + g[0] + '<span>' + g[1] + '</span></dt><dd>' + g[2] + '</dd></div>';
+    }).join('');
+    if (empty) empty.hidden = rows.length > 0;
+    if (cnt) cnt.textContent = rows.length + ' / ' + G.length + ' 条';
+  }
+  if (input) input.addEventListener('input', function () { render(input.value); });
+  render('');
+})();
+
+/* ============================================================
+   13. 原文摘录
+   ============================================================ */
+(function quotes() {
+  var grid = $('qsGrid');
+  if (!grid) return;
+  var Q = [
+    ['在人的天性中，我们发现三种主要的争吵原因：第一是竞争，第二是猜疑，第三是荣耀。第一种使人为了得利而侵犯，第二种为了安全，第三种为了名声。',
+      'So that in the nature of man, we find three principall causes of quarrell. First, Competition; Secondly, Diffidence; Thirdly, Glory.', 'Ch. XIII'],
+    ['在这种状况下，没有勤劳的位置，因为成果不确定；因而没有技艺，没有文字，没有社会；最糟的是，持续的恐惧与暴力死亡的危险。而人的生命，孤独、贫困、卑污、残忍而短寿。',
+      '…no Arts; no Letters; no Society; and which is worst of all, continuall feare, and danger of violent death; And the life of man, solitary, poore, nasty, brutish, and short.', 'Ch. XIII'],
+    ['在这种状况下，没有什么是不义的。是与非、正义与不义的概念在这里没有位置。有暴力与欺诈，就是战争中的两种主要德性。',
+      'To this warre of every man against every man, this also is consequent; that nothing can be Unjust… Force, and Fraud, are in warre the two Cardinall vertues.', 'Ch. XIII'],
+    ['没有剑的契约，不过是一纸空文，完全没有力量保障一个人。',
+      'And Covenants, without the Sword, are but Words, and of no strength to secure a man at all.', 'Ch. XVII'],
+    ['这就产生了那个伟大的利维坦，或者更虔敬地说，那个有朽的神；我们在不朽的上帝之下，要归功于他，才有我们的和平与防卫。',
+      'This is the Generation of that great LEVIATHAN, or rather (to speake more reverently) of that Mortall God, to which wee owe under the Immortall God, our peace and defence.', 'Ch. XVII'],
+    ['我授权并放弃我统治自己的权利，交给这个人或这个会议，条件是你也把你的权利交给他，并以同样方式授权他的一切行为。',
+      'I Authorise and give up my Right of Governing my selfe, to this Man, or to this Assembly of men, on this condition, that thou give up thy Right to him, and Authorise all his Actions in like manner.', 'Ch. XVII'],
+    ['臣民自由的范围，仅在于主权者在规范他们的行为时所未曾规定的那些事情：比如买卖、以及彼此间订立契约的自由；选择自己的住所、饮食、职业，并按自己认为合适的方式教养子女，诸如此类。',
+      'The Liberty of a Subject, lyeth therefore only in those things, which in regulating their actions, the Soveraign hath prætermitted…', 'Ch. XXI'],
+    ['如果主权者命令一个人（即使是被正当判罪的）杀死、伤害或残害自己，或者不得抵抗攻击他的人，或者不得使用食物、空气、医药以及任何离开就无法活命的东西——这个人仍然有不服从的自由。',
+      'If the Soveraign command a man (though justly condemned,) to kill, wound, or mayme himselfe; or not to resist those that assault him; or to abstain from the use of food, ayre, medicine… yet hath that man the Liberty to disobey.', 'Ch. XXI'],
+    ['臣民对主权者的服从义务，被理解为只延续到——并且不多于——他用以保护他们的权力延续之时。',
+      'The Obligation of Subjects to the Soveraign, is understood to last as long, and no longer, than the power lasteth, by which he is able to protect them.', 'Ch. XXI'],
+    ['对不可见之物的恐惧，是每个人心中那被他本人称为宗教之物的自然种子。',
+      'This Feare of things invisible, is the naturall Seed of that, which every one in himself calleth Religion.', 'Ch. XI']
+  ];
+  grid.innerHTML = Q.map(function (q) {
+    return '<div class="qcard"><div class="cn">' + q[0] + '</div><span class="en">' + q[1] +
+      '</span><div class="src">Leviathan · ' + q[2] + '</div></div>';
+  }).join('');
+})();
+
+/* ============================================================
+   14. 调试出口
+   ============================================================ */
+window.__diag = {
+  get viewport() { return { w: window.innerWidth, h: window.innerHeight }; },
+  get overflow() {
+    var de = document.documentElement;
+    return { scrollWidth: de.scrollWidth, clientWidth: de.clientWidth, delta: de.scrollWidth - de.clientWidth };
+  },
+  get spread() { var e = $('spread'); return e ? +e.value : null; },
+  setSpread: function (v) { var e = $('spread'); if (e) { e.value = v; e.dispatchEvent(new Event('input')); } },
+  sim: SIM,
+  cov: COV,
+  liberty: LB,
+  quiz: QUIZ,
+  get dark() {
+    var l = $('darkLit');
+    return { lit: l ? +l.textContent : null, slabs: all('.slab').map(function (s) { return s.getAttribute('data-off'); }) };
+  },
+  get counts() {
+    return {
+      sections: SECTIONS.length,
+      drawer: all('#drawerList a').length,
+      powers: all('.pw').length,
+      chain: all('.chain li').length,
+      glossary: all('.gl-item').length,
+      quotes: all('.qcard').length,
+      crowd: all('#crowd .fig').length,
+      revealed: all('.reveal').length,
+      revealedIn: all('.reveal.in').length
+    };
+  }
+};
+})();
+</script>
+
+</body>
+</html>
